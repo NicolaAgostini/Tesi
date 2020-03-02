@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="5f02ac3c-4e9c-4116-909c-d0e7a5d89afe" name="Default Changelist" comment="" />
+    <list default="true" id="5f02ac3c-4e9c-4116-909c-d0e7a5d89afe" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/Dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/Dataset.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -13,8 +15,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Dataset.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="394">
-              <caret line="286" column="40" selection-start-line="286" selection-start-column="40" selection-end-line="286" selection-end-column="40" />
+            <state relative-caret-position="245">
+              <caret line="413" lean-forward="true" selection-start-line="413" selection-end-line="413" />
             </state>
           </provider>
         </entry>
@@ -104,12 +106,12 @@
       <workItem from="1582885749156" duration="1979000" />
       <workItem from="1582890280550" duration="2580000" />
       <workItem from="1582973937323" duration="20144000" />
-      <workItem from="1583173782370" duration="21000" />
+      <workItem from="1583173782370" duration="4228000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="25676000" />
+    <option name="totallyTimeSpent" value="29883000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="877" extended-state="6" />
@@ -172,8 +174,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Dataset.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="394">
-          <caret line="286" column="40" selection-start-line="286" selection-start-column="40" selection-end-line="286" selection-end-column="40" />
+        <state relative-caret-position="245">
+          <caret line="413" lean-forward="true" selection-start-line="413" selection-end-line="413" />
         </state>
       </provider>
     </entry>

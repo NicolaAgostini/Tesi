@@ -212,7 +212,7 @@ class Dataset():
     def clean_dataset(self, which_part):  # works on video file
         """
         :param which_part:
-        :return: the dataset without the videos where the car stopped before 10 secs
+        :return: the dataset (video and info files) without the videos where the car stopped before 10 secs
         """
 
 
@@ -269,22 +269,24 @@ class Dataset():
         data = {}
         data["videos"] = []
         print("generating groundtruth file for all the videos")
-        for info_name in tqdm(os.listdir(path + "/bdd100k/info1/100k/" + which_part + "/")):
+        for info_name in tqdm(os.listdir(path + "/bdd100k/info/100k/" + which_part + "/")):
             #print(info_name)
             if not info_name.startswith('.'):
 
                 try:
-                    with open(path + "/bdd100k/info1/100k/" + which_part + "/"+info_name, 'r') as f:
+                    with open(path + "/bdd100k/info/100k/" + which_part + "/"+info_name, 'r') as f:
                         try:
                             info = json.load(f)
                             i = 0
                             has_stopped = False
+                            not_consider = False
                             for v in info["locations"]:  # not consider sequences where car vel < 5 in the first 10 sec
 
                                 if v["speed"] < threshold:
                                     if i < 10:
-                                        #break  # i don't consider the file if stopped in less than 10 secs
-                                        raise InputError("ERROR: event of stopping in less than 10 secs")
+                                        not_consider = True
+                                        break  # i don't consider the file if stopped in less than 10 secs
+                                        #raise InputError("ERROR: event of stopping in less than 10 secs")
                                     data["videos"].append({
                                         "filename": os.path.splitext(info_name)[0],
                                         "stop": i
@@ -293,11 +295,13 @@ class Dataset():
                                     break
 
                                 i += 1
-                            if has_stopped == False:
+                            if has_stopped == False and not_consider == False:
                                 data["videos"].append({
                                     "filename": os.path.splitext(info_name)[0],
                                     "stop": "No"
                                 })
+                        except ValueError:  # includes simplejson.decoder.JSONDecodeError
+                            print("Decoding JSON:  "+info_name+" has failed")
 
                         except InputError as error:
                             print('A New Exception occured: ', error.message)
@@ -312,7 +316,91 @@ class Dataset():
         with open(path + "/bdd100k/groundtruth/" + which_part + "/info.json", 'w+') as outfile:
             json.dump(data, outfile)
 
-    #def handle_observedframes(self):
+
+    def handle_positiveframes(self, which_part):  # prerequisites: the videos have to be subsampled at 5 fps and groundtruth.json file available
+        for i in range(3):
+            if "val" in which_part:
+                try:
+                    os.makedirs(path + "/bdd100k/" + "test" + "/positivi" + (i + 1))
+                except FileExistsError:
+                    print("directory already exists")
+                    pass
+
+                if i == 0:
+
+                    try:
+                        os.makedirs(path + "/bdd100k/" + "test" + "/negativi")
+                    except FileExistsError:
+                        print("directory already exists")
+                        pass
+            else:
+                try:
+                    os.makedirs(path + "/bdd100k/"+"train" + "/positivi"+(i+1))
+                except FileExistsError:
+                    print("directory already exists")
+                    pass
+
+                if i == 0:
+
+                    try:
+                        os.makedirs(path + "/bdd100k/"+"train" + "/negativi")
+                    except FileExistsError:
+                        print("directory already exists")
+                        pass
+
+        for i in range(3):
+            try:
+                with open(path + "/bdd100k/groundtruth/" + which_part + "/info.json", 'r') as f:
+                    try:
+                        info = json.load(f)
+
+
+                        for v in info["videos"]:  # not consider sequences where car vel < 5 in the first 10 sec
+
+                            if v["stop"] != "No":
+
+                                if v["stop"] >=10*(i+1) and v["stop"] < 10*(i+2):
+
+                                    name = v["filename"]
+                                    if "train" in which_part:
+                                        if not os.path.exists(path + "/bdd100k/train/positivi" + str(i+1) + "/" + name + ".mp4"):
+                                            copyfile(path + "/bdd100k/video5fps/" + which_part+"/" + name + ".mp4",
+                                                     path + "/bdd100k/train/positivi" + str(i+1) + "/" + name + ".mp4")
+                                    else:
+                                        if "val" in which_part:
+                                            if not os.path.exists(path + "/bdd100k/test/positivi" + str(i+1) + "/" + name + ".mp4"):
+                                                copyfile(path + "/bdd100k/video5fps/" + which_part + "/" + name + ".mp4",
+                                                         path + "/bdd100k/test/positivi" + str(i+1) + "/" + name + ".mp4")
+
+                            else:
+                                if v["stop"] == "No":
+                                    name = v["filename"]
+                                    if "train" in which_part:
+                                        if not os.path.exists(
+                                                path + "/bdd100k/train/negativi" + "/" + name + ".mp4"):
+                                            copyfile(path + "/bdd100k/video5fps/" + which_part + "/" + name + ".mp4",
+                                                     path + "/bdd100k/train/negativi" + "/" + name + ".mp4")
+                                    else:
+                                        if "val" in which_part:
+                                            if not os.path.exists(
+                                                    path + "/bdd100k/test/negativi" + "/" + name + ".mp4"):
+                                                copyfile(path + "/bdd100k/video5fps/" + which_part + "/" + name + ".mp4",
+                                                         path + "/bdd100k/test/negativi" + "/" + name + ".mp4")
+
+
+
+
+
+
+
+                    except ValueError:  # includes simplejson.decoder.JSONDecodeError
+                        print("opening JSON:  info.json has failed")
+
+            except InputError as error:
+                print('A New Exception occured: ', error.message)
+
+
+
 
 
 
@@ -321,14 +409,17 @@ def main():
     a = Dataset(5, "kmh", path)
     #open_video()
 
-    a.clean_dataset("train")
+    #a.clean_dataset("train")
     #a.clean_dataset("val")
 
-    #a.subsample_video_fps("train")
-    #a.subsample_video_fps("val")
+    a.subsample_video_fps("train")
+    a.subsample_video_fps("val")
 
-    a.generate_groundtruth("train")
-    a.generate_groundtruth("val")
+    #a.generate_groundtruth("train")
+    #a.generate_groundtruth("val")
+
+    #a.handle_positiveframes("train")
+    #a.handle_positiveframes("val")
 
 
 
