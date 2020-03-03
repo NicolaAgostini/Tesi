@@ -15,8 +15,12 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Dataset.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="245">
-              <caret line="413" lean-forward="true" selection-start-line="413" selection-end-line="413" />
+            <state relative-caret-position="300">
+              <caret line="579" column="39" selection-start-line="579" selection-start-column="39" selection-end-line="579" selection-end-column="39" />
+              <folding>
+                <element signature="e#0#37#0" expanded="true" />
+                <element signature="e#21099#21282#0" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -46,6 +50,7 @@
     <findStrings>
       <find>raise</find>
       <find>exist</find>
+      <find>test</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -106,12 +111,12 @@
       <workItem from="1582885749156" duration="1979000" />
       <workItem from="1582890280550" duration="2580000" />
       <workItem from="1582973937323" duration="20144000" />
-      <workItem from="1583173782370" duration="4228000" />
+      <workItem from="1583173782370" duration="23073000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="29883000" />
+    <option name="totallyTimeSpent" value="48728000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="877" extended-state="6" />
@@ -172,19 +177,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Dataset.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="245">
-          <caret line="413" lean-forward="true" selection-start-line="413" selection-end-line="413" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/test.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="855">
           <caret line="64" column="80" selection-start-line="64" selection-start-column="80" selection-end-line="64" selection-end-column="80" />
           <folding>
             <element signature="e#0#37#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/random.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="186">
+          <caret line="752" selection-start-line="752" selection-end-line="752" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Dataset.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="579" column="39" selection-start-line="579" selection-start-column="39" selection-end-line="579" selection-end-column="39" />
+          <folding>
+            <element signature="e#0#37#0" expanded="true" />
+            <element signature="e#21099#21282#0" />
           </folding>
         </state>
       </provider>

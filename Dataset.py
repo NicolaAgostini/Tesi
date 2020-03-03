@@ -8,11 +8,13 @@ import numpy as np
 from shutil import copyfile
 from test import *
 from tqdm import tqdm
+import math
+import random
 
 
 
 #path = os.getcwd()
-path = "/volumes/Bella_li"
+path = "/volumes/HD"
 
 
 class Error(Exception):
@@ -30,14 +32,24 @@ class InputError(Error):
     def __init__(self, message):
         self.message = message
 
+def count_items(file_path, is_json):
+    if is_json == True:
+        with open(file_path, 'r') as f:
+            info = json.load(f)
+            v = info["videos"]
+            print("Total number of valid videos: "+ str(len(v)))
+    else:
+        print("Total number of files: " + str(sum([len(files) for r, d, files in os.walk(file_path)])))
+
 class Dataset():
     """A simple class for handling data sets."""
 
-    def __init__(self, vel, format, path_data):
+    def __init__(self, vel, format, path_data, observed_frames):
 
         self.vel = vel
         self.format = format
         self.path_data = path_data
+        self.observed_frames = observed_frames
 
 
 
@@ -74,6 +86,10 @@ class Dataset():
             else:
                 raise InputError("You must declare the format properly : choose from mph and kmh")
         return threshold
+
+
+
+
 
 
 
@@ -246,7 +262,7 @@ class Dataset():
 
 
 
-    def generate_groundtruth(self, which_part):  # only works on Json in info1 must be executed after generated info1 folder and its files
+    def generate_groundtruth(self, which_part):  # only works on Json in info
         """
         :param which_part: values "train" or "val"
         :return: the ground truth file created ONLY for specific which_part, if which_part is "val" the the file regards the TEST subset
@@ -258,17 +274,26 @@ class Dataset():
 
             pass
         try:
-            os.makedirs(path + "/bdd100k/groundtruth/test")
+            os.makedirs(path + "/bdd100k/groundtruth/val")
         except FileExistsError:
             print("directory already exists")
 
             pass
 
+
+
+
         threshold = self.get_threshold()
 
         data = {}
         data["videos"] = []
+
+        not_validdata = {}
+        not_validdata["videos"] = []
+
         print("generating groundtruth file for all the videos")
+        nnot_considered = 0
+        nconsidered = 0
         for info_name in tqdm(os.listdir(path + "/bdd100k/info/100k/" + which_part + "/")):
             #print(info_name)
             if not info_name.startswith('.'):
@@ -283,14 +308,20 @@ class Dataset():
                             for v in info["locations"]:  # not consider sequences where car vel < 5 in the first 10 sec
 
                                 if v["speed"] < threshold:
-                                    if i < 10:
+                                    if i <= 10:
+                                        nnot_considered += 1
                                         not_consider = True
-                                        break  # i don't consider the file if stopped in less than 10 secs
+                                        not_validdata["videos"].append({
+                                            "filename": os.path.splitext(info_name)[0],
+                                            "stop": i
+                                        })
+                                        break  # i don't consider the file if stopped in less than 10 secs but i save to make the valid
                                         #raise InputError("ERROR: event of stopping in less than 10 secs")
                                     data["videos"].append({
                                         "filename": os.path.splitext(info_name)[0],
                                         "stop": i
                                     })
+                                    nconsidered += 1
                                     has_stopped = True
                                     break
 
@@ -300,6 +331,7 @@ class Dataset():
                                     "filename": os.path.splitext(info_name)[0],
                                     "stop": "No"
                                 })
+                                nconsidered += 1
                         except ValueError:  # includes simplejson.decoder.JSONDecodeError
                             print("Decoding JSON:  "+info_name+" has failed")
 
@@ -311,17 +343,25 @@ class Dataset():
 
                 except EnvironmentError:  # parent of IOError, OSError *and* WindowsError where available
                         print("error in opening Json Info file")
-        if "val" in which_part:
-            which_part = "test"
+        print("Number of invalid video is: " + str(nnot_considered))
+        print("Number of valid video is: " + str(nconsidered))
+
         with open(path + "/bdd100k/groundtruth/" + which_part + "/info.json", 'w+') as outfile:
             json.dump(data, outfile)
+        with open(path + "/bdd100k/groundtruth/" + which_part + "/infoNotValid.json", 'w+') as outfile:
+            json.dump(not_validdata, outfile)
 
 
-    def handle_positiveframes(self, which_part):  # prerequisites: the videos have to be subsampled at 5 fps and groundtruth.json file available
+    def handle_positiveframes(self, which_part, validity):  # prerequisites:  groundtruth.json and rain_how_tocut.json files available
+        """
+        :param which_part:
+        :param validity: value "valid" or "not" (for not valid) depending the videos is valid or not
+        :return: this function uses groundtruth json and splits the videos in 3 positive parts and 1 negative
+        """
         for i in range(3):
             if "val" in which_part:
                 try:
-                    os.makedirs(path + "/bdd100k/" + "test" + "/positivi" + (i + 1))
+                    os.makedirs(path + "/bdd100k/" + "val" + validity + "/positivi" + str(i + 1))
                 except FileExistsError:
                     print("directory already exists")
                     pass
@@ -329,13 +369,13 @@ class Dataset():
                 if i == 0:
 
                     try:
-                        os.makedirs(path + "/bdd100k/" + "test" + "/negativi")
+                        os.makedirs(path + "/bdd100k/" + "val" + validity + "/negativi")
                     except FileExistsError:
                         print("directory already exists")
                         pass
             else:
                 try:
-                    os.makedirs(path + "/bdd100k/"+"train" + "/positivi"+(i+1))
+                    os.makedirs(path + "/bdd100k/"+"train" + validity + "/positivi"+str(i+1))
                 except FileExistsError:
                     print("directory already exists")
                     pass
@@ -343,49 +383,57 @@ class Dataset():
                 if i == 0:
 
                     try:
-                        os.makedirs(path + "/bdd100k/"+"train" + "/negativi")
+                        os.makedirs(path + "/bdd100k/"+"train" + validity + "/negativi")
                     except FileExistsError:
                         print("directory already exists")
                         pass
 
         for i in range(3):
             try:
-                with open(path + "/bdd100k/groundtruth/" + which_part + "/info.json", 'r') as f:
+                if "valid" in validity:
+                    path_ofjson = path + "/bdd100k/groundtruth/" + which_part + "/info.json"
+                else:
+                    if "not" in validity:
+                        path_ofjson = path + "/bdd100k/" +which_part+ "_how_tocut.json"
+
+                with open(path_ofjson, 'r') as f:
                     try:
                         info = json.load(f)
 
 
-                        for v in info["videos"]:  # not consider sequences where car vel < 5 in the first 10 sec
+                        for v in tqdm(info["videos"]):
+                            name = v["filename"]
 
-                            if v["stop"] != "No":
+                            if os.path.exists(path + "/bdd100k/videos/" + which_part + "/" + name + ".mov"):
+                                if v["stop"] != "No":
 
-                                if v["stop"] >=10*(i+1) and v["stop"] < 10*(i+2):
+                                    if v["stop"] >= 10*(i+1) and v["stop"] < 10*(i+2):
 
-                                    name = v["filename"]
-                                    if "train" in which_part:
-                                        if not os.path.exists(path + "/bdd100k/train/positivi" + str(i+1) + "/" + name + ".mp4"):
-                                            copyfile(path + "/bdd100k/video5fps/" + which_part+"/" + name + ".mp4",
-                                                     path + "/bdd100k/train/positivi" + str(i+1) + "/" + name + ".mp4")
-                                    else:
-                                        if "val" in which_part:
-                                            if not os.path.exists(path + "/bdd100k/test/positivi" + str(i+1) + "/" + name + ".mp4"):
-                                                copyfile(path + "/bdd100k/video5fps/" + which_part + "/" + name + ".mp4",
-                                                         path + "/bdd100k/test/positivi" + str(i+1) + "/" + name + ".mp4")
 
-                            else:
-                                if v["stop"] == "No":
-                                    name = v["filename"]
-                                    if "train" in which_part:
-                                        if not os.path.exists(
-                                                path + "/bdd100k/train/negativi" + "/" + name + ".mp4"):
-                                            copyfile(path + "/bdd100k/video5fps/" + which_part + "/" + name + ".mp4",
-                                                     path + "/bdd100k/train/negativi" + "/" + name + ".mp4")
-                                    else:
-                                        if "val" in which_part:
+                                        if "train" in which_part:
+                                            if not os.path.exists(path + "/bdd100k/train"+ validity +"/positivi" + str(i+1) + "/" + name + ".mov"):
+                                                copyfile(path + "/bdd100k/videos/" + which_part+"/" + name + ".mov",
+                                                         path + "/bdd100k/train"+ validity +"/positivi" + str(i+1) + "/" + name + ".mov")
+                                        else:
+                                            if "val" in which_part:
+                                                if not os.path.exists(path + "/bdd100k/val"+ validity +"/positivi" + str(i+1) + "/" + name + ".mov"):
+                                                    copyfile(path + "/bdd100k/videos/" + which_part + "/" + name + ".mov",
+                                                             path + "/bdd100k/val"+ validity +"/positivi" + str(i+1) + "/" + name + ".mov")
+
+                                else:
+                                    if v["stop"] == "No":
+
+                                        if "train" in which_part:
                                             if not os.path.exists(
-                                                    path + "/bdd100k/test/negativi" + "/" + name + ".mp4"):
-                                                copyfile(path + "/bdd100k/video5fps/" + which_part + "/" + name + ".mp4",
-                                                         path + "/bdd100k/test/negativi" + "/" + name + ".mp4")
+                                                    path + "/bdd100k/train"+ validity +"/negativi" + "/" + name + ".mov"):
+                                                copyfile(path + "/bdd100k/videos/" + which_part + "/" + name + ".mov",
+                                                         path + "/bdd100k/train"+ validity +"/negativi" + "/" + name + ".mov")
+                                        else:
+                                            if "val" in which_part:
+                                                if not os.path.exists(
+                                                        path + "/bdd100k/val"+ validity +"/negativi" + "/" + name + ".mov"):
+                                                    copyfile(path + "/bdd100k/videos/" + which_part + "/" + name + ".mov",
+                                                             path + "/bdd100k/val"+ validity +"/negativi" + "/" + name + ".mov")
 
 
 
@@ -401,25 +449,135 @@ class Dataset():
 
 
 
+    def invalid_tovalidJSON(self, which_part):
+        """
+        :prerequisites: works with groundtruth infoNotValid.json
+        :return: this function will output a json, for invalid videos consisting of a json pointing where each filename
+        (considered invalid) will be cut
+        """
+        threshold = self.get_threshold()
+        how_tocut = {}
+        how_tocut["videos"] = []
+        try:
+            with open(path + "/bdd100k/groundtruth/" + which_part + "/infoNotValid.json", 'r') as f:
+                try:
+                    info = json.load(f)  # has the FIRST time to stop
+                    for v in tqdm(info["videos"]):
+                        T0 = v["stop"]
+                        #T1 = 0
+                        with open(path + "/bdd100k/info/100k/" + which_part + "/" + v["filename"] + ".json", 'r') as infoFILE:
+                            infoJsonvalues = json.load(infoFILE)  # has all the velocity within the 40 secs of the specific video file
+                            i = 0
+                            found = False
+                            start = -1
+                            end = -1
+                            new_stop = -1
+                            for q in infoJsonvalues["locations"]:
+                                if q["speed"] < threshold:
+                                    T0 = i
+
+
+                                if (i - T0 - math.ceil(self.observed_frames / 5)) > 10 and found == False:  # if true it means that there are 10 sec without stopping event
+                                    #interval = 10 + math.ceil(self.observed_frames / 5)
+                                    found = True
+                                    start = random.randint(T0, i)
+                                    end = start + math.ceil(self.observed_frames/5) + 10 + 1
+                                    if end > 40:
+                                        start = T0
+                                        end = start + math.ceil(self.observed_frames/5) + 10 + 1
+                                        if end > 40:
+                                            found = False
+                                            break
+
+
+
+
+
+                                if found==True and q["speed"] < threshold and i<= end:
+                                    new_stop = i
+                                    break
+
+
+                                i += 1
+                            if found == True:
+                                if new_stop == -1:
+                                    how_tocut["videos"].append({
+                                        "filename": v["filename"],
+                                        "start": start,
+                                        "end": end,
+                                        "stop": "No"
+                                    })
+
+                                else:
+                                    how_tocut["videos"].append({
+                                    "filename": v["filename"],
+                                    "start": start,
+                                    "end": end,
+                                    "stop": new_stop
+                                    })
+                except ValueError:  # includes simplejson.decoder.JSONDecodeError
+                    print("opening JSON:  info.json has failed")
+
+
+        except InputError as error:
+         print('A New Exception occured: ', error.message)
+
+
+        with open(path + "/bdd100k/" + which_part + "_how_tocut.json", 'w+') as outfile:
+            json.dump(how_tocut, outfile)
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def invalid_tovalid(self, which_part):
+        """
+        :return: this function will handle the invalid videos with infonotValid.json and create valid videos always in
+        5 fps
+        """
+        self.invalid_tovalidJSON(which_part)
+
+
 
 
 
 def main():
 
-    a = Dataset(5, "kmh", path)
+    a = Dataset(5, "mph", path, 16)
     #open_video()
 
     #a.clean_dataset("train")
     #a.clean_dataset("val")
 
-    a.subsample_video_fps("train")
-    a.subsample_video_fps("val")
+    #a.subsample_video_fps("train")
+    #a.subsample_video_fps("val")
 
     #a.generate_groundtruth("train")
     #a.generate_groundtruth("val")
 
     #a.handle_positiveframes("train")
     #a.handle_positiveframes("val")
+
+    #count_items(path + "/bdd100k/groundtruth/test/info.json", True)
+
+    #a.invalid_tovalidJSON("train")
+
+    #a.invalid_tovalidJSON("val")
+
+
+    a.handle_positiveframes("train", "valid")
+    a.handle_positiveframes("val", "valid")
+
+    a.handle_positiveframes("train", "not")
+    a.handle_positiveframes("val", "not")
 
 
 
