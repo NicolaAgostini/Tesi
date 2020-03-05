@@ -2,9 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5f02ac3c-4e9c-4116-909c-d0e7a5d89afe" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/nicolago.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Video_ops.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/Dataset.py" afterDir="false" />
     </list>
@@ -19,15 +16,12 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Dataset.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="251">
-              <caret line="502" column="40" selection-start-line="502" selection-start-column="40" selection-end-line="502" selection-end-column="40" />
+            <state relative-caret-position="316">
+              <caret line="617" column="26" selection-start-line="617" selection-start-column="26" selection-end-line="617" selection-end-column="26" />
               <folding>
                 <element signature="e#0#37#0" expanded="true" />
-                <element signature="e#4877#9259#0" />
-                <element signature="e#9333#10338#0" />
-                <element signature="e#8932#12557#0" />
-                <element signature="e#12983#15403#0" />
-                <element signature="e#16058#19966#0" />
+                <element signature="e#8949#12827#0" />
+                <element signature="e#16067#19987#0" />
               </folding>
             </state>
           </provider>
@@ -36,8 +30,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Video_ops.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="328">
-              <caret line="49" lean-forward="true" selection-start-line="49" selection-end-line="49" />
+            <state relative-caret-position="705">
+              <caret line="49" selection-start-line="49" selection-end-line="49" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
               </folding>
@@ -96,7 +90,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -108,6 +101,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -144,18 +138,19 @@
       <workItem from="1582890280550" duration="2580000" />
       <workItem from="1582973937323" duration="20144000" />
       <workItem from="1583173782370" duration="23801000" />
-      <workItem from="1583400681023" duration="10976000" />
+      <workItem from="1583400681023" duration="11081000" />
+      <workItem from="1583432557710" duration="2514000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="60432000" />
+    <option name="totallyTimeSpent" value="63051000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1440" height="877" extended-state="6" />
+    <frame x="0" y="23" width="1440" height="877" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2267525" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.22961374" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -217,37 +212,34 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test.py">
+    <entry file="file://$PROJECT_DIR$/Dataset.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="855">
-          <caret line="64" column="80" selection-start-line="64" selection-start-column="80" selection-end-line="64" selection-end-column="80" />
+        <state relative-caret-position="316">
+          <caret line="617" column="26" selection-start-line="617" selection-start-column="26" selection-end-line="617" selection-end-column="26" />
           <folding>
             <element signature="e#0#37#0" expanded="true" />
+            <element signature="e#8949#12827#0" />
+            <element signature="e#16067#19987#0" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Video_ops.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="328">
-          <caret line="49" lean-forward="true" selection-start-line="49" selection-end-line="49" />
+        <state relative-caret-position="705">
+          <caret line="49" selection-start-line="49" selection-end-line="49" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Dataset.py">
+    <entry file="file://$PROJECT_DIR$/test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="251">
-          <caret line="502" column="40" selection-start-line="502" selection-start-column="40" selection-end-line="502" selection-end-column="40" />
+        <state relative-caret-position="855">
+          <caret line="64" column="80" selection-start-line="64" selection-start-column="80" selection-end-line="64" selection-end-column="80" />
           <folding>
             <element signature="e#0#37#0" expanded="true" />
-            <element signature="e#4877#9259#0" />
-            <element signature="e#9333#10338#0" />
-            <element signature="e#8932#12557#0" />
-            <element signature="e#12983#15403#0" />
-            <element signature="e#16058#19966#0" />
           </folding>
         </state>
       </provider>

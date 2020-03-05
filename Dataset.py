@@ -425,7 +425,7 @@ class Dataset():
 
 
 
-                                if found==True and q["speed"] < threshold and i <= end:
+                                if found==True and q["speed"] < threshold and i <= end and i >= start + math.ceil(self.observed_frames/5):
                                     new_stop = i  # update the stop time with a new stop time
                                     break
 
@@ -459,7 +459,7 @@ class Dataset():
 
 
 
-    def handle_validv(self, which_part):  # prerequisites train/val + valid and groundtruth/train/info.json available
+    def handle_vid(self, which_part, validity):  # prerequisites train/val + valid folders (3+1) and groundtruth/train/info.json available
         """
         :param which_part: "train" or "val"
         :return: for the VALID videos it returns the videos sampled at 5 fps, resized at 112 X 112 pixels and cut in
@@ -474,7 +474,12 @@ class Dataset():
 
         gt = {}
         try:
-            with open(path + "/bdd100k/groundtruth/" + which_part + "/info.json", 'r') as f:
+            if "valid" in validity:
+                path_ofjson = path + "/bdd100k/groundtruth/" + which_part + "/info.json"
+            else:
+                if "not" in validity:
+                    path_ofjson = path + "/bdd100k/" +which_part+ "_how_tocut.json"
+            with open(path_ofjson, 'r') as f:
                 try:
                     info = json.load(f)  # contains the stop events for each videos
                     number = -1
@@ -495,9 +500,9 @@ class Dataset():
 
 
                         if number == "":
-                            video = cv2.VideoCapture(path + "/bdd100k/trainvalid/negativi" + "/" + filename + ".mov")
+                            video = cv2.VideoCapture(path + "/bdd100k/train"+validity + "/negativi" + "/" + filename + ".mov")
                         else:
-                            video = cv2.VideoCapture(path + "/bdd100k/trainvalid/positivi" + str(number) + "/" + filename + ".mov")
+                            video = cv2.VideoCapture(path + "/bdd100k/train" + validity + "/positivi" + str(number) + "/" + filename + ".mov")
 
                         if video.isOpened() == False:
                             print("Video NOT found")
@@ -510,7 +515,7 @@ class Dataset():
                         out = cv2.VideoWriter(path + "/bdd100k/" + which_part + "/" + filename + '.mp4', fourcc, 5.0, (112, 112))  # save videos in mp4
 
                         while (video.isOpened()):
-                            counter += 1
+
                             # print(video.get(4))
                             # print(counter)
                             ret, frame = video.read()
@@ -531,6 +536,8 @@ class Dataset():
                                     if counter % 6 == 0 and counter<20*30 and counter>= 30*10 - ((self.observed_frames/5)*30):
                                         frame = cv2.resize(frame, (112, 112))
                                         out.write(frame)
+
+                            counter += 1  # HA SENSO  PARTIRE DALL' 1???
 
                         if v["stop"] == "No":
                             gt[filename] = "No"
@@ -555,12 +562,21 @@ class Dataset():
 
 
 
+
+
+
     def cut_videos(self, which_part):
         """
         :return: the videos cut depending on the observed frames, subsampled at 5 fps adn each frame of resolution 112 X 112
         and also a new Json file in which every video has its stopping event
         """
         self.invalid_tovalidJSON(which_part)  # create a json named "whichpart_how_tocut.json"
+
+        self.handle_vid(which_part, validity="valid")  # handle valid videos cutting them and resizing (112x112  5fps)
+
+        self.handle_vid(which_part, validity="not")  # handle NOT valid videos cutting them and resizing (112x112  5fps)
+
+
 
 
 
@@ -599,7 +615,7 @@ def main():
     #a.handle_videos("train", "not","/bdd100k/train", path_groundtruth)
     #a.handle_videos("val", "not", "/bdd100k/val", path_groundtruth)
 
-    a.handle_validv("train")
+    a.handle_vid("train", "not")
 
 
 
