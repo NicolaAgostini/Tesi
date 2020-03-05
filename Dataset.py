@@ -526,24 +526,38 @@ class Dataset():
 
                             #frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
-
-                            if v["stop"] != "No":
-                                if counter % 6 == 0 and counter<10* (int(number)+1) *30 and counter>= 30*10*int(number) - ((self.observed_frames/5)*30):  # every 6 frame is 1 sec (30fps original video)
-                                    frame = cv2.resize(frame, (112, 112))
-                                    out.write(frame)
-                            else:
-                                if v["stop"] == "No":
-                                    if counter % 6 == 0 and counter<20*30 and counter>= 30*10 - ((self.observed_frames/5)*30):
+                            if "valid" in validity:
+                                if v["stop"] != "No":
+                                    if counter % 6 == 0 and counter<10* (int(number)+1) *30 and counter>= 30*10*int(number) - ((self.observed_frames/5)*30):  # every 6 frame is 1 sec (30fps original video)
                                         frame = cv2.resize(frame, (112, 112))
                                         out.write(frame)
+                                else:
+                                    if v["stop"] == "No":
+                                        if counter % 6 == 0 and counter<20*30 and counter>= 30*10 - ((self.observed_frames/5)*30):
+                                            frame = cv2.resize(frame, (112, 112))
+                                            out.write(frame)
+                            else:
+                                if "not" in validity:
+                                    if v["stop"] != "No":
+                                        if counter % 6 == 0 and counter < v["end"] * 30 and counter >= v["end"]*30 - 10*30 - (self.observed_frames/5)*30:  # every 6 frame is 1 sec (30fps original video)
+                                            frame = cv2.resize(frame, (112, 112))
+                                            out.write(frame)
+                                    else:
+                                        if v["stop"] == "No":
+                                            if counter % 6 == 0 and counter < v["end"] * 30 and counter >= v["end"]*30 - 10*30 - (self.observed_frames/5)*30:
+                                                frame = cv2.resize(frame, (112, 112))
+                                                out.write(frame)
 
                             counter += 1  # HA SENSO  PARTIRE DALL' 1???
 
                         if v["stop"] == "No":
                             gt[filename] = "No"
                         else:
-                            if v["stop"] != "No":
+                            if v["stop"] != "No" and "valid" in validity:
                                 gt[filename] = int(v["stop"]) - (10*int(number))  # the new stop is between 0 and 10 sec of the predicting time (not considering observed frames)
+                            else:
+                                if "not" in validity:
+                                    gt[filename] = int(v["stop"]) - int(v["start"])
 
                         out.release()
                         video.release()
