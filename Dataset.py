@@ -12,6 +12,7 @@ from Video_ops import *
 from tqdm import tqdm
 import math
 import random
+import time
 
 
 
@@ -43,8 +44,8 @@ def count_items(file_path, is_json):
     if is_json == True:
         with open(file_path, 'r') as f:
             info = json.load(f)
-            v = info["videos"]
-            print("Total number of valid videos: " + str(len(v)))
+            #v = info["videos"]
+            print("Total number of valid videos: " + str(len(info)))
     else:
         print("Total number of files: " + str(sum([len(files) for r, d, files in os.walk(file_path)])))
 
@@ -459,7 +460,7 @@ class Dataset():
 
 
 
-    def handle_vid(self, which_part, validity):  # prerequisites train/val + valid folders (3+1) and groundtruth/train/info.json available
+    def handle_vid(self, which_part, validity, gt):  # prerequisites train/val + valid folders (3+1) and groundtruth/train/info.json available
         """
         :param which_part: "train" or "val"
         :return: for the VALID videos it returns the videos sampled at 5 fps, resized at 112 X 112 pixels and cut in
@@ -474,7 +475,7 @@ class Dataset():
             print("directory already exists")
             pass
 
-        gt = {}
+
         try:
             if "valid" in validity:
                 path_ofjson = path + "/bdd100k/temporal/tgroundtruth/" + which_part + "/info.json"
@@ -514,6 +515,7 @@ class Dataset():
                         fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # conversion in mp4
                         if os.path.exists(path + "/bdd100k/" + which_part + "/" + filename + '.mp4'):
                             print(" Video already exists!! CHECK ME! ")
+                            continue
                         out = cv2.VideoWriter(path + "/bdd100k/" + which_part + "/" + filename + '.mp4', fourcc, 5.0, (112, 112))  # save videos in mp4
 
                         while (video.isOpened()):
@@ -573,8 +575,10 @@ class Dataset():
         except InputError as error:
             print('A New Exception occured: ', error.message)
 
-        with open(path + "/bdd100k/" + which_part + "groundtruth.json", 'w+') as outfile:
-            json.dump(gt, outfile)
+        print(len(gt))
+        time.sleep(3)
+        return gt
+
 
 
 
@@ -585,6 +589,10 @@ class Dataset():
         """
         :return: will output in the folder "/bdd100k" the videos cut and resized with groundtruth.json
         """
+
+        gt = {}  # groundtruth
+
+        
         self.generate_groundtruth("train", "/bdd100k/temporal/tgroundtruth/")
         self.generate_groundtruth("val", "/bdd100k/temporal/tgroundtruth/")
 
@@ -592,14 +600,27 @@ class Dataset():
         self.invalid_tovalidJSON("val")
 
         self.order_videos("train", "valid", "/bdd100k/temporal/train", "/bdd100k/temporal/tgroundtruth/")
-        self.order_videos("val", "valid", "/bdd100k/temporal/train", "/bdd100k/temporal/tgroundtruth/")
+        self.order_videos("val", "valid", "/bdd100k/temporal/val", "/bdd100k/temporal/tgroundtruth/")
         self.order_videos("train", "not", "/bdd100k/temporal/train", "/bdd100k/temporal")
-        self.order_videos("val", "not", "/bdd100k/temporal/train", "/bdd100k/temporal")
+        self.order_videos("val", "not", "/bdd100k/temporal/val", "/bdd100k/temporal")
+        
 
-        self.handle_vid("train", "valid")
-        self.handle_vid("val", "valid")
-        self.handle_vid("train", "not")
-        self.handle_vid("val", "not")
+
+        gt = self.handle_vid("train", "valid", gt)
+
+        gt = self.handle_vid("train", "not", gt)
+
+
+        with open(path + "/bdd100k/" + "train" + "groundtruth.json", 'w+') as outfile:
+            json.dump(gt, outfile)
+
+        gt = {}
+
+        gt = self.handle_vid("val", "valid", gt)
+        gt = self.handle_vid("val", "not", gt)
+
+        with open(path + "/bdd100k/" + "val" + "groundtruth.json", 'w+') as outfile:
+            json.dump(gt, outfile)
 
 
 
@@ -608,6 +629,8 @@ class Dataset():
 def main():
 
     a = Dataset(5, "mph", path, 16)
+
+    #count_items(path + "/bdd100k/traingroundtruth.json", True)
 
     a.preprocess_dataset()
 
