@@ -310,7 +310,7 @@ class Dataset():
             json.dump(not_validdata, outfile)
 
 
-    def handle_videos(self, which_part, validity, path_to, path_groundtruth):  # prerequisites:  groundtruth.json and rain_how_tocut.json files available
+    def order_videos(self, which_part, validity, path_to, path_groundtruth):  # prerequisites:  groundtruth.json and rain_how_tocut.json files available
         """
         :param which_part: "train" or "val"
         :param validity: "valid" or "not"
@@ -391,7 +391,7 @@ class Dataset():
         how_tocut = {}
         how_tocut["videos"] = []
         try:
-            with open(path + "/bdd100k/groundtruth/" + which_part + "/infoNotValid.json", 'r') as f:
+            with open(path + "/bdd100k/temporal/tgroundtruth/" + which_part + "/infoNotValid.json", 'r') as f:
                 try:
                     info = json.load(f)  # has the FIRST time to stop
                     for v in tqdm(info["videos"]):
@@ -454,7 +454,7 @@ class Dataset():
         except InputError as error:
             print('A New Exception occured: ', error.message)
 
-        with open(path + "/bdd100k/" + which_part + "_how_tocut.json", 'w+') as outfile:
+        with open(path + "/bdd100k/temporal/" + which_part + "_how_tocut.json", 'w+') as outfile:
             json.dump(how_tocut, outfile)
 
 
@@ -464,6 +464,8 @@ class Dataset():
         :param which_part: "train" or "val"
         :return: for the VALID videos it returns the videos sampled at 5 fps, resized at 112 X 112 pixels and cut in
         observed frame prediction + 10 sec of prediction. It handles videos in train/val + valid folders
+        Furthermore it cut the videos considered NOT-VALID following the specific of train/val + _how_tocut.json always
+        maintaining the same specifics about height and width and fps
         """
 
         try:
@@ -475,10 +477,10 @@ class Dataset():
         gt = {}
         try:
             if "valid" in validity:
-                path_ofjson = path + "/bdd100k/groundtruth/" + which_part + "/info.json"
+                path_ofjson = path + "/bdd100k/temporal/tgroundtruth/" + which_part + "/info.json"
             else:
                 if "not" in validity:
-                    path_ofjson = path + "/bdd100k/" +which_part+ "_how_tocut.json"
+                    path_ofjson = path + "/bdd100k/temporal/" +which_part+ "_how_tocut.json"
             with open(path_ofjson, 'r') as f:
                 try:
                     info = json.load(f)  # contains the stop events for each videos
@@ -500,12 +502,12 @@ class Dataset():
 
 
                         if number == "":
-                            video = cv2.VideoCapture(path + "/bdd100k/train"+validity + "/negativi" + "/" + filename + ".mov")
+                            video = cv2.VideoCapture(path + "/bdd100k/temporal/train"+validity + "/negativi" + "/" + filename + ".mov")
                         else:
-                            video = cv2.VideoCapture(path + "/bdd100k/train" + validity + "/positivi" + str(number) + "/" + filename + ".mov")
+                            video = cv2.VideoCapture(path + "/bdd100k/temporal/train" + validity + "/positivi" + str(number) + "/" + filename + ".mov")
 
                         if video.isOpened() == False:
-                            print("Video NOT found")
+                            #print("Video NOT found")
                             continue
                         counter = 0
 
@@ -557,7 +559,7 @@ class Dataset():
                                 gt[filename] = int(v["stop"]) - (10*int(number))  # the new stop is between 0 and 10 sec of the predicting time (not considering observed frames)
                             else:
                                 if "not" in validity:
-                                    gt[filename] = int(v["stop"]) - int(v["start"])
+                                    gt[filename] = int(v["stop"]) - (int(v["end"]-10))
 
                         out.release()
                         video.release()
@@ -579,19 +581,25 @@ class Dataset():
 
 
 
-    def cut_videos(self, which_part):
+    def preprocess_dataset(self):
         """
-        :return: the videos cut depending on the observed frames, subsampled at 5 fps adn each frame of resolution 112 X 112
-        and also a new Json file in which every video has its stopping event
+        :return: will output in the folder "/bdd100k" the videos cut and resized with groundtruth.json
         """
-        self.invalid_tovalidJSON(which_part)  # create a json named "whichpart_how_tocut.json"
+        self.generate_groundtruth("train", "/bdd100k/temporal/tgroundtruth/")
+        self.generate_groundtruth("val", "/bdd100k/temporal/tgroundtruth/")
 
-        self.handle_vid(which_part, validity="valid")  # handle valid videos cutting them and resizing (112x112  5fps)
+        self.invalid_tovalidJSON("train")
+        self.invalid_tovalidJSON("val")
 
-        self.handle_vid(which_part, validity="not")  # handle NOT valid videos cutting them and resizing (112x112  5fps)
+        self.order_videos("train", "valid", "/bdd100k/temporal/train", "/bdd100k/temporal/tgroundtruth/")
+        self.order_videos("val", "valid", "/bdd100k/temporal/train", "/bdd100k/temporal/tgroundtruth/")
+        self.order_videos("train", "not", "/bdd100k/temporal/train", "/bdd100k/temporal")
+        self.order_videos("val", "not", "/bdd100k/temporal/train", "/bdd100k/temporal")
 
-
-
+        self.handle_vid("train", "valid")
+        self.handle_vid("val", "valid")
+        self.handle_vid("train", "not")
+        self.handle_vid("val", "not")
 
 
 
@@ -600,6 +608,9 @@ class Dataset():
 def main():
 
     a = Dataset(5, "mph", path, 16)
+
+    a.preprocess_dataset()
+
     #open_video()
 
     #a.clean_dataset("train")
@@ -608,7 +619,7 @@ def main():
     #a.subsample_video_fps("train")
     #a.subsample_video_fps("val")
 
-    path_groundtruth = "/bdd100k/groundtruth/"
+    #path_groundtruth = "/bdd100k/groundtruth/"
 
     #a.generate_groundtruth("train", path_groundtruth)
     #a.generate_groundtruth("val", path_groundtruth)
@@ -629,7 +640,7 @@ def main():
     #a.handle_videos("train", "not","/bdd100k/train", path_groundtruth)
     #a.handle_videos("val", "not", "/bdd100k/val", path_groundtruth)
 
-    a.handle_vid("train", "not")
+    #a.handle_vid("train", "not")
 
 
 

@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5f02ac3c-4e9c-4116-909c-d0e7a5d89afe" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/Dataset.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -15,12 +16,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Dataset.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="285">
-              <caret line="559" column="80" selection-start-line="559" selection-start-column="80" selection-end-line="559" selection-end-column="80" />
+            <state relative-caret-position="249">
+              <caret line="585" column="102" lean-forward="true" selection-start-line="585" selection-start-column="102" selection-end-line="585" selection-end-column="102" />
               <folding>
                 <element signature="e#0#37#0" expanded="true" />
-                <element signature="e#8949#12827#0" />
-                <element signature="e#16067#19987#0" />
+                <element signature="e#3328#7715#0" />
               </folding>
             </state>
           </provider>
@@ -29,7 +29,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Video_ops.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="705">
+            <state relative-caret-position="735">
               <caret line="49" selection-start-line="49" selection-end-line="49" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
@@ -41,7 +41,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="855">
+            <state relative-caret-position="960">
               <caret line="64" column="80" selection-start-line="64" selection-start-column="80" selection-end-line="64" selection-end-column="80" />
               <folding>
                 <element signature="e#0#37#0" expanded="true" />
@@ -138,18 +138,19 @@
       <workItem from="1582973937323" duration="20144000" />
       <workItem from="1583173782370" duration="23801000" />
       <workItem from="1583400681023" duration="11081000" />
-      <workItem from="1583432557710" duration="3603000" />
+      <workItem from="1583432557710" duration="3698000" />
+      <workItem from="1583491636086" duration="3949000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="64140000" />
+    <option name="totallyTimeSpent" value="68184000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="877" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.22961374" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.23247497" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -213,19 +214,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Dataset.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="559" column="80" selection-start-line="559" selection-start-column="80" selection-end-line="559" selection-end-column="80" />
+        <state relative-caret-position="249">
+          <caret line="585" column="102" lean-forward="true" selection-start-line="585" selection-start-column="102" selection-end-line="585" selection-end-column="102" />
           <folding>
             <element signature="e#0#37#0" expanded="true" />
-            <element signature="e#8949#12827#0" />
-            <element signature="e#16067#19987#0" />
+            <element signature="e#3328#7715#0" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Video_ops.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="705">
+        <state relative-caret-position="735">
           <caret line="49" selection-start-line="49" selection-end-line="49" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
@@ -235,7 +235,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="855">
+        <state relative-caret-position="960">
           <caret line="64" column="80" selection-start-line="64" selection-start-column="80" selection-end-line="64" selection-end-column="80" />
           <folding>
             <element signature="e#0#37#0" expanded="true" />
