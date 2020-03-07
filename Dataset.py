@@ -343,7 +343,7 @@ class Dataset():
                     path_ofjson = path + path_groundtruth + which_part + "/info.json"
                 else:
                     if "not" in validity:
-                        path_ofjson = path + "/bdd100k/" +which_part+ "_how_tocut.json"
+                        path_ofjson = path + "/bdd100k/temporal/" +which_part+ "_how_tocut.json"
 
                 with open(path_ofjson, 'r') as f:
                     try:
@@ -592,7 +592,7 @@ class Dataset():
 
         gt = {}  # groundtruth
 
-        
+        """
         self.generate_groundtruth("train", "/bdd100k/temporal/tgroundtruth/")
         self.generate_groundtruth("val", "/bdd100k/temporal/tgroundtruth/")
 
@@ -601,6 +601,7 @@ class Dataset():
 
         self.order_videos("train", "valid", "/bdd100k/temporal/train", "/bdd100k/temporal/tgroundtruth/")
         self.order_videos("val", "valid", "/bdd100k/temporal/val", "/bdd100k/temporal/tgroundtruth/")
+        """
         self.order_videos("train", "not", "/bdd100k/temporal/train", "/bdd100k/temporal")
         self.order_videos("val", "not", "/bdd100k/temporal/val", "/bdd100k/temporal")
         
