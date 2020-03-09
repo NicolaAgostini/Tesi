@@ -599,7 +599,7 @@ class Dataset():
 
         gt = {}  # groundtruth
 
-        """
+
         self.generate_groundtruth("train", "/bdd100k/temporal/tgroundtruth/")
         self.generate_groundtruth("val", "/bdd100k/temporal/tgroundtruth/")
 
@@ -608,7 +608,7 @@ class Dataset():
 
         self.order_videos("train", "valid", "/bdd100k/temporal/train", "/bdd100k/temporal/tgroundtruth/")
         self.order_videos("val", "valid", "/bdd100k/temporal/val", "/bdd100k/temporal/tgroundtruth/")
-        """
+        
         self.order_videos("train", "not", "/bdd100k/temporal/train", "/bdd100k/temporal")
         self.order_videos("val", "not", "/bdd100k/temporal/val", "/bdd100k/temporal")
         
