@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="5f02ac3c-4e9c-4116-909c-d0e7a5d89afe" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/Dataset.py" afterDir="false" />
-    </list>
+    <list default="true" id="5f02ac3c-4e9c-4116-909c-d0e7a5d89afe" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,10 +14,9 @@
         <entry file="file://$PROJECT_DIR$/Dataset.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="120">
-              <caret line="594" column="8" lean-forward="true" selection-start-line="594" selection-start-column="8" selection-end-line="594" selection-end-column="8" />
+              <caret line="594" column="8" selection-start-line="594" selection-start-column="8" selection-end-line="594" selection-end-column="8" />
               <folding>
                 <element signature="e#0#37#0" expanded="true" />
-                <element signature="e#3328#7715#0" />
               </folding>
             </state>
           </provider>
@@ -141,17 +137,17 @@
       <workItem from="1583432557710" duration="3698000" />
       <workItem from="1583491636086" duration="4102000" />
       <workItem from="1583514268944" duration="3669000" />
+      <workItem from="1583747851965" duration="205000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="72006000" />
+    <option name="totallyTimeSpent" value="72216000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="877" extended-state="0" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2353362" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.23819743" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -216,10 +212,9 @@
     <entry file="file://$PROJECT_DIR$/Dataset.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
-          <caret line="594" column="8" lean-forward="true" selection-start-line="594" selection-start-column="8" selection-end-line="594" selection-end-column="8" />
+          <caret line="594" column="8" selection-start-line="594" selection-start-column="8" selection-end-line="594" selection-end-column="8" />
           <folding>
             <element signature="e#0#37#0" expanded="true" />
-            <element signature="e#3328#7715#0" />
           </folding>
         </state>
       </provider>
