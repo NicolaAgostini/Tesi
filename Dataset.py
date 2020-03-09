@@ -504,8 +504,10 @@ class Dataset():
 
                         if number == "":
                             video = cv2.VideoCapture(path + "/bdd100k/temporal/train"+validity + "/negativi" + "/" + filename + ".mov")
+                            rot = get_rotation(path + "/bdd100k/temporal/train"+validity + "/negativi" + "/" + filename + ".mov")
                         else:
                             video = cv2.VideoCapture(path + "/bdd100k/temporal/train" + validity + "/positivi" + str(number) + "/" + filename + ".mov")
+                            rot = get_rotation(path + "/bdd100k/temporal/train" + validity + "/positivi" + str(number) + "/" + filename + ".mov")
 
                         if video.isOpened() == False:
                             #print("Video NOT found")
@@ -528,7 +530,12 @@ class Dataset():
 
                                 break
 
-                            #frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
+                            if rot == 270:
+                                frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
+                            if rot == 90:
+                                frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
+
 
                             if "valid" in validity:
                                 if v["stop"] != "No":
@@ -627,50 +634,3 @@ class Dataset():
 
 
 
-def main():
-
-    a = Dataset(5, "mph", path, 16)
-
-    #count_items(path + "/bdd100k/traingroundtruth.json", True)
-
-    a.preprocess_dataset()
-
-    #open_video()
-
-    #a.clean_dataset("train")
-    #a.clean_dataset("val")
-
-    #a.subsample_video_fps("train")
-    #a.subsample_video_fps("val")
-
-    #path_groundtruth = "/bdd100k/groundtruth/"
-
-    #a.generate_groundtruth("train", path_groundtruth)
-    #a.generate_groundtruth("val", path_groundtruth)
-
-
-
-    #count_items(path + "/bdd100k/groundtruth/train/infoNotValid.json", True)
-    #count_items(path + "/bdd100k/train_how_tocut.json", True)
-
-    #a.invalid_tovalidJSON("train")
-
-    #a.invalid_tovalidJSON("val")
-
-
-    #a.handle_videos("train", "valid","/bdd100k/train", path_groundtruth)
-    #a.handle_videos("val", "valid", "/bdd100k/val", path_groundtruth)
-
-    #a.handle_videos("train", "not","/bdd100k/train", path_groundtruth)
-    #a.handle_videos("val", "not", "/bdd100k/val", path_groundtruth)
-
-    #a.handle_vid("train", "not")
-
-
-
-
-
-
-
-if __name__ == '__main__':
-    main()
