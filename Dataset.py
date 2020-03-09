@@ -501,13 +501,15 @@ class Dataset():
                                     if int(v["stop"]) <= 40:
                                         number = str(3)
 
-
+                        rot = -1
                         if number == "":
                             video = cv2.VideoCapture(path + "/bdd100k/temporal/train"+validity + "/negativi" + "/" + filename + ".mov")
-                            rot = get_rotation(path + "/bdd100k/temporal/train"+validity + "/negativi" + "/" + filename + ".mov")
+                            if os.path.exists(path + "/bdd100k/temporal/train"+validity + "/negativi" + "/" + filename + ".mov"):
+                                rot = get_rotation(path + "/bdd100k/temporal/train"+validity + "/negativi" + "/" + filename + ".mov")
                         else:
                             video = cv2.VideoCapture(path + "/bdd100k/temporal/train" + validity + "/positivi" + str(number) + "/" + filename + ".mov")
-                            rot = get_rotation(path + "/bdd100k/temporal/train" + validity + "/positivi" + str(number) + "/" + filename + ".mov")
+                            if os.path.exists(path + "/bdd100k/temporal/train" + validity + "/positivi" + str(number) + "/" + filename + ".mov"):
+                                rot = get_rotation(path + "/bdd100k/temporal/train" + validity + "/positivi" + str(number) + "/" + filename + ".mov")
 
                         if video.isOpened() == False:
                             #print("Video NOT found")
@@ -535,6 +537,11 @@ class Dataset():
 
                             if rot == 90:
                                 frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
+
+                            if rot == -1:
+                                print("mmmh")
+
+
 
 
                             if "valid" in validity:
@@ -611,7 +618,7 @@ class Dataset():
         
         self.order_videos("train", "not", "/bdd100k/temporal/train", "/bdd100k/temporal")
         self.order_videos("val", "not", "/bdd100k/temporal/val", "/bdd100k/temporal")
-        
+
 
 
         gt = self.handle_vid("train", "valid", gt)
