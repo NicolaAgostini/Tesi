@@ -52,12 +52,13 @@ def count_items(file_path, is_json):
 class Dataset():
     """A simple class for handling data sets."""
 
-    def __init__(self, vel, format, path_data, observed_frames):
+    def __init__(self, vel, format, path_data, sample_size, frames_obs):
 
         self.vel = vel
         self.format = format
         self.path_data = path_data
-        self.observed_frames = observed_frames
+        self.sample_size = sample_size
+        self.frames_obs = frames_obs
 
 
 
@@ -410,14 +411,14 @@ class Dataset():
                                     T0 = i
 
 
-                                if (i - T0 - math.ceil(self.observed_frames / 5)) >= 10 and found == False:  # if true it means that there are 10 sec without stopping event
+                                if (i - T0 - math.ceil(self.sample_size / 5)) >= 10 and found == False:  # if true it means that there are 10 sec without stopping event
                                     #interval = 10 + math.ceil(self.observed_frames / 5)
                                     found = True
                                     start = random.randint(T0, i)  # start is a rondom number between the last stop and the second now considered
-                                    end = start + math.ceil(self.observed_frames/5) + 10
+                                    end = start + math.ceil(self.sample_size/5) + 10
                                     if end > 40:
                                         start = T0
-                                        end = start + math.ceil(self.observed_frames/5) + 10
+                                        end = start + math.ceil(self.sample_size/5) + 10
                                         if end > 40:
                                             found = False
                                             break
@@ -426,7 +427,7 @@ class Dataset():
 
 
 
-                                if found==True and q["speed"] < threshold and i <= end and i >= start + math.ceil(self.observed_frames/5):
+                                if found==True and q["speed"] < threshold and i <= end and i >= start + math.ceil(self.sample_size/5):
                                     new_stop = i  # update the stop time with a new stop time
                                     break
 
@@ -546,23 +547,23 @@ class Dataset():
 
                             if "valid" in validity:
                                 if v["stop"] != "No":
-                                    if counter % 6 == 0 and counter<10* (int(number)+1) *30 and counter>= 30*10*int(number) - ((self.observed_frames/5)*30):  # every 6 frame is 1 sec (30fps original video)
+                                    if counter % 6 == 0 and counter<10* (int(number)+1) *30 and counter>= 30*10*int(number) - ((self.sample_size/5)*30):  # every 6 frame is 1 sec (30fps original video)
                                         frame = cv2.resize(frame, (112, 112))
                                         out.write(frame)
                                 else:
                                     if v["stop"] == "No":
-                                        if counter % 6 == 0 and counter<20*30 and counter>= 30*10 - ((self.observed_frames/5)*30):
+                                        if counter % 6 == 0 and counter<20*30 and counter>= 30*10 - ((self.sample_size/5)*30):
                                             frame = cv2.resize(frame, (112, 112))
                                             out.write(frame)
                             else:
                                 if "not" in validity:
                                     if v["stop"] != "No":
-                                        if counter % 6 == 0 and counter < v["end"] * 30 and counter >= v["end"]*30 - 10*30 - (self.observed_frames/5)*30:  # every 6 frame is 1 sec (30fps original video)
+                                        if counter % 6 == 0 and counter < v["end"] * 30 and counter >= v["end"]*30 - 10*30 - (self.sample_size/5)*30:  # every 6 frame is 1 sec (30fps original video)
                                             frame = cv2.resize(frame, (112, 112))
                                             out.write(frame)
                                     else:
                                         if v["stop"] == "No":
-                                            if counter % 6 == 0 and counter < v["end"] * 30 and counter >= v["end"]*30 - 10*30 - (self.observed_frames/5)*30:
+                                            if counter % 6 == 0 and counter < v["end"] * 30 and counter >= v["end"]*30 - 10*30 - (self.sample_size/5)*30:
                                                 frame = cv2.resize(frame, (112, 112))
                                                 out.write(frame)
 
@@ -636,6 +637,61 @@ class Dataset():
 
         with open(path + "/bdd100k/" + "val" + "groundtruth.json", 'w+') as outfile:
             json.dump(gt, outfile)
+
+        self.generate_img("volumes/HD/bdd100k/train/", "train")
+        self.generate_img("volumes/HD/bdd100k/val/", "test")
+
+
+    def generate_img(self, path, which_part):  # FIXME: ora lavoro nella cartella test, rendimi globale poi!!!!
+        """
+        :param path: path of the videos
+        :param n_obs: number of observed frames
+        :param which_part: if "train" or "test"
+        :return: the images for every observed frame, in a specific folder
+        """
+
+        try:
+            os.makedirs("/Users/nicolago/Desktop/test/"+which_part+"img/")
+        except FileExistsError:
+            print("directory already exists")
+            pass
+
+        not_considered = self.sample_size - self.frames_obs
+        for i in tqdm(os.listdir(path)):
+            with open("/Users/nicolago/Desktop/test/traingroundtruth.json", 'r') as f:
+                info = json.load(f)
+                if not i.startswith('.'):
+                    try:
+                        os.makedirs("/Users/nicolago/Desktop/test/"+which_part+"img/"+os.path.splitext(i)[0])
+                    except FileExistsError:
+                        print("directory already exists")
+                        pass
+                    vc = cv2.VideoCapture(path+i)
+                    counter = 0
+                    n_frame = 0
+                    while (vc.isOpened()):
+
+                        counter += 1
+
+                        # print(video.get(4))
+                        # print(counter)
+                        ret, frame = vc.read()
+
+                        if np.shape(frame) == ():  # to prevent error while EOF is reached
+
+                            break
+
+
+
+                        if counter > not_considered and counter<=self.sample_size:
+                            n_frame += 1
+                            cv2.imwrite("/Users/nicolago/Desktop/test/"+which_part+"img/"+os.path.splitext(i)[0]+"/"+os.path.splitext(i)[0]+"-"+str(n_frame)+".jpg", frame)
+                    vc.release()
+
+
+
+
+
 
 
 
