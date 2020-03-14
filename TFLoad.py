@@ -151,13 +151,14 @@ def _process_image(path1, info):  # if the current frame is the frame where it s
     if label != "No" and int(label) == int(n_frame):
         #print("ok")
         l = 0
+    name = os.path.split(path1)[-1].split(".")[0]
+    return image, name, l
 
-    return image, l
 
-
-def _convert_to_example(image_buffer, label):
+def _convert_to_example(image_buffer, filename, label):
     example = tf.train.Example(features=tf.train.Features(feature={
         'label': _int64_feature(label),
+        "filename": _bytes_feature(tf.compat.as_bytes(filename)),
         'encoded': _bytes_feature(tf.compat.as_bytes(image_buffer))}))
     return example
 
@@ -180,8 +181,8 @@ def load_dataset():
 
         with tf.io.TFRecordWriter("/Users/nicolago/Desktop/test/img.tfrecords") as writer:
             for filename in tqdm(all_images):
-                image_buffer, label = _process_image(filename, info)
-                example = _convert_to_example(image_buffer, label)
+                image_buffer, name, label = _process_image(filename, info)
+                example = _convert_to_example(image_buffer, name, label)
                 writer.write(example.SerializeToString())
 
 
@@ -200,11 +201,16 @@ def cose(path):
 
 
 def read_tfrecord(path_of_file):
+    """
+    :param path_of_file:
+    :return: read in adataset tf image, its name (with the infor in which frame u are) and the label 0 for stop 1 for motion
+    """
     image_dataset = tf.data.TFRecordDataset(path_of_file)
     IMG_SIZE = 112
     # Create a dictionary describing the features.
     image_feature_description = {
         'label': tf.io.FixedLenFeature([], tf.int64),
+        'filename': tf.io.FixedLenFeature([], tf.string),
         'encoded': tf.io.FixedLenFeature([], tf.string),
     }
 
@@ -214,19 +220,19 @@ def read_tfrecord(path_of_file):
 
         image = feature['encoded']
         image = tf.image.decode_jpeg(image, channels=3)
-        image = tf.image.resize(image, [224, 224])
+        image = tf.image.resize(image, [112, 112])
         image /= 255.0  # normalize to [0,1] range
 
 
 
-        return image, feature['label']
+        return image, feature["filename"], feature["label"]
 
     dataset = image_dataset.map(_parse_image_function)
 
     BATCH_SIZE = 32
 
-    for image, label in dataset.take(3):
-        print(label)
+    for image, name, label in dataset.take(1):
+        print(name, label.numpy())
         plt.imshow(image)
         plt.show()
 
