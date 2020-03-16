@@ -145,22 +145,15 @@ def _process_image(path1, info):  # if the current frame is the frame where it s
     :return:
     """
 
-    #n_frame = os.path.splitext(os.path.split(path1)[-1])[0].split("-")[-1]
+
     name = path1.split("/")[-1]
     label = info[name]
-    #print(label, n_frame)
+
     if label == "No":
         label = -1  # -1 means NO SHOW
-    #name = os.path.split(path1)[-1].split(".")[0]
+
     return label, name
 
-
-def _convert_to_example(image_buffer, filename, label):
-    example = tf.train.Example(features=tf.train.Features(feature={
-        'label': _int64_feature(label),
-        "filename": _bytes_feature(tf.compat.as_bytes(filename)),
-        'encoded': _bytes_feature(tf.compat.as_bytes(image_buffer))}))
-    return example
 
 def load_dataset():
     """
@@ -229,9 +222,17 @@ def decode(serialized_example):
     # Decode the encoded JPG images
     images = []
     for i in range(16):
+        """
+        img = tf.image.decode_jpeg(parsed_features["frames/{:03d}".format(i)])
+        img = tf.cast(img, tf.float32)
+        img /= 255.0  #normalize
+
+        images.append(img)
+        """
+
         images.append(tf.image.decode_jpeg(parsed_features["frames/{:03d}".format(i)]))
 
-    # Pack the frames into one big tensor of shape (N,H,W,3)
+    # Pack the frames into one big tensor of shape (N,H,W,3) where N is number of frames (16)
     images = tf.stack(images)
     label = tf.cast(parsed_features['class_label'], tf.int64)
 
@@ -245,7 +246,14 @@ def decode(serialized_example):
 
 
 
-
+def normalize(x, y):
+    temp_imgs = []
+    x_unpacked = tf.unstack(x)
+    for i in x_unpacked:
+        temp_imgs.append(tf.image.per_image_standardization(i))
+    #x = tf.image.per_image_standardization(x)  # <--- by the way i could simply call this
+    images = tf.stack(tf.convert_to_tensor(temp_imgs, dtype=tf.float32))
+    return images, y
 
 
 def read_tfrecord():
@@ -259,8 +267,13 @@ def read_tfrecord():
     dataset = tf.data.TFRecordDataset(tfrecord_files)
 
     dataset = dataset.repeat(NUM_EPOCHS)
-    dataset = dataset.map(decode)
+    dataset = dataset.map(decode, num_parallel_calls=os.cpu_count())
+    dataset = dataset.map(normalize)  # normalize the images
 
+    for image, label in dataset.take(1):
+        print(image[0])
+
+    """
     for image, label in dataset.take(1):
         print(label.numpy())
         for frame in range(16):
@@ -269,7 +282,7 @@ def read_tfrecord():
         key = cv2.waitKey(0)
         if key == ord('q'):
             exit()
-
+    """
 
 
 
