@@ -471,7 +471,7 @@ class Dataset():
         """
 
         try:
-            os.makedirs(path + "/bdd100k/" + which_part)
+            os.makedirs(path + "/bdd100k/temporal/" + which_part)
         except FileExistsError:
             print("directory already exists")
             pass
@@ -521,7 +521,7 @@ class Dataset():
                         if os.path.exists(path + "/bdd100k/" + which_part + "/" + filename + '.mp4'):
                             print(" Video already exists!! CHECK ME! ")
                             continue
-                        out = cv2.VideoWriter(path + "/bdd100k/" + which_part + "/" + filename + '.mp4', fourcc, 5.0, (112, 112))  # save videos in mp4
+                        out = cv2.VideoWriter(path + "/bdd100k/temporal/" + which_part + "/" + filename + '.mp4', fourcc, 5.0, (112, 112))  # save videos in mp4
 
                         while (video.isOpened()):
 
@@ -604,7 +604,7 @@ class Dataset():
         """
         :return: will output in the folder "/bdd100k" the videos cut and resized with groundtruth.json
         """
-
+        """
         gt = {}  # groundtruth
 
 
@@ -635,58 +635,57 @@ class Dataset():
         gt = self.handle_vid("val", "valid", gt)
         gt = self.handle_vid("val", "not", gt)
 
-        with open(path + "/bdd100k/" + "val" + "groundtruth.json", 'w+') as outfile:
+        with open(path + "/bdd100k/" + "test" + "groundtruth.json", 'w+') as outfile:
             json.dump(gt, outfile)
+        """
 
-        self.generate_img("volumes/HD/bdd100k/train/", "train")
-        self.generate_img("volumes/HD/bdd100k/val/", "test")
+        self.generate_img("/volumes/HD/bdd100k/temporal/train/", "train")
+        self.generate_img("/volumes/HD/bdd100k/temporal/val/", "test")
 
 
     def generate_img(self, path, which_part):  # FIXME: ora lavoro nella cartella test, rendimi globale poi!!!!
         """
-        :param path: path of the videos
-        :param n_obs: number of observed frames
+        :param path: path of the videos where to extract frames
         :param which_part: if "train" or "test"
         :return: the images for every observed frame, in a specific folder
         """
 
         try:
-            os.makedirs("/Users/nicolago/Desktop/test/"+which_part+"img/")
+            os.makedirs("/volumes/HD/bdd100k/"+which_part)
         except FileExistsError:
             print("directory already exists")
             pass
 
         not_considered = self.sample_size - self.frames_obs
         for i in tqdm(os.listdir(path)):
-            with open("/Users/nicolago/Desktop/test/traingroundtruth.json", 'r') as f:
-                info = json.load(f)
-                if not i.startswith('.'):
-                    try:
-                        os.makedirs("/Users/nicolago/Desktop/test/"+which_part+"img/"+os.path.splitext(i)[0])
-                    except FileExistsError:
-                        print("directory already exists")
-                        pass
-                    vc = cv2.VideoCapture(path+i)
-                    counter = 0
-                    n_frame = 0
-                    while (vc.isOpened()):
 
-                        counter += 1
+            if not i.startswith('.'):
+                try:
+                    os.makedirs("/volumes/HD/bdd100k/"+which_part+"/"+os.path.splitext(i)[0])
+                except FileExistsError:
+                    print("directory already exists")
+                    pass
+                vc = cv2.VideoCapture(path+i)
+                counter = 0
+                n_frame = 0
+                while (vc.isOpened()):
 
-                        # print(video.get(4))
-                        # print(counter)
-                        ret, frame = vc.read()
+                    counter += 1
 
-                        if np.shape(frame) == ():  # to prevent error while EOF is reached
+                    # print(video.get(4))
+                    # print(counter)
+                    ret, frame = vc.read()
 
-                            break
+                    if np.shape(frame) == ():  # to prevent error while EOF is reached
 
+                        break
 
 
-                        if counter > not_considered and counter<=self.sample_size:
-                            n_frame += 1
-                            cv2.imwrite("/Users/nicolago/Desktop/test/"+which_part+"img/"+os.path.splitext(i)[0]+"/"+os.path.splitext(i)[0]+"-"+str(n_frame)+".jpg", frame)
-                    vc.release()
+
+                    if counter > not_considered and counter<=self.sample_size:
+                        n_frame += 1
+                        cv2.imwrite("/volumes/HD/bdd100k/"+which_part+"/"+os.path.splitext(i)[0]+"/"+os.path.splitext(i)[0]+"-"+str(n_frame)+".jpg", frame)
+                vc.release()
 
 
 

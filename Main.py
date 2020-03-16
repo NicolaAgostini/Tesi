@@ -30,11 +30,17 @@ def main():
 
 
     #load_dataset()
-    read_tfrecord()
+    #read_tfrecord()
     #read_tfrecord("/Users/nicolago/Desktop/test/img.tfrecords")
     #image, classlabel = read_tfrecord("/Users/nicolago/Desktop/test/0.tfrec")
 
     #cose("/Users/nicolago/Desktop/test/0.tfrec")
+
+    b = Tensors(16)
+
+    #b.generate_TFrecord()
+
+    b.load_TFrecord()
 
 
 if __name__ == '__main__':
