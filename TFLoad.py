@@ -15,6 +15,8 @@ import numpy as np
 import datetime as dt
 import sys
 from tqdm import tqdm
+import cv2
+import glob
 
 
 
@@ -142,17 +144,15 @@ def _process_image(path1, info):  # if the current frame is the frame where it s
     :param info: dict of the json groundtruth
     :return:
     """
-    image = open(path1, 'rb').read()
-    n_frame = os.path.splitext(os.path.split(path1)[-1])[0].split("-")[-1]
-    name = os.path.split(path1)[0].split("/")[-1]
+
+    #n_frame = os.path.splitext(os.path.split(path1)[-1])[0].split("-")[-1]
+    name = path1.split("/")[-1]
     label = info[name]
     #print(label, n_frame)
-    l = 1
-    if label != "No" and int(label) == int(n_frame):
-        #print("ok")
-        l = 0
-    name = os.path.split(path1)[-1].split(".")[0]
-    return image, name, l
+    if label == "No":
+        label = -1  # -1 means NO SHOW
+    #name = os.path.split(path1)[-1].split(".")[0]
+    return label, name
 
 
 def _convert_to_example(image_buffer, filename, label):
@@ -167,74 +167,108 @@ def load_dataset():
     :return: writes if .tfrecords all the frames with label and name
     """
     #tf.print(dataset, output_stream=sys.stderr)
-    all_images = []
-
-    for img_d in os.listdir("/Users/nicolago/Desktop/test/trainimg/"):
-        if not img_d.startswith('.'):
-            for i in range(16):
-                all_images.append("/Users/nicolago/Desktop/test/trainimg/"+img_d+"/"+img_d+"-"+str(i+1)+".jpg")
-
-    #print(all_images)
-
+    videos = []
     with open("/Users/nicolago/Desktop/test/traingroundtruth.json", 'r') as f:
         info = json.load(f)
+        for img_d in os.listdir("/Users/nicolago/Desktop/test/trainimg/"):
+            temp = []
+            if not img_d.startswith('.'):
+                for i in range(16):
+                    img = Image.open("/Users/nicolago/Desktop/test/trainimg/"+img_d+"/"+img_d+"-"+str(i+1)+".jpg")
+                    temp.append(np.asarray(img, dtype='uint8'))
+                temp = np.array(temp)
+                with tf.io.TFRecordWriter("/Users/nicolago/Desktop/test/"+img_d+".tfrecords") as writer:
+                    # Read and resize all video frames, np.uint8 of size [N,H,W,3]
+                    frames = temp
+                    label, name = _process_image("/Users/nicolago/Desktop/test/trainimg/"+img_d, info)
+                    features = {}
+                    features['num_frames'] = _int64_feature(frames.shape[0])
+                    features['height'] = _int64_feature(frames.shape[1])
+                    features['width'] = _int64_feature(frames.shape[2])
+                    features['channels'] = _int64_feature(frames.shape[3])
+                    features['class_label'] = _int64_feature(label)
+                    #features['class_text'] = _bytes_feature(tf.compat.as_bytes(example['class_label']))
+                    features['filename'] = _bytes_feature(tf.compat.as_bytes(name))
 
-        with tf.io.TFRecordWriter("/Users/nicolago/Desktop/test/img.tfrecords") as writer:
-            for filename in tqdm(all_images):
-                image_buffer, name, label = _process_image(filename, info)
-                example = _convert_to_example(image_buffer, name, label)
-                writer.write(example.SerializeToString())
+                    # Compress the frames using JPG and store in as bytes in:
+                    # 'frames/000001', 'frames/000002', ...
+                    for i in range(len(frames)):
+                        ret, buffer = cv2.imencode(".jpg", frames[i])
+                        features["frames/{:03d}".format(i)] = _bytes_feature(tf.compat.as_bytes(buffer.tobytes()))
+
+                    tfrecord_example = tf.train.Example(features=tf.train.Features(feature=features))
+                    writer.write(tfrecord_example.SerializeToString())
 
 
 
 
-def cose(path):
-
-    dataset = tf.data.TFRecordDataset(path)
-    dataset = dataset.map(read_tfrecord)
-    #print(tf.print(dataset))
-    dataset = dataset.shuffle(1000 + 3 * 1)
-    dataset = dataset.batch(1)
-    for image, label in dataset.take(1):
-        plt.title(label.numpy())
-        plt.imshow(image)
 
 
-def read_tfrecord(path_of_file):
+
+
+def decode(serialized_example):
+    '''
+    Given a serialized example in which the frames are stored as
+    compressed JPG images 'frames/0001', 'frames/0002' etc., this
+    function samples SEQ_NUM_FRAMES from the frame list, decodes them from
+    JPG into a tensor and packs them to obtain a tensor of shape (N,H,W,3).
+    Returns the the tuple (frames, class_label (tf.int64)
+    :param serialized_example: serialized example from tf.data.TFRecordDataset
+    :return: tuple: (frames (tf.uint8), class_label (tf.int64)
+    '''
+
+    # Prepare feature list; read encoded JPG images as bytes
+    features = dict()
+    features["class_label"] = tf.io.FixedLenFeature((), tf.int64)
+    for i in range(16):
+        features["frames/{:03d}".format(i)] = tf.io.FixedLenFeature((), tf.string)
+
+    # Parse into tensors
+    parsed_features = tf.io.parse_single_example(serialized_example, features)
+
+    # Decode the encoded JPG images
+    images = []
+    for i in range(16):
+        images.append(tf.image.decode_jpeg(parsed_features["frames/{:03d}".format(i)]))
+
+    # Pack the frames into one big tensor of shape (N,H,W,3)
+    images = tf.stack(images)
+    label = tf.cast(parsed_features['class_label'], tf.int64)
+
+    # Randomly sample offset ... ? Need to produce strings for dict indices after this
+    # offset = tf.random_uniform(shape=(), minval=0, maxval=label, dtype=tf.int64)
+
+    return images, label
+
+
+
+
+
+
+
+
+
+def read_tfrecord():
     """
     :param path_of_file:
     :return: read in adataset tf image, its name (with the infor in which frame u are) and the label 0 for stop 1 for motion
     """
-    image_dataset = tf.data.TFRecordDataset(path_of_file)
-    IMG_SIZE = 112
-    # Create a dictionary describing the features.
-    image_feature_description = {
-        'label': tf.io.FixedLenFeature([], tf.int64),
-        'filename': tf.io.FixedLenFeature([], tf.string),
-        'encoded': tf.io.FixedLenFeature([], tf.string),
-    }
+    NUM_EPOCHS = 1
+    tfrecord_files = glob.glob("/Users/nicolago/Desktop/test/*.tfrecords")
+    tfrecord_files.sort()
+    dataset = tf.data.TFRecordDataset(tfrecord_files)
 
-    def _parse_image_function(example_proto):
-        # Parse the input tf.Example proto using the dictionary above.
-        feature = tf.io.parse_single_example(example_proto, image_feature_description)
+    dataset = dataset.repeat(NUM_EPOCHS)
+    dataset = dataset.map(decode)
 
-        image = feature['encoded']
-        image = tf.image.decode_jpeg(image, channels=3)
-        image = tf.image.resize(image, [112, 112])
-        image /= 255.0  # normalize to [0,1] range
-
-
-
-        return image, feature["filename"], feature["label"]
-
-    dataset = image_dataset.map(_parse_image_function)
-
-    BATCH_SIZE = 32
-
-    for image, name, label in dataset.take(1):
-        print(name, label.numpy())
-        plt.imshow(image)
-        plt.show()
+    for image, label in dataset.take(1):
+        print(label.numpy())
+        for frame in range(16):
+            cv2.imshow("image", np.array(image[frame]))
+            cv2.waitKey(100)
+        key = cv2.waitKey(0)
+        if key == ord('q'):
+            exit()
 
 
 

@@ -30,7 +30,8 @@ def main():
 
 
     #load_dataset()
-    read_tfrecord("/Users/nicolago/Desktop/test/img.tfrecords")
+    read_tfrecord()
+    #read_tfrecord("/Users/nicolago/Desktop/test/img.tfrecords")
     #image, classlabel = read_tfrecord("/Users/nicolago/Desktop/test/0.tfrec")
 
     #cose("/Users/nicolago/Desktop/test/0.tfrec")
