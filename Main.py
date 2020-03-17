@@ -6,13 +6,13 @@ from TFLoad import *
 
 
 def main():
-    #path = "/Users/nicolago/Desktop/test/*.mp4"
+    path = "/Users/nicolago/Desktop/test/*.mp4"
 
-    #a = Dataset(5, "mph", path, 24, 16)
+    a = Dataset(5, "mph", path, 24, 16)
 
     # count_items(path + "/bdd100k/traingroundtruth.json", True)
 
-    #a.preprocess_dataset()
+    a.preprocess_dataset()
     #open_video()
     #subsample_video_fps_test()
 
@@ -36,11 +36,11 @@ def main():
 
     #cose("/Users/nicolago/Desktop/test/0.tfrec")
 
-    b = Tensors(16)
+    #b = Tensors(16)
 
     #b.generate_TFrecord()
 
-    b.load_TFrecord()
+    #b.load_TFrecord()
 
 
 if __name__ == '__main__':

@@ -590,8 +590,8 @@ class Dataset():
         except InputError as error:
             print('A New Exception occured: ', error.message)
 
-        print(len(gt))
-        time.sleep(3)
+        #print(len(gt))
+        #time.sleep(3)
         return gt
 
 
@@ -604,10 +604,10 @@ class Dataset():
         """
         :return: will output in the folder "/bdd100k" the videos cut and resized with groundtruth.json
         """
-        """
+
         gt = {}  # groundtruth
 
-
+        """
         self.generate_groundtruth("train", "/bdd100k/temporal/tgroundtruth/")
         self.generate_groundtruth("val", "/bdd100k/temporal/tgroundtruth/")
 
@@ -620,11 +620,11 @@ class Dataset():
         self.order_videos("train", "not", "/bdd100k/temporal/train", "/bdd100k/temporal")
         self.order_videos("val", "not", "/bdd100k/temporal/val", "/bdd100k/temporal")
 
+        """
 
+        gt = self.handle_vid_onlyimg("train", "valid", gt)
 
-        gt = self.handle_vid("train", "valid", gt)
-
-        gt = self.handle_vid("train", "not", gt)
+        gt = self.handle_vid_onlyimg("train", "not", gt)
 
 
         with open(path + "/bdd100k/" + "train" + "groundtruth.json", 'w+') as outfile:
@@ -632,15 +632,15 @@ class Dataset():
 
         gt = {}
 
-        gt = self.handle_vid("val", "valid", gt)
-        gt = self.handle_vid("val", "not", gt)
+        gt = self.handle_vid_onlyimg("val", "valid", gt)
+        gt = self.handle_vid_onlyimg("val", "not", gt)
 
         with open(path + "/bdd100k/" + "test" + "groundtruth.json", 'w+') as outfile:
             json.dump(gt, outfile)
-        """
 
-        self.generate_img("/volumes/HD/bdd100k/temporal/train/", "train")
-        self.generate_img("/volumes/HD/bdd100k/temporal/val/", "test")
+
+        #self.generate_img("/volumes/HD/bdd100k/temporal/train/", "train")
+        #self.generate_img("/volumes/HD/bdd100k/temporal/val/", "test")
 
 
     def generate_img(self, path, which_part):  # FIXME: ora lavoro nella cartella test, rendimi globale poi!!!!
@@ -689,6 +689,154 @@ class Dataset():
 
 
 
+    def handle_vid_onlyimg(self, which_part, validity, gt):  # prerequisites train/val + valid folders (3+1) and groundtruth/train/info.json available
+        """
+        :param which_part: "train" or "val"
+        :return: for the VALID videos it returns the videos sampled at 5 fps, resized at 112 X 112 pixels and cut in
+        observed frame prediction + 10 sec of prediction. It handles videos in train/val + valid folders
+        Furthermore it cut the videos considered NOT-VALID following the specific of train/val + _how_tocut.json always
+        maintaining the same specifics about height and width and fps
+        """
+        try:
+            os.makedirs("/volumes/HD/bdd100k/"+which_part)
+        except FileExistsError:
+            print("directory already exists")
+            pass
+
+
+
+        try:
+            if "valid" in validity:
+                path_ofjson = path + "/bdd100k/temporal/tgroundtruth/" + which_part + "/info.json"
+            else:
+                if "not" in validity:
+                    path_ofjson = path + "/bdd100k/temporal/" +which_part+ "_how_tocut.json"
+            with open(path_ofjson, 'r') as f:
+                try:
+                    info = json.load(f)  # contains the stop events for each videos
+                    number = -1
+                    for v in tqdm(info["videos"]):
+                        filename = v["filename"]
+                        try:
+                            os.makedirs("/volumes/HD/bdd100k/" + which_part + "/" + filename)
+                        except FileExistsError:
+                            print("directory already exists")
+                            pass
+
+                        if v["stop"] == "No":
+                            number = ""
+                        else:
+                            if int(v["stop"]) <= 20:
+                                number = str(1)
+                            else:
+                                if int(v["stop"]) <= 30:
+                                    number = str(2)
+                                else:
+                                    if int(v["stop"]) <= 40:
+                                        number = str(3)
+
+                        rot = -1
+                        if number == "":
+                            video = cv2.VideoCapture(path + "/bdd100k/temporal/train"+validity + "/negativi" + "/" + filename + ".mov")
+                            if os.path.exists(path + "/bdd100k/temporal/train"+validity + "/negativi" + "/" + filename + ".mov"):
+                                rot = get_rotation(path + "/bdd100k/temporal/train"+validity + "/negativi" + "/" + filename + ".mov")
+                        else:
+                            video = cv2.VideoCapture(path + "/bdd100k/temporal/train" + validity + "/positivi" + str(number) + "/" + filename + ".mov")
+                            if os.path.exists(path + "/bdd100k/temporal/train" + validity + "/positivi" + str(number) + "/" + filename + ".mov"):
+                                rot = get_rotation(path + "/bdd100k/temporal/train" + validity + "/positivi" + str(number) + "/" + filename + ".mov")
+
+                        if video.isOpened() == False:
+                            #print("Video NOT found")
+                            continue
+                        counter = 0
+
+
+
+                        counter_1 = 0
+                        while (video.isOpened()):
+
+
+
+                            # print(video.get(4))
+                            # print(counter)
+                            ret, frame = video.read()
+
+                            if np.shape(frame) == ():  # to prevent error while EOF is reached
+
+                                break
+
+                            if rot == 270:
+                                frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
+                            if rot == 90:
+                                frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
+
+                            if rot == -1:
+                                print("mmmh")
+
+
+
+
+                            if "valid" in validity:
+                                if v["stop"] != "No":
+                                    if counter % 6 == 0 and counter<10* (int(number)) *30 and counter>= 30*10*int(number) - ((self.frames_obs/5)*30):  # every 6 frame is 1 sec (30fps original video)
+                                        counter_1 += 1
+                                        frame = cv2.resize(frame, (112, 112))
+                                        cv2.imwrite(
+                                            "/volumes/HD/bdd100k/" + which_part + "/" + filename + "/" +
+                                            filename + "-" + str(counter_1) + ".jpg", frame)
+                                else:
+                                    if v["stop"] == "No":
+                                        if counter % 6 == 0 and counter<10*30 and counter>= 30*10 - ((self.frames_obs/5)*30):
+                                            counter_1 += 1
+                                            frame = cv2.resize(frame, (112, 112))
+                                            cv2.imwrite(
+                                                "/volumes/HD/bdd100k/" + which_part + "/" + filename + "/" +
+                                                filename + "-" + str(counter_1) + ".jpg", frame)
+                            else:
+                                if "not" in validity:
+                                    if v["stop"] != "No":
+                                        if counter % 6 == 0 and counter < v["end"] * 30 and counter >= v["end"]*30  - (self.frames_obs/5)*30:  # every 6 frame is 1 sec (30fps original video)
+                                            counter_1 += 1
+                                            frame = cv2.resize(frame, (112, 112))
+                                            cv2.imwrite(
+                                                "/volumes/HD/bdd100k/" + which_part + "/" + filename + "/" +
+                                                filename + "-" + str(counter_1) + ".jpg", frame)
+                                    else:
+                                        if v["stop"] == "No":
+                                            if counter % 6 == 0 and counter < v["end"] * 30 and counter >= v["end"]*30  - (self.frames_obs/5)*30:
+                                                counter_1 += 1
+                                                frame = cv2.resize(frame, (112, 112))
+                                                cv2.imwrite(
+                                                    "/volumes/HD/bdd100k/" + which_part + "/" + filename + "/" +
+                                                    filename + "-" + str(counter_1) + ".jpg", frame)
+
+                            counter += 1  # HA SENSO  PARTIRE DALL' 1???
+
+                        if v["stop"] == "No":
+                            gt[filename] = "No"
+                        else:
+                            if v["stop"] != "No" and "valid" in validity:
+                                gt[filename] = int(v["stop"]) - (10*int(number))  # the new stop is between 0 and 10 sec of the predicting time (not considering observed frames)
+                            else:
+                                if "not" in validity:
+                                    gt[filename] = int(v["stop"]) - (int(v["end"]-10))
+
+
+                        video.release()
+
+
+
+                except ValueError:  # includes simplejson.decoder.JSONDecodeError
+                    print("Error:")
+                    print(traceback.print_exc())
+
+        except InputError as error:
+            print('A New Exception occured: ', error.message)
+
+        #print(len(gt))
+        #time.sleep(3)
+        return gt
 
 
 

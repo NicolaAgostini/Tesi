@@ -142,7 +142,7 @@ def _process_image(path1, info):  # if the current frame is the frame where it s
     """
     :param path: path of the image
     :param info: dict of the json groundtruth
-    :return:
+    :return: the label and the name of the file video
     """
 
 
@@ -202,7 +202,7 @@ def load_dataset():
 def decode(serialized_example):
     '''
     Given a serialized example in which the frames are stored as
-    compressed JPG images 'frames/0001', 'frames/0002' etc., this
+    compressed JPG images 'frames/01', 'frames/02' etc., this
     function samples SEQ_NUM_FRAMES from the frame list, decodes them from
     JPG into a tensor and packs them to obtain a tensor of shape (N,H,W,3).
     Returns the the tuple (frames, class_label (tf.int64)
@@ -222,7 +222,7 @@ def decode(serialized_example):
 
     # Decode the encoded JPG images
     images = []
-    for i in range(16):
+    for i in range(16):  # i can normalize here dividing each pixel by 255
         """
         img = tf.image.decode_jpeg(parsed_features["frames/{:02d}".format(i)])
         img = tf.cast(img, tf.float32)
@@ -360,7 +360,7 @@ class Tensors():
 
         dataset = dataset.repeat(NUM_EPOCHS)
         dataset = dataset.map(decode, num_parallel_calls=os.cpu_count())
-        #dataset = dataset.map(normalize)  # normalize the images
+        #dataset = dataset.map(normalize, num_parallel_calls=os.cpu_count())  # normalize the images
         """
         for image, label in dataset.take(1):
             print(image[0])
