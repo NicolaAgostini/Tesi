@@ -1,46 +1,27 @@
-from Dataset import *
+from Preprocessing_bdd100k import *
 from test import *
-from TFLoad import *
+from TFLoad_bdd100k import *
+from Glove import Glove
+import numpy as np
 
+
+
+alpha = 0.8
 
 
 
 def main():
-    path = "/Users/nicolago/Desktop/test/*.mp4"
+    a = Glove("/Users/nicolago/Desktop/Glove.6B/", alpha)
+    a.load_glove()
+    #print(a.find_similar("move")[1:6])
+    phi = a.compute_phi()
+    print(phi.shape)
+    a.compute_Pi(phi)
+    #a.print_heatmap()
+    print(a.get_onehot())
+    b = a.get_ysoft()
+    test_nearest(b)
 
-    a = Dataset(5, "mph", path, 24, 16)
-
-    # count_items(path + "/bdd100k/traingroundtruth.json", True)
-
-    a.preprocess_dataset()
-    #open_video()
-    #subsample_video_fps_test()
-
-
-
-
-    #load_datas(path)
-
-    #a.generate_img("/Users/nicolago/Desktop/test/train/", 16)
-
-    #convert_toarray("/Users/nicolago/Desktop/test/imgs/")
-
-    #load_datas()
-    #a.generate_img("/Users/nicolago/Desktop/test/train/", "train")
-
-
-    #load_dataset()
-    #read_tfrecord()
-    #read_tfrecord("/Users/nicolago/Desktop/test/img.tfrecords")
-    #image, classlabel = read_tfrecord("/Users/nicolago/Desktop/test/0.tfrec")
-
-    #cose("/Users/nicolago/Desktop/test/0.tfrec")
-
-    #b = Tensors(16)
-
-    #b.generate_TFrecord()
-
-    #b.load_TFrecord()
 
 
 if __name__ == '__main__':

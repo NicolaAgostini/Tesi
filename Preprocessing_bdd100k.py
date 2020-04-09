@@ -45,7 +45,7 @@ def count_items(file_path, is_json):
         with open(file_path, 'r') as f:
             info = json.load(f)
             #v = info["videos"]
-            print("Total number of valid videos: " + str(len(info)))
+            print("Total number of valid videos: " + str(len(info["videos"])))
     else:
         print("Total number of files: " + str(sum([len(files) for r, d, files in os.walk(file_path)])))
 
