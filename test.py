@@ -146,7 +146,7 @@ def open_video():
 def test_nearest(y_soft):
     dict = {}
     for i in range(y_soft.shape[0]):
-        dict[i] = y_soft[2][i]
+        dict[i] = y_soft[4][i]
 
     ordered = sorted(dict.items(), key=lambda x: x[1], reverse=True)
     print(ordered)

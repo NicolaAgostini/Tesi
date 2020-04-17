@@ -6,21 +6,23 @@ import numpy as np
 
 
 
-alpha = 0.8
+alpha = 0.2
 
 
 
 def main():
-    a = Glove("/Users/nicolago/Desktop/Glove.6B/", alpha)
-    a.load_glove()
+    a = Glove("/Users/nicolago/Desktop/Glove.6B/", alpha, "standard")
+
     #print(a.find_similar("move")[1:6])
-    phi = a.compute_phi()
-    print(phi.shape)
-    a.compute_Pi(phi)
-    #a.print_heatmap()
-    print(a.get_onehot())
     b = a.get_ysoft()
+    print(b.shape)
+
+    a.print_heatmap()
+
+    # TEST #
     test_nearest(b)
+
+
 
 
 
