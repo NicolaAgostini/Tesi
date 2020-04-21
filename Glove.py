@@ -174,7 +174,7 @@ class Glove():
         self.compute_Pi()
         self.compute_onehot()
         y_soft = []
-        n_labels= self.y.shape[0]
+        n_labels = self.y.shape[0]
         if self.which_methods == "standard":
             for i in range(n_labels):
                 y_soft.append((1-self.alpha)*self.y[i] + self.alpha*(1/n_labels))

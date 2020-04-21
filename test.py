@@ -5,6 +5,7 @@ import tensorflow as tf
 import cv2
 import numpy as np
 import time
+import lmdb
 
 from shutil import copyfile
 
@@ -150,3 +151,31 @@ def test_nearest(y_soft):
 
     ordered = sorted(dict.items(), key=lambda x: x[1], reverse=True)
     print(ordered)
+
+
+def inspect_lmdb(path):
+    env = lmdb.open(path, readonly=True, lock=False)
+    with env.begin() as txn:
+        with txn.cursor() as curs:
+            # do stuff
+            for key, value in curs:
+                print((key, value))
+
+"""
+AN EXAMPLE OF WHAT THERE IS INSIDE LMDB FILES:
+
+(b'OP01-R01-PastaSalad_frame_0000007548.jpg', b'\x00\x00\x00\x00\x01\x95\x05;9.\xd0>\x82\xfc!?n\xf3 ETC....
+(b'OP01-R01-PastaSalad_frame_0000007549.jpg', b'\xc97\xc0=3k\xed>\x00\x00\x00\x00\xba\x9a\x82?\x99\ ETC...
+
+ETC...
+
+
+
+"""
+
+
+
+
+
+
+
