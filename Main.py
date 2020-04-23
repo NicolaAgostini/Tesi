@@ -16,15 +16,17 @@ path_to_lmdb = ["/Volumes/Bella_li/egtea/TSN-C_3_egtea_action_CE_s1_flow_model_b
 groundtruth_path = "/volumes/Bella_li/egtea/action_annotation/train_split1.txt"
 
 groundtruth_path_csv = "/volumes/Bella_li/egtea/training.csv"
+input_dim = [1024, 1024, 352]
 
 
 def get_dataset(batch_size, num_workers):
     a = Dataset(path_to_lmdb, groundtruth_path_csv)
     return DataLoader(a, batch_size=batch_size, num_workers=num_workers,
-                      pin_memory=True, shuffle= True) # suffle true for training
+                      pin_memory=True, shuffle= True)  # suffle true for training
 
 
 def main():
+    dataset = get_dataset(4, 4)
 
 
     #inspect_lmdb(path_to_lmdb[1])
