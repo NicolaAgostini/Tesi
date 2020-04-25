@@ -49,7 +49,7 @@ class LSTM(nn.Module):
 
 
 class LSTMROLLING(nn.Module):
-    def __init__(self, num_class, feat_in, hidden, dropout=0.8, depth=1):
+    def __init__(self, feat_in, hidden, dropout=0.8, depth=1):
 
 
         super(LSTMROLLING, self).__init__()
