@@ -55,7 +55,7 @@ def read_representations(frames, env):
     # convert list to numpy array
     features = np.array(features)
 
-    return features
+    return features  # dim 1024 for rgb and flow and 352 for obj X 14
 
 def read_data(frames, env):
     """A wrapper form read_representations to handle loading from more environments.

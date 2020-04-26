@@ -32,6 +32,7 @@ def get_dataset(ground_truth, batch_size, num_workers):
     return DataLoader(a, batch_size=batch_size, num_workers=num_workers,
                       pin_memory=True, shuffle= True)  # suffle true for training
 
+"""
 def get_model():
     rgb_model = LSTMROLLING(input_dim[0], 1024)
     flow_model = LSTMROLLING(input_dim[1], 1024)
@@ -40,13 +41,19 @@ def get_model():
     model = RLSTMFusion([rgb_model, flow_model, obj_model], 1024)  # the model is the fusion of the three branches
 
     return model
+    
+"""
 
 
 def main():
+
+    test_model()
+
+    """
     data_loader_train = get_dataset(groundtruth_path_csv_train, 4, 4)  # loader for training
     data_loader_val = get_dataset(groundtruth_path_csv_val, 4, 4)  # loader for validation
+    """
 
-    model = get_model()
 
 
     #inspect_lmdb(path_to_lmdb[1])

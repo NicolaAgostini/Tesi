@@ -5,106 +5,72 @@ import numpy as np
 from torch.nn import functional as F
 
 
+class BaselineModel(torch.nn.Module):
+    def __init__(self, batch_size, seq_len, input_size, dropout=0.8, num_classes=106):
+        super(BaselineModel, self).__init__()
 
-class LSTM(nn.Module):
-    """"An LSTM implementation """
-    def __init__(self, feat_in, feat_out=1024, num_layers=1, dropout=0, num_class=106):
+        self.branches = [torch.nn.LSTM(input_size[0], 1024, seq_len),
+                         torch.nn.LSTM(input_size[1], 1024, seq_len),
+                         torch.nn.LSTM(input_size[2], 1024, seq_len)]
         """
-            feat_in: input feature size
-            feat_out: output feature size
-            num_layers: number of layers
-            dropout: dropout probability
+        self.branches = nn.ModuleDict({
+            "rgb": torch.nn.LSTM(input_size[0], 1024, seq_len),  # input of lstm is 1024 (vector of input), hidden units are 1024, num layers is 14 (6 enc + 8 dec)
+            "flow": torch.nn.LSTM(input_size[1], 1024, seq_len),  # output of each LSTM will be batch_size * temp_sequence=14 * hidden = 1024
+            "obj": torch.nn.LSTM(input_size[2], 1024, seq_len)
+        })
         """
-        super(LSTM, self).__init__()
-        self.input_dim = feat_in
-        self.hidden_dim = feat_out  #hidden è la dimensione dell'output dell'lstm che poi sarà l'input della FC
-        self.num_layers = num_layers  # numero di livelli(iterazioni) di una singola lstm
+        self.batch_size = batch_size
+        self.dropout = torch.nn.Dropout(dropout)
+        self.fc = torch.nn.Linear(batch_size*1024*3, num_classes)  # without seq_len because i want my output on every timestamp from 0 to 2s of observations
+        self.num_classes = num_classes
 
-        # simply create an LSTM with the given parameters
-        self.lstm = nn.LSTM(feat_in, feat_out, num_layers=num_layers, dropout=dropout)
-        #self.classifier = nn.Sequential(nn.Dropout(dropout), nn.Linear(self.hidden, num_class))
-        #self.linear = nn.Linear(self.hidden_dim, output_dim)
+    def forward(self, feat):  # input will be batch_size * sequence length * input_dim
+        '''
+        input feat: dictionary like {key: np.ndarray of shape [batch_size, 14, len(key)] for key in modalities}  where
+                    key€{rgb, flow, obj} and if key="rgb" => len(key) = 1024
 
-    def forward(self, seq):
+        '''
+
+        # LSTM forward
+        x = []
         """
-        Iterates over the input and pass the hidden and cell state to the next LSTM
-        :param seq:
-        :return: the list of (hidden state, cell state) of the LSTM over the input sequence of frames
+        ### first type of input ###
+        
+        for key, value in feat.items():
+            x_mod, hidden = self.branches[key](value)  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
+            #print(x_mod.size())
+            x.append(x_mod)  # append to a list
         """
-        last_cell = None
-        last_hid = None
-        hid = []
-        cell = []
-        for i in range(seq.shape[0]):  # for every time steps
-            el = seq[i, ...].unsqueeze(0)
-            if last_cell is not None:
-                _, (last_hid, last_cell) = self.lstm(el, (last_hid, last_cell))  # the next LSTM takes as inputs the
-                # frame at time t and also the hidden and cell state of the previous LSTM
-            else:
-                _, (last_hid, last_cell) = self.lstm(el)
-            hid.append(last_hid)
-            cell.append(last_cell)
 
-        return torch.stack(hid, 0), torch.stack(cell, 0)
+        for key, value in enumerate(feat):
+            x_mod, hidden = self.branches[key](value)  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
+            # print(x_mod.size())
+            x.append(x_mod)  # append to a list
 
 
-class LSTMROLLING(nn.Module):
-    def __init__(self, feat_in, hidden, dropout=0.8, depth=1):
+        print(np.shape(x))
+        # Concatenate
+        x = torch.cat(x, -1)  # x has shape [batch_size, 14, 3 * lstm_hidden_size]
 
+        print(x.size())
 
-        super(LSTMROLLING, self).__init__()
-        self.feat_in = feat_in
-        self.dropout = nn.Dropout(dropout)
-        self.hidden = hidden
-        self.rolling_lstm = LSTM(feat_in, hidden, num_layers=depth, dropout=dropout if depth > 1 else 0)
-        #self.unrolling_lstm = nn.LSTM(feat_in, hidden, num_layers=depth, dropout=dropout if depth > 1 else 0)
-        #self.classifier = nn.Sequential(nn.Dropout(dropout), nn.Linear(hidden, num_class))
+        # Take last time samples
+        x = x[:, -8:, :]  # x has shape [batch_size, 8, 3 * lstm_hidden_size]
 
-    def forward(self, inputs):
-        # permute the inputs for compatibility with the LSTM
-        inputs = inputs.permute(1, 0, 2)
+        # Dropout
+        x = self.dropout(x)  # apply dropout otherwise ll encounter overfitting
+        #x = x.view(self.batch_size, -1)  # prepare input to FC linear
+        print(x.size())
+        # Fully connected
+        x = self.fc(x)  # x has shape [batch_size, 8, num_classes]
+        x = torch.nn.functional.softmax(x, -1)
 
-        # pass the frames through the rolling LSTM
-        # and get the hidden (x) and cell (c) states at each time-step
-        x, c = self.rolling_lstm(self.dropout(inputs))  # x, c are the hidden and cell states of all the lstm during the time steps
-        out = x.contiguous()  # batchsize x timesteps x hidden
+        '''
+        For example, if each feature input is sampled every 0.25, then
+        x[:, 0, :] is the prediction at 0.0 [sec]
+        x[:, 1, :] is the prediction at 0.25 [sec]
+        x[:, 2, :] is the prediction at 0.5 [sec]
+        etc...
+        '''
 
-
-        return out  # return the hidden state for every V_i
-
-
-class RLSTMFusion(nn.Module):
-    def __init__(self, branches, hidden):
-        """
-            branches: list of pre-trained branches
-            hidden: size of hidden vectors of the branches
-        """
-        super(RLSTMFusion, self).__init__()
-        self.branches = nn.ModuleList(branches)
-
-        # input size for the MATT network
-        # given by 1(only the hidden state) * num_branches * hidden_size
-        in_size = len(self.branches) * hidden
-
-        # final fusion of branches
-        self.final = nn.Linear(in_size, 106)
-
-    def forward(self, inputs):
-        """inputs: tuple containing the inputs to the single branches
-        :return: a 106 vector with largest number in predicted future actions
-        """
-        preds = []
-
-        # for each branch
-        for i in range(len(inputs)):
-            # feed the inputs to the LSTM and get the scores y
-            prediction = self.branches[i](inputs[i])
-            preds.append(prediction)  # preds now has a list of branches*(number of preds)*(hidden=1024)
-        y = torch.stack(preds, 2)  # stack predictions along dimension 2
-        y = y.contiguous().view(y.size(0), -1)  # concatenate the branches obtaining batch* # preds * 3*1024
-
-        y_final = self.final(y)
-
-        return y_final
-
-
+        return x

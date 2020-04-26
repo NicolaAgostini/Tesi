@@ -6,6 +6,9 @@ import cv2
 import numpy as np
 import time
 import lmdb
+from Model import *
+from Dataset import *
+from torch.utils.data import DataLoader
 
 from shutil import copyfile
 
@@ -172,6 +175,93 @@ ETC...
 
 
 """
+
+def read_mock_representation(e):
+    if "obj" in e:
+        return torch.randn(14, 352)
+    else:
+        return torch.randn(14, 1024)
+
+
+def read_mock_data(env):
+    l = [read_mock_representation(e) for e in env]
+    return l
+
+
+class Mock_Dataset(data.Dataset):
+    """
+    this class will provide and object dataset which implement the methods __getitem()__ and __len()__
+    and give an iterator on the dataset composed by features of rgb, optical flow and objects
+    """
+
+    def __init__(self, env):
+        self.env = env  # list of enviroments es. rgb, flow, obj
+
+    def __len__(self):
+        return 1
+
+    def __getitem__(self, index):
+        """
+        return a item mock out with label and past features
+        """
+
+
+        # return a dictionary containing the id of the current sequence
+        out = {'id': 1}
+
+
+        # read representations for past frames
+        out['past_features'] = read_mock_data(self.env)
+
+        # get the label of the current sequence
+
+        out['label'] = torch.randn(106)
+
+        return out
+
+def get_mock_dataloader():
+    a = Mock_Dataset(["rgb", "flow", "obj"])
+    print(a.__getitem__(1))
+    return DataLoader(a, batch_size=1)
+
+
+def test_model():
+    """
+    function to test the input and output size of the model
+    """
+    device = torch.device("cpu")
+
+    batch_size = 1
+    seq_len = 14
+    input_dim = [1024, 1024, 352]
+    inp_rgb = torch.randn(batch_size, seq_len, input_dim[0])
+    inp_flow = torch.randn(batch_size, seq_len, input_dim[1])
+    inp_obj = torch.randn(batch_size, seq_len, input_dim[2])
+
+    dict_in={
+        "rgb": inp_rgb,
+        "flow": inp_flow,
+        "obj": inp_obj
+    }
+
+    model = BaselineModel(1, seq_len, input_dim)
+    model.to(device)
+
+    loaders = get_mock_dataloader()
+
+    for i, batch in enumerate(loaders):
+        x = batch['past_features']
+        #print(len(x))
+
+        y = batch['label']
+
+        output = model(x)
+        #output = model(dict_in)
+        print(output.size())
+
+
+
+
 
 
 
