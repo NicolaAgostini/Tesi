@@ -14,10 +14,13 @@ alpha = 0.2
 path_to_lmdb = ["/Volumes/Bella_li/egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd/",
                     "/Volumes/Bella_li/egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd/"]  # the folders that contain the .mdb files
 
-groundtruth_path_train = "/volumes/Bella_li/egtea/action_annotation/train_split1.txt"
+groundtruth_path_train = ["/volumes/Bella_li/egtea/action_annotation/train_split1.txt",
+                          "/volumes/Bella_li/egtea/action_annotation/train_split2.txt",
+                          "/volumes/Bella_li/egtea/action_annotation/train_split3.txt"]
 
-groundtruth_path_csv_train = "/volumes/Bella_li/egtea/training.csv"
-groundtruth_path_csv_val = "/volumes/Bella_li/egtea/validation.csv"
+
+
+
 
 input_dim = [1024, 1024, 352]
 
@@ -30,7 +33,7 @@ def get_dataset(ground_truth, batch_size, num_workers):
     """
     a = Dataset(path_to_lmdb, ground_truth)
     return DataLoader(a, batch_size=batch_size, num_workers=num_workers,
-                      pin_memory=True, shuffle= True)  # suffle true for training
+                      pin_memory=True, shuffle=True)  # suffle true for training
 
 """
 def get_model():
@@ -44,14 +47,29 @@ def get_model():
     
 """
 
+def initialize_trainval_csv(which_split):
+    """
+    generate training and validation csv
+    :param which_split: {1,2,3} the split of egtea gaze +
+    :return:
+    """
+
+    list_path = generate_train_val_txt(groundtruth_path_train[which_split], str(which_split))
+    path = txt_to_csv(list_path[0], "training")
+    path.append(txt_to_csv(list_path[1], "validation"))
+    return path
+
 
 def main():
 
     test_model()
 
     """
-    data_loader_train = get_dataset(groundtruth_path_csv_train, 4, 4)  # loader for training
-    data_loader_val = get_dataset(groundtruth_path_csv_val, 4, 4)  # loader for validation
+    path = initialize_trainval_csv(1)
+    
+    data_loader_train = get_dataset(path[0], 4, 4)  # loader for training
+    data_loader_val = get_dataset(path[1], 4, 4)  # loader for validation
+    
     """
 
 

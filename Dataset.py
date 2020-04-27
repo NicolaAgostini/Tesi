@@ -5,19 +5,39 @@ import tqdm
 import numpy as np
 import csv
 import re
+from random import seed
+from random import random
 
 
-
-
-def txt_to_csv(path_oftxt):
+def generate_train_val_txt(path_oftxt, which_split):
     """
-    from the txt files return the trainign csv in which there are annotations well formed for lmdb features
+    from a train split generate train and val(10%) in txt
+    :param path_oftxt:    train_split1.txt
+    :return:
+    """
+    counter = 0
+    with open(path_oftxt, 'r') as f:
+        with open("/Volumes/Bella_li/egtea/"+which_split+"_train.txt", 'w+', newline='') as train:
+            with open("/Volumes/Bella_li/egtea/"+which_split+"_val.txt", 'w+', newline='') as val:
+                for line in f:
+
+                    seed(counter)
+                    if random() >= 0.9:
+                        val.write(line)
+                    else:
+                        train.write(line)
+                    counter += 1
+    return ["/Volumes/Bella_li/egtea/"+which_split+"_train.txt", "/Volumes/Bella_li/egtea/"+which_split+"_val.txt"]
+
+def txt_to_csv(path_oftxt, which_part):
+    """
+    from the txt files return the training csv in which there are annotations well formed for lmdb features
     :param path_oftxt:
     :return:
     """
     count = 0
     with open(path_oftxt, 'r') as f:
-        with open('/Volumes/Bella_li/egtea/training.csv', 'w+', newline='') as file:
+        with open("/Volumes/Bella_li/egtea/"+which_part+".csv", 'w+', newline='') as file:
             for line in f:
 
                 values = re.split("-| ", line)
@@ -32,6 +52,7 @@ def txt_to_csv(path_oftxt):
                 writer.writerow([count, v_name, start_frame, end_frame, action_id])
 
                 count += 1
+    return "/Volumes/Bella_li/egtea/"+which_part+".csv"
 
 
 
@@ -55,7 +76,7 @@ def read_representations(frames, env):
     # convert list to numpy array
     features = np.array(features)
 
-    return features  # dim 1024 for rgb and flow and 352 for obj X 14
+    return features  # dim 14 X 1024 for rgb and flow and 352 for obj
 
 def read_data(frames, env):
     """A wrapper form read_representations to handle loading from more environments.

@@ -222,7 +222,7 @@ class Mock_Dataset(data.Dataset):
 def get_mock_dataloader():
     a = Mock_Dataset(["rgb", "flow", "obj"])
     print(a.__getitem__(1))
-    return DataLoader(a, batch_size=1)
+    return DataLoader(a, batch_size=1)  # change batch size
 
 
 def test_model():
@@ -234,17 +234,8 @@ def test_model():
     batch_size = 1
     seq_len = 14
     input_dim = [1024, 1024, 352]
-    inp_rgb = torch.randn(batch_size, seq_len, input_dim[0])
-    inp_flow = torch.randn(batch_size, seq_len, input_dim[1])
-    inp_obj = torch.randn(batch_size, seq_len, input_dim[2])
 
-    dict_in={
-        "rgb": inp_rgb,
-        "flow": inp_flow,
-        "obj": inp_obj
-    }
-
-    model = BaselineModel(1, seq_len, input_dim)
+    model = BaselineModel(1, seq_len, input_dim)  # batch size, temporal sequence, input dimension
     model.to(device)
 
     loaders = get_mock_dataloader()
