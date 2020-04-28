@@ -9,6 +9,7 @@ import lmdb
 from Model import *
 from Dataset import *
 from torch.utils.data import DataLoader
+import math
 
 from shutil import copyfile
 
@@ -215,13 +216,13 @@ class Mock_Dataset(data.Dataset):
 
         # get the label of the current sequence
 
-        out['label'] = torch.randn(106)
+        out['label'] = math.ceil(np.random.uniform(0, 105))
 
         return out
 
 def get_mock_dataloader():
     a = Mock_Dataset(["rgb", "flow", "obj"])
-    print(a.__getitem__(1))
+    #print(a.__getitem__(1))
     return DataLoader(a, batch_size=1)  # change batch size
 
 

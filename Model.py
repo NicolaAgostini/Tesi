@@ -48,11 +48,11 @@ class BaselineModel(torch.nn.Module):
             x.append(x_mod)  # append to a list
 
 
-        print(np.shape(x))
+        #print(np.shape(x))
         # Concatenate
         x = torch.cat(x, -1)  # x has shape [batch_size, 14, 3 * lstm_hidden_size]
 
-        print(x.size())
+        #print(x.size())
 
         # Take last time samples
         x = x[:, -8:, :]  # x has shape [batch_size, 8, 3 * lstm_hidden_size]
@@ -60,7 +60,7 @@ class BaselineModel(torch.nn.Module):
         # Dropout
         x = self.dropout(x)  # apply dropout otherwise ll encounter overfitting
         #x = x.view(self.batch_size, -1)  # prepare input to FC linear
-        print(x.size())
+        #print(x.size())
         # Fully connected
         x = self.fc(x)  # x has shape [batch_size, 8, num_classes]
         x = torch.nn.functional.softmax(x, -1)
