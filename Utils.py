@@ -51,7 +51,7 @@ def topk_accuracy(scores, labels, ks, selected_class=None):
 
     # compute true positives in the top-maxk predictions
     tp = rankings[:, :maxk] == labels.reshape(-1, 1)  # check where label from ranking (top 5 highest) is equal to groundtruth
-    #print(tp)
+    print(tp)
 
     # trim to selected ks and compute accuracies
     return [tp[:, :k].max(1).mean() for k in ks]

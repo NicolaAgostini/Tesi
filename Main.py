@@ -10,7 +10,6 @@ from torch.nn import functional as F
 from Utils import topk_accuracy, ValueMeter, topk_accuracy_multiple_timesteps, get_marginal_indexes, marginalize, softmax,  topk_recall_multiple_timesteps, tta, predictions_to_json
 
 
-
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 mode = "train"  # if train or test
@@ -26,6 +25,8 @@ groundtruth_path_train = ["/volumes/Bella_li/egtea/action_annotation/train_split
 
 
 path_to_csv_trainval = ['/Volumes/Bella_li/egtea/training1.csv', '/Volumes/Bella_li/egtea/validation1.csv']  # path of train val csv
+
+path_test_txt = "/volumes/Bella_li/egtea/action_annotation/test_split1.txt"
 
 
 
@@ -78,12 +79,23 @@ def initialize_trainval_csv(which_split):
     path.append(txt_to_csv(list_path[1], "validation"+str(which_split)))
     return path
 
+def initialize_test_csv(which_split):
+    """
+    given in input the test split txt file will generate the csv test file suitable for get_dataset function for test data loader
+    :param which_split: depending on the test split {1,2,3}
+    :return: the path of the test csv file generated
+    """
+    path = [txt_to_csv(path_test_txt, "test" + str(which_split))]
+    return path
+
 
 def main():
 
 
 
     #path = initialize_trainval_csv(1)  # to generate training and validation csv
+
+    path_test = initialize_test_csv(1)
 
     
     smoothed_labels = label_smmothing("prior")
@@ -93,8 +105,8 @@ def main():
     model = model.to(device)
 
     if mode == "train":
-        #data_loader_train = get_dataset(path[0], 4, 4)  # loader for training
-        #data_loader_val = get_dataset(path[1], 4, 4)  # loader for validation
+        #data_loader_train = get_dataset(path_to_csv_trainval[0], 4, 4)  # loader for training
+        #data_loader_val = get_dataset(path_to_csv_trainval[1], 4, 4)  # loader for validation
 
         data_loader_train = get_mock_dataloader()
         data_loader_val = get_mock_dataloader()
@@ -102,6 +114,12 @@ def main():
         optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum)
 
         train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, smoothed_labels)
+
+    elif mode =="test":
+        data_loader_test = get_dataset(path_test, 4, 4)
+
+        get_scores(model, data_loader_test)
+
 
 
 
@@ -130,12 +148,11 @@ def train_val(model, loaders, optimizer, epochs, smoothed_labels):
                 for i, batch in enumerate(loaders[mode]):
                     x = batch['past_features']  # load in batch the next "past_features" datas of size (batch_size * 14 * 1024(352)
 
-
                     x = [xx.to(device) for xx in x]  # if input is a size (for multiple branch) then load in the devices
 
+                    y = batch['label'].to(device)  # get the label of the batch (batch, 1)
 
-                    y = batch['label'].to(device)  # get the label of the batch (batch * 1)
-                    y_temp = y  # label (batch_size, 1)
+                    y_temp = y  # label (batch_size, 1) to use for top-k accuracy
                     bs = y.shape[0]  # batch size
 
                     temp = []
@@ -153,18 +170,10 @@ def train_val(model, loaders, optimizer, epochs, smoothed_labels):
                     preds = model(x)
                     print("output of the model " + str(preds.size()))
 
-                    # take only the last 8 predictions
-                    #preds = preds.view(batch_size, -1, -1)
-
-                    #preds = preds[:, -8:, :].contiguous()
-
                     # linearize predictions
                     linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106) ogni riga ha una label corrispondente al timestamp
-                    # replicate the labels across timesteps and linearize
-                    #print("Output transformed " + str(linear_preds.size()))
-                    #print(preds.size())
+
                     linear_labels = y
-                    #print(linear_labels.size())
 
                     loss = nn.BCEWithLogitsLoss()(linear_preds, linear_labels)  # loss function for smoothed labels
 
@@ -180,8 +189,8 @@ def train_val(model, loaders, optimizer, epochs, smoothed_labels):
                     print(acc)
 
                     # store the values in the meters to keep incremental averages
-                    loss_meter[mode].add(loss.item(), bs)
-                    accuracy_meter[mode].add(acc, bs)
+                    loss_meter[str(mode)].add(loss.item(), bs)
+                    accuracy_meter[str(mode)].add(acc, bs)
 
 
                     # if in training mode
@@ -201,15 +210,80 @@ def train_val(model, loaders, optimizer, epochs, smoothed_labels):
                     
 
                 # log at the end of each epoch
-                print(mode, epoch + 1, loss_meter[mode], accuracy_meter[mode], green=True)
+                print(mode, epoch + 1, loss_meter[str(mode)].value(), accuracy_meter[str(mode)].value())
                 
 
 
         # save checkpoint at the end of each train/val epoch
         #save_model(model, epoch + 1, accuracy_meter['validation'].value())
 
-        torch.save({'state_dict': model.state_dict(), 'epoch': epoch}, "/volumes/Bella_li/"+model+".pth.tar")
+        torch.save({'state_dict': model.state_dict(), 'epoch': epoch}, "/volumes/Bella_li/model.pth.tar")
 
+
+
+
+
+
+def get_scores(model, loader):
+    pass
+    """
+    model.eval()
+    predictions = []
+    labels = []
+    ids = []
+    with torch.set_grad_enabled(False):
+        for batch in tqdm(loader, 'Evaluating...', len(loader)):
+            x = batch['past_features']
+            
+            x = [xx.to(device) for xx in x]
+        
+
+            y = batch['label'].numpy()
+
+            ids.append(batch['id'].numpy())
+
+            preds = model(x).cpu().numpy()[:, -args.S_ant:, :]
+
+            predictions.append(preds)
+            labels.append(y)
+
+    action_scores = np.concatenate(predictions)
+    labels = np.concatenate(labels)
+    ids = np.concatenate(ids)
+
+    actions = pd.read_csv(
+        join(args.path_to_data, 'actions.csv'), index_col='id')
+
+    vi = get_marginal_indexes(actions, 'verb')
+    ni = get_marginal_indexes(actions, 'noun')
+
+    action_probs = softmax(action_scores.reshape(-1, action_scores.shape[-1]))
+
+    verb_scores = marginalize(action_probs, vi).reshape(
+        action_scores.shape[0], action_scores.shape[1], -1)
+    noun_scores = marginalize(action_probs, ni).reshape(
+        action_scores.shape[0], action_scores.shape[1], -1)
+
+    if labels.max() > 0:
+        return verb_scores, noun_scores, action_scores, labels[:, 0], labels[:, 1], labels[:, 2]
+    else:
+        return verb_scores, noun_scores, action_scores, ids
+"""
+
+
+def load_model(model):
+    """
+    load the saved state in the model passed as a parameter
+    to load in main:
+    model = BaselineModel(batch_size, seq_len, input_dim)
+    model = model.to(device)
+    load_model(model)
+
+    :return:
+    """
+    chk = torch.load("/volumes/Bella_li/model.pth.tar")
+
+    model.load_state_dict(chk['state_dict'])
 
 
 
