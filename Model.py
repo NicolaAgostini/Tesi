@@ -21,7 +21,7 @@ class BaselineModel(torch.nn.Module):
         """
         self.batch_size = batch_size
         self.dropout = torch.nn.Dropout(dropout)
-        self.fc = torch.nn.Linear(batch_size*1024*3, num_classes)  # without seq_len because i want my output on every timestamp from 0 to 2s of observations
+        self.fc = torch.nn.Linear(1024*3, num_classes)  # without seq_len because i want my output on every timestamp from 0 to 2s of observations
         self.num_classes = num_classes
 
     def forward(self, feat):  # input will be batch_size * sequence length * input_dim
@@ -52,7 +52,7 @@ class BaselineModel(torch.nn.Module):
         # Concatenate
         x = torch.cat(x, -1)  # x has shape [batch_size, 14, 3 * lstm_hidden_size]
 
-        #print(x.size())
+        #print("otput lstm" + str(x.size()))
 
         # Take last time samples
         x = x[:, -8:, :]  # x has shape [batch_size, 8, 3 * lstm_hidden_size]

@@ -7,6 +7,7 @@ from Dataset import *
 from Model import *
 from torch.utils.data import DataLoader
 from torch.nn import functional as F
+from Utils import topk_accuracy, ValueMeter, topk_accuracy_multiple_timesteps, get_marginal_indexes, marginalize, softmax,  topk_recall_multiple_timesteps, tta, predictions_to_json
 
 
 
@@ -31,13 +32,15 @@ path_to_csv_trainval = ['/Volumes/Bella_li/egtea/training1.csv', '/Volumes/Bella
 ### SOME MODEL'S VARIABLES ###
 
 input_dim = [1024, 1024, 352]
-batch_size = 1
+batch_size = 2
 seq_len = 14
 
 learning_rate = 0.01
 momentum = 0.9
 
 epochs = 100
+
+display_every = 10
 
 
 
@@ -113,6 +116,9 @@ def train_val(model, loaders, optimizer, epochs, smoothed_labels):
     """
     for epoch in range(epochs):
 
+        loss_meter = {'0': ValueMeter(), '1': ValueMeter()}
+        accuracy_meter = {'0': ValueMeter(), '1': ValueMeter()}
+
         for mode in [0, 1]:  # 0 for training, 1 for validation
             # enable gradients only if training
             with torch.set_grad_enabled(mode == 0):
@@ -129,48 +135,54 @@ def train_val(model, loaders, optimizer, epochs, smoothed_labels):
 
 
                     y = batch['label'].to(device)  # get the label of the batch (batch * 1)
+                    y_temp = y  # label (batch_size, 1)
                     bs = y.shape[0]  # batch size
 
                     temp = []
                     for j in range(bs):
-                        temp.append(smoothed_labels[y[j]])
-                    y = temp  # y size (batch, 106) and contains the smoothed labels for every y
+                        temp += 8*[smoothed_labels[y[j]]]
+                    y = temp  # y size (batch*8, 106) and contains the smoothed labels for every y where 8 is 8 anticipation steps
                     y = torch.FloatTensor(y)
 
 
-                    print(y.size())
+                    #print(y[1])
 
 
 
 
                     preds = model(x)
+                    print("output of the model " + str(preds.size()))
 
                     # take only the last 8 predictions
-                    preds = preds[:, -8:, :].contiguous()
+                    #preds = preds.view(batch_size, -1, -1)
+
+                    #preds = preds[:, -8:, :].contiguous()
 
                     # linearize predictions
-                    linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106)
+                    linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106) ogni riga ha una label corrispondente al timestamp
                     # replicate the labels across timesteps and linearize
-                    print("Output " + str(linear_preds.size()))
+                    #print("Output transformed " + str(linear_preds.size()))
                     #print(preds.size())
-                    linear_labels = y.expand(preds.shape[1], -1).contiguous()
-                    print(linear_labels.size())
+                    linear_labels = y
+                    #print(linear_labels.size())
 
                     loss = nn.BCEWithLogitsLoss()(linear_preds, linear_labels)  # loss function for smoothed labels
+
                     # get the predictions for anticipation time = 1s (index -4) (anticipation)
                     # or for the last time-step (100%) (early recognition)
                     # top5 accuracy at 1s
-                    """
-                    idx = -4 if args.task == 'anticipation' else -1
+                    idx = -4
+
                     # use top-5 for anticipation and top-1 for early recognition
-                    k = 5 if args.task == 'anticipation' else 1
-                    acc = topk_accuracy(
-                        preds[:, idx, :].detach().cpu().numpy(), y.detach().cpu().numpy(), (k,))[0] * 100
+                    k = 5
+
+                    acc = topk_accuracy(preds[:, idx, :].detach().cpu().numpy(), y_temp.detach().cpu().numpy(), (k,))[0] * 100
+                    print(acc)
 
                     # store the values in the meters to keep incremental averages
                     loss_meter[mode].add(loss.item(), bs)
                     accuracy_meter[mode].add(acc, bs)
-                    """
+
 
                     # if in training mode
                     if mode == 0:
@@ -183,27 +195,21 @@ def train_val(model, loaders, optimizer, epochs, smoothed_labels):
 
                     # log training during loop
                     # avoid logging the very first batch. It can be biased.
-                    """
-                    if mode == 0 and i != 0 and i % args.display_every == 0:
+
+                    if mode == 0 and i != 0 and i % display_every == 0:
                         print(mode, e, loss_meter[mode], accuracy_meter[mode])
                     
 
                 # log at the end of each epoch
-                print(mode, epoch + 1, loss_meter[mode], accuracy_meter[mode],
-                    max(accuracy_meter[mode].value(), best_perf) if mode == 1
-                    else None, green=True)
+                print(mode, epoch + 1, loss_meter[mode], accuracy_meter[mode], green=True)
                 
 
-        if best_perf < accuracy_meter['validation'].value():
-            best_perf = accuracy_meter['validation'].value()
-            is_best = True
-        else:
-            is_best = False
 
         # save checkpoint at the end of each train/val epoch
-        save_model(model, epoch + 1, accuracy_meter['validation'].value(), best_perf,
-                   is_best=is_best)
-    """
+        #save_model(model, epoch + 1, accuracy_meter['validation'].value())
+
+        torch.save({'state_dict': model.state_dict(), 'epoch': epoch}, "/volumes/Bella_li/"+model+".pth.tar")
+
 
 
 

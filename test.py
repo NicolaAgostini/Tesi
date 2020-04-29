@@ -197,9 +197,11 @@ class Mock_Dataset(data.Dataset):
 
     def __init__(self, env):
         self.env = env  # list of enviroments es. rgb, flow, obj
+        self.ids =[1, 2]
+        self.label = [56, 34]
 
     def __len__(self):
-        return 1
+        return len(self.ids)
 
     def __getitem__(self, index):
         """
@@ -208,7 +210,7 @@ class Mock_Dataset(data.Dataset):
 
 
         # return a dictionary containing the id of the current sequence
-        out = {'id': 1}
+        out = {'id': self.ids[index]}
 
 
         # read representations for past frames
@@ -216,14 +218,14 @@ class Mock_Dataset(data.Dataset):
 
         # get the label of the current sequence
 
-        out['label'] = math.ceil(np.random.uniform(0, 105))
+        out['label'] = self.label[index]
 
         return out
 
 def get_mock_dataloader():
     a = Mock_Dataset(["rgb", "flow", "obj"])
     #print(a.__getitem__(1))
-    return DataLoader(a, batch_size=1)  # change batch size
+    return DataLoader(a, batch_size=2)  # change batch size
 
 
 def test_model():
