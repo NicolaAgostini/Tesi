@@ -9,6 +9,7 @@ from torch.utils.data import DataLoader
 from torch.nn import functional as F
 from Utils import topk_accuracy, ValueMeter, topk_accuracy_multiple_timesteps, get_marginal_indexes, marginalize, softmax,  topk_recall_multiple_timesteps, tta, predictions_to_json
 
+root_path = "/volumes/Bella_li/"
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -19,25 +20,29 @@ alpha = 0.2
 path_to_lmdb = ["/Volumes/Bella_li/egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd/",
                     "/Volumes/Bella_li/egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd/"]  # the folders that contain the .mdb files
 
-groundtruth_path_train = ["/volumes/Bella_li/egtea/action_annotation/train_split1.txt",
-                          "/volumes/Bella_li/egtea/action_annotation/train_split2.txt",
-                          "/volumes/Bella_li/egtea/action_annotation/train_split3.txt"]
+groundtruth_path_train = [root_path+"egtea/action_annotation/train_split1.txt",
+                          root_path+"egtea/action_annotation/train_split2.txt",
+                          root_path+"egtea/action_annotation/train_split3.txt"]
+
+groundtruth_path_test = [root_path+"egtea/action_annotation/test_split1.txt",
+                          root_path+"egtea/action_annotation/test_split2.txt",
+                          root_path+"egtea/action_annotation/test_split3.txt"]
 
 
-path_to_csv_trainval = ['/Volumes/Bella_li/egtea/training1.csv', '/Volumes/Bella_li/egtea/validation1.csv']  # path of train val csv
+path_to_csv_trainval = [root_path+"egtea/training1.csv", root_path+"egtea/validation1.csv"]  # path of train val csv
 
-path_test_txt = "/volumes/Bella_li/egtea/action_annotation/test_split1.txt"
+
 
 
 
 ### SOME MODEL'S VARIABLES ###
 
 input_dim = [1024, 1024, 352]
-batch_size = 2
+batch_size = 1
 seq_len = 14
 
-learning_rate = 0.01
-momentum = 0.9
+learning_rate = 0.001
+
 
 epochs = 100
 
@@ -74,19 +79,11 @@ def initialize_trainval_csv(which_split):
     :return:
     """
 
-    list_path = generate_train_val_txt(groundtruth_path_train[which_split], str(which_split))
-    path = [txt_to_csv(list_path[0], "training"+str(which_split))]
-    path.append(txt_to_csv(list_path[1], "validation"+str(which_split)))
+
+    path = [txt_to_csv(groundtruth_path_train[which_split-1], "training"+str(which_split))]
+    path.append(txt_to_csv(groundtruth_path_test[which_split-1], "validation"+str(which_split)))
     return path
 
-def initialize_test_csv(which_split):
-    """
-    given in input the test split txt file will generate the csv test file suitable for get_dataset function for test data loader
-    :param which_split: depending on the test split {1,2,3}
-    :return: the path of the test csv file generated
-    """
-    path = [txt_to_csv(path_test_txt, "test" + str(which_split))]
-    return path
 
 
 def main():
@@ -95,10 +92,10 @@ def main():
 
     #path = initialize_trainval_csv(1)  # to generate training and validation csv
 
-    path_test = initialize_test_csv(1)
+
 
     
-    smoothed_labels = label_smmothing("prior")
+    #smoothed_labels = label_smmothing("prior")  # for smoothed labels
 
 
     model = BaselineModel(batch_size, seq_len, input_dim)
@@ -111,19 +108,18 @@ def main():
         data_loader_train = get_mock_dataloader()
         data_loader_val = get_mock_dataloader()
 
-        optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum)
+        optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-        train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, smoothed_labels)
+        # train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, smoothed_labels)  # with smoothed labels
 
-    elif mode =="test":
-        data_loader_test = get_dataset(path_test, 4, 4)
-
-        get_scores(model, data_loader_test)
+        train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
 
 
 
 
-def train_val(model, loaders, optimizer, epochs, smoothed_labels):
+
+
+def train_val(model, loaders, optimizer, epochs):
     """
 
     :param model:
@@ -152,6 +148,11 @@ def train_val(model, loaders, optimizer, epochs, smoothed_labels):
 
                     y = batch['label'].to(device)  # get the label of the batch (batch, 1)
 
+                    #print(y.size())
+
+
+                    ###  FOR SMOOTHED LABELS ###
+                    """
                     y_temp = y  # label (batch_size, 1) to use for top-k accuracy
                     bs = y.shape[0]  # batch size
 
@@ -161,21 +162,36 @@ def train_val(model, loaders, optimizer, epochs, smoothed_labels):
                     y = temp  # y size (batch*8, 106) and contains the smoothed labels for every y where 8 is 8 anticipation steps
                     y = torch.FloatTensor(y)
 
+                    USE WITH :
+                    
+                    
+                    linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106) ogni riga ha una label corrispondente al timestamp
+                    
+                    linear_labels = y
+                     
+                     loss = nn.BCEWithLogitsLoss()(linear_preds, linear_labels)  # loss function for smoothed labels
 
                     #print(y[1])
+                    """
 
-
-
+                    bs = y.shape[0]  # batch size
 
                     preds = model(x)
-                    print("output of the model " + str(preds.size()))
+                    preds = preds.contiguous()
+                    #print("output of the model " + str(preds.size()))
 
                     # linearize predictions
                     linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106) ogni riga ha una label corrispondente al timestamp
 
-                    linear_labels = y
+                    #print(linear_preds.size())
 
-                    loss = nn.BCEWithLogitsLoss()(linear_preds, linear_labels)  # loss function for smoothed labels
+                    linear_labels = y.view(-1, 1).expand(-1, preds.shape[1]).contiguous().view(-1)
+
+                    #print("labels ", linear_labels)
+
+                    loss = F.cross_entropy(linear_preds, linear_labels)
+                    # loss = nn.CrossEntropyLoss()(linear_preds, linear_labels)
+                    #print(loss)
 
                     # get the predictions for anticipation time = 1s (index -4) (anticipation)
                     # or for the last time-step (100%) (early recognition)
@@ -185,8 +201,8 @@ def train_val(model, loaders, optimizer, epochs, smoothed_labels):
                     # use top-5 for anticipation and top-1 for early recognition
                     k = 5
 
-                    acc = topk_accuracy(preds[:, idx, :].detach().cpu().numpy(), y_temp.detach().cpu().numpy(), (k,))[0] * 100
-                    print(acc)
+                    acc = topk_accuracy(preds[:, idx, :].detach().cpu().numpy(), y.detach().cpu().numpy(), (k,))[0] * 100
+                    #print(acc)
 
                     # store the values in the meters to keep incremental averages
                     loss_meter[str(mode)].add(loss.item(), bs)
@@ -217,7 +233,7 @@ def train_val(model, loaders, optimizer, epochs, smoothed_labels):
         # save checkpoint at the end of each train/val epoch
         #save_model(model, epoch + 1, accuracy_meter['validation'].value())
 
-        torch.save({'state_dict': model.state_dict(), 'epoch': epoch}, "/volumes/Bella_li/model.pth.tar")
+        torch.save({'state_dict': model.state_dict(), 'epoch': epoch}, root_path+"egtea/model.pth.tar")
 
 
 
@@ -281,7 +297,7 @@ def load_model(model):
 
     :return:
     """
-    chk = torch.load("/volumes/Bella_li/model.pth.tar")
+    chk = torch.load(root_path+"egtea/model.pth.tar")
 
     model.load_state_dict(chk['state_dict'])
 
@@ -294,7 +310,7 @@ def label_smmothing(set_modality="standard", alpha=0.1, temperature = 0):
     :param temperature: provided for softmax
     :return: smoothed labels depending on the specific modality
     """
-    a = Glove("/Users/nicolago/Desktop/Glove.6B/", alpha, set_modality, temperature)
+    a = Glove(root_path+"/Glove.6B/", alpha, set_modality, temperature)
 
     # print(a.find_similar("move")[1:6])
     b = a.get_ysoft()
