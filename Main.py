@@ -15,7 +15,7 @@ root_path = "/home/2/2014/nagostin/Desktop/"
 
 #device = torch.device(device)
 
-print("device " + str(device))
+#print("device " + str(device))
 
 mode = "train"  # if train or test
 
