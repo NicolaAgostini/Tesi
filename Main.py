@@ -19,7 +19,8 @@ mode = "train"  # if train or test
 alpha = 0.2
 
 path_to_lmdb = [root_path+"egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd/",
-                    root_path+"egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd/"]  # the folders that contain the .mdb files
+                    root_path+"egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd/",
+                    root_path+"egtea/obj/"]  # the folders that contain the .mdb files
 
 groundtruth_path_train = [root_path+"egtea/action_annotation/train_split1.txt",
                           root_path+"egtea/action_annotation/train_split2.txt",
