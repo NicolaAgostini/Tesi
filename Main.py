@@ -11,7 +11,7 @@ from Utils import topk_accuracy, ValueMeter, topk_accuracy_multiple_timesteps, g
 
 root_path = "/home/2/2014/nagostin/Desktop/"
 
-device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+#device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
 device = torch.device(device)
 
@@ -218,7 +218,7 @@ def train_val(model, loaders, optimizer, epochs):
                     # avoid logging the very first batch. It can be biased.
 
                     if mode == 0 and i != 0 and i % display_every == 0:
-                        print(mode, e, loss_meter[mode], accuracy_meter[mode])
+                        print(mode, e, loss_meter[str(mode)], accuracy_meter[str(mode)])
                     
 
                 # log at the end of each epoch
