@@ -11,11 +11,7 @@ from Utils import topk_accuracy, ValueMeter, topk_accuracy_multiple_timesteps, g
 
 root_path = "/home/2/2014/nagostin/Desktop/"
 
-#device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
-#device = torch.device(device)
-
-#print("device " + str(device))
 
 mode = "train"  # if train or test
 
