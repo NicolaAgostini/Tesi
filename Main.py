@@ -96,7 +96,8 @@ def main():
 
     #smoothed_labels = label_smmothing("prior")  # for smoothed labels
 
-    model = BaselineModel(batch_size, seq_len, input_dim).to(device)
+    model = BaselineModel(batch_size, seq_len, input_dim)
+    model = model.to(device)
     #model.to(device)
 
     if mode == "train":
