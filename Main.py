@@ -12,6 +12,8 @@ root_path = "/home/2/2014/nagostin/Desktop/"
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
+print("device " + device)
+
 mode = "train"  # if train or test
 
 alpha = 0.2
@@ -92,7 +94,7 @@ def main():
     #smoothed_labels = label_smmothing("prior")  # for smoothed labels
 
     model = BaselineModel(batch_size, seq_len, input_dim)
-    model = model.to(device)
+    model.to(device)
 
     if mode == "train":
         data_loader_train = get_dataset(path_to_csv_trainval[0], 4, 4)  # loader for training
