@@ -9,9 +9,9 @@ class BaselineModel(torch.nn.Module):
     def __init__(self, batch_size, seq_len, input_size, dropout=0.8, num_classes=106):
         super(BaselineModel, self).__init__()
 
-        self.branches = [torch.nn.LSTM(input_size[0], 1024, seq_len),
-                         torch.nn.LSTM(input_size[1], 1024, seq_len),
-                         torch.nn.LSTM(input_size[2], 1024, seq_len)]
+        self.branches = [torch.nn.LSTM(input_size[0], 1024, seq_len).cuda(),
+                         torch.nn.LSTM(input_size[1], 1024, seq_len).cuda(),
+                         torch.nn.LSTM(input_size[2], 1024, seq_len).cuda()]
         """
         self.branches = nn.ModuleDict({
             "rgb": torch.nn.LSTM(input_size[0], 1024, seq_len),  # input of lstm is 1024 (vector of input), hidden units are 1024, num layers is 14 (6 enc + 8 dec)
@@ -20,8 +20,8 @@ class BaselineModel(torch.nn.Module):
         })
         """
         self.batch_size = batch_size
-        self.dropout = torch.nn.Dropout(dropout)
-        self.fc = torch.nn.Linear(1024*3, num_classes)  # without seq_len because i want my output on every timestamp from 0 to 2s of observations
+        self.dropout = torch.nn.Dropout(dropout).cuda()
+        self.fc = torch.nn.Linear(1024*3, num_classes).cuda()  # without seq_len because i want my output on every timestamp from 0 to 2s of observations
         self.num_classes = num_classes
 
     def forward(self, feat):  # input will be batch_size * sequence length * input_dim
@@ -43,7 +43,7 @@ class BaselineModel(torch.nn.Module):
         """
 
         for key, value in enumerate(feat):
-            x_mod, hidden = self.branches[key](value)  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
+            x_mod, hidden = self.branches[key](value).cuda()  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
             # print(x_mod.size())
             x.append(x_mod)  # append to a list
 
