@@ -214,7 +214,7 @@ def train_val(model, loaders, optimizer, epochs):
                     # avoid logging the very first batch. It can be biased.
 
                     if mode == 0 and i != 0 and i % display_every == 0:
-                        print(mode, e, loss_meter[str(mode)], accuracy_meter[str(mode)])
+                        print(mode, e, loss_meter[str(mode)].value(), accuracy_meter[str(mode)].value())
                     
 
                 # log at the end of each epoch
