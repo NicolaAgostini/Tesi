@@ -1,6 +1,5 @@
 from Preprocessing_bdd100k import *
 from test import *
-from TFLoad_bdd100k import *
 from Glove import Glove
 import numpy as np
 from Dataset import *
@@ -9,7 +8,7 @@ from torch.utils.data import DataLoader
 from torch.nn import functional as F
 from Utils import topk_accuracy, ValueMeter, topk_accuracy_multiple_timesteps, get_marginal_indexes, marginalize, softmax,  topk_recall_multiple_timesteps, tta, predictions_to_json
 
-root_path = "/volumes/Bella_li/"
+root_path = "/home/2/2014/nagostin/Desktop/"
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -17,8 +16,8 @@ mode = "train"  # if train or test
 
 alpha = 0.2
 
-path_to_lmdb = ["/Volumes/Bella_li/egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd/",
-                    "/Volumes/Bella_li/egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd/"]  # the folders that contain the .mdb files
+path_to_lmdb = [root_path+"egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd/",
+                    root_path+"egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd/"]  # the folders that contain the .mdb files
 
 groundtruth_path_train = [root_path+"egtea/action_annotation/train_split1.txt",
                           root_path+"egtea/action_annotation/train_split2.txt",
@@ -38,7 +37,7 @@ path_to_csv_trainval = [root_path+"egtea/training1.csv", root_path+"egtea/valida
 ### SOME MODEL'S VARIABLES ###
 
 input_dim = [1024, 1024, 352]
-batch_size = 1
+batch_size = 128
 seq_len = 14
 
 learning_rate = 0.001
@@ -88,25 +87,19 @@ def initialize_trainval_csv(which_split):
 
 def main():
 
+    path = initialize_trainval_csv(1)  # to generate training and validation csv depending on split defined by authors of egtea gaze +
 
-
-    #path = initialize_trainval_csv(1)  # to generate training and validation csv
-
-
-
-    
     #smoothed_labels = label_smmothing("prior")  # for smoothed labels
-
 
     model = BaselineModel(batch_size, seq_len, input_dim)
     model = model.to(device)
 
     if mode == "train":
-        #data_loader_train = get_dataset(path_to_csv_trainval[0], 4, 4)  # loader for training
-        #data_loader_val = get_dataset(path_to_csv_trainval[1], 4, 4)  # loader for validation
+        data_loader_train = get_dataset(path_to_csv_trainval[0], 4, 4)  # loader for training
+        data_loader_val = get_dataset(path_to_csv_trainval[1], 4, 4)  # loader for validation
 
-        data_loader_train = get_mock_dataloader()
-        data_loader_val = get_mock_dataloader()
+        #data_loader_train = get_mock_dataloader()
+        #data_loader_val = get_mock_dataloader()
 
         optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
@@ -147,9 +140,6 @@ def train_val(model, loaders, optimizer, epochs):
                     x = [xx.to(device) for xx in x]  # if input is a size (for multiple branch) then load in the devices
 
                     y = batch['label'].to(device)  # get the label of the batch (batch, 1)
-
-                    #print(y.size())
-
 
                     ###  FOR SMOOTHED LABELS ###
                     """
@@ -198,10 +188,9 @@ def train_val(model, loaders, optimizer, epochs):
                     # top5 accuracy at 1s
                     idx = -4
 
-                    # use top-5 for anticipation and top-1 for early recognition
-                    k = 5
+                    k = 5  # top 5 anticipation
 
-                    acc = topk_accuracy(preds[:, idx, :].detach().cpu().numpy(), y.detach().cpu().numpy(), (k,))[0] * 100
+                    acc = topk_accuracy(preds[:, idx, :].detach().cpu().numpy(), y.detach().cpu().numpy(), (k,))[0] * 100  # top 5 accuracy percentage
                     #print(acc)
 
                     # store the values in the meters to keep incremental averages
