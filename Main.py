@@ -96,8 +96,8 @@ def main():
 
     #smoothed_labels = label_smmothing("prior")  # for smoothed labels
 
-    model = BaselineModel(batch_size, seq_len, input_dim)
-    model = model.to(device)
+    model = BaselineModel(batch_size, seq_len, input_dim).cuda()
+
     #model.to(device)
 
     if mode == "train":
@@ -143,9 +143,9 @@ def train_val(model, loaders, optimizer, epochs):
                 for i, batch in enumerate(loaders[mode]):
                     x = batch['past_features']  # load in batch the next "past_features" datas of size (batch_size * 14 * 1024(352)
 
-                    x = [xx.to(device) for xx in x]  # if input is a list (for multiple branch) then load in the device gpu
+                    x = [xx.cuda() for xx in x]  # if input is a list (for multiple branch) then load in the device gpu
 
-                    y = batch['label'].to(device)  # get the label of the batch (batch, 1)
+                    y = batch['label'].cuda()  # get the label of the batch (batch, 1)
 
                     ###  FOR SMOOTHED LABELS ###
                     """
