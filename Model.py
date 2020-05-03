@@ -43,9 +43,9 @@ class BaselineModel(torch.nn.Module):
         """
 
         for key, value in enumerate(feat):
-            x_mod, hidden = self.branches[key](value).cuda()  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
+            x_mod, hidden = self.branches[key](value)  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
             # print(x_mod.size())
-            x.append(x_mod)  # append to a list
+            x.append(x_mod.cuda())  # append to a list
 
 
         #print(np.shape(x))
