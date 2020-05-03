@@ -27,7 +27,7 @@ def txt_to_csv(path_oftxt, which_part):
                 end_time = values[4]
                 start_frame = values[5].replace("F", "")
                 end_frame = values[6].replace("F", "")
-                action_id = values[7]
+                action_id = int(values[7])-1
 
                 writer = csv.writer(file)
                 writer.writerow([count, v_name, start_frame, end_frame, action_id])
@@ -184,6 +184,6 @@ class Dataset(data.Dataset):
 
         # get the label of the current sequence
         label = self.labels[index]
-        out['label'] = label
+        out['label'] = label  # label is from 0 to 105
 
         return out

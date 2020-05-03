@@ -93,13 +93,13 @@ def main():
 
     #smoothed_labels = label_smmothing("prior")  # for smoothed labels
 
-    #model = BaselineModel(batch_size, seq_len, input_dim).cuda()
-    model = BaselineModel(batch_size, seq_len, input_dim)
+    model = BaselineModel(batch_size, seq_len, input_dim).cuda()
+    #model = BaselineModel(batch_size, seq_len, input_dim)
     #model.to(device)
 
     if mode == "train":
-        data_loader_train = get_dataset(path_to_csv_trainval[0], 4, 4)  # loader for training
-        data_loader_val = get_dataset(path_to_csv_trainval[1], 4, 4)  # loader for validation
+        data_loader_train = get_dataset(path_to_csv_trainval[0], batch_size, 4)  # loader for training
+        data_loader_val = get_dataset(path_to_csv_trainval[1], batch_size, 4)  # loader for validation
 
         #data_loader_train = get_mock_dataloader()
         #data_loader_val = get_mock_dataloader()
@@ -140,10 +140,10 @@ def train_val(model, loaders, optimizer, epochs):
                 for i, batch in enumerate(loaders[mode]):
                     x = batch['past_features']  # load in batch the next "past_features" datas of size (batch_size * 14 * 1024(352)
 
-                    #x = [xx.cuda() for xx in x]  # if input is a list (for multiple branch) then load in the device gpu
+                    x = [xx.cuda() for xx in x]  # if input is a list (for multiple branch) then load in the device gpu
 
-                    #y = batch['label'].cuda()  # get the label of the batch (batch, 1)
-                    y = batch["label"]
+                    y = batch['label'].cuda()  # get the label of the batch (batch, 1)
+                    #y = batch['label']
                     ###  FOR SMOOTHED LABELS ###
                     """
                     y_temp = y  # label (batch_size, 1) to use for top-k accuracy
