@@ -54,7 +54,7 @@ def read_representations(frames, env):
     # convert list to numpy array
     features = np.array(features)
 
-    print("features dim " + str(features.shape))
+    #print("features dim " + str(features.shape))
 
     return features  # dim 14 X 1024 for rgb and flow and 352 for obj
 
@@ -92,7 +92,7 @@ class Dataset(data.Dataset):
 
         self.env = [lmdb.open(l, readonly=True, lock=False) for l in self.lmdb_path]
 
-        print("How many environments? " + str(len(self.env)))
+        #print("How many environments? " + str(len(self.env)))
 
         self.handlevideos()
 
