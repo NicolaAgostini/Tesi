@@ -65,7 +65,7 @@ class BaselineModel(torch.nn.Module):
         #x = x.view(self.batch_size, -1)  # prepare input to FC linear
         #print(x.size())
         # Fully connected
-        x = self.fc(x)  # x has shape [batch_size, 8, num_classes]
+        x = self.fc(x)  # output x has shape [batch_size, 8, num_classes]
         x = torch.nn.functional.softmax(x, -1)
 
         '''

@@ -5,8 +5,6 @@ import tqdm
 import numpy as np
 import csv
 import re
-from random import seed
-from random import random
 from Main import root_path
 
 
@@ -23,8 +21,8 @@ def txt_to_csv(path_oftxt, which_part):
 
                 values = re.split("-| ", line)
                 v_name = values[0]+"-"+values[1]+"-"+values[2]
-                start_time = values[3]
-                end_time = values[4]
+                # start_time = values[3]  # Not used
+                # end_time = values[4]  # Not used
                 start_frame = values[5].replace("F", "")
                 end_frame = values[6].replace("F", "")
                 action_id = int(values[7])-1
@@ -34,7 +32,6 @@ def txt_to_csv(path_oftxt, which_part):
 
                 count += 1
     return root_path+"egtea/"+which_part+".csv"
-
 
 
 def read_representations(frames, env):
@@ -57,6 +54,8 @@ def read_representations(frames, env):
     # convert list to numpy array
     features = np.array(features)
 
+    print("features dim " + str(features.shape))
+
     return features  # dim 14 X 1024 for rgb and flow and 352 for obj
 
 def read_data(frames, env):
@@ -64,7 +63,6 @@ def read_data(frames, env):
     This is used for multimodal data loading (e.g., RGB + Flow)
     :return l : a list of 3 arrays: rgb, opt flow, obj containing the frames (img) for the considered sequence
     """
-
 
     # read the representations from all environments
     l = [read_representations(frames, e) for e in env]
@@ -78,7 +76,8 @@ class Dataset(data.Dataset):
     """
     def __init__(self, lmdb_path, groundthruth_path_csv):
         # read all videos annotations csv in pandas
-        self.allvideos = pandas.read_csv(groundthruth_path_csv, header=None, names=["id", "video", "start", "end", "action"])
+        self.allvideos = pandas.read_csv(groundthruth_path_csv, header=None,
+                                         names=["id", "video", "start", "end", "action"])
         self.lmdb_path = lmdb_path
         self.img_tmpl = "frame_{:010d}.jpg"  # the template used to save the frames in the features .mdb file
 
@@ -92,6 +91,8 @@ class Dataset(data.Dataset):
         self.labels = []  # labels of each action
 
         self.env = [lmdb.open(l, readonly=True, lock=False) for l in self.lmdb_path]
+
+        print("How many environments? " + str(len(self.env)))
 
         self.handlevideos()
 
@@ -114,13 +115,11 @@ class Dataset(data.Dataset):
                 self.past_frames.append(self.get_frames(frames, value.video))
                 # now past frames are the list in correct format of the frames in lmdb
 
-
                 self.ids.append(value.id)  # append the id of the video  # FIXME : ID OR CLIP NAME ???
 
                 # handle whether a list of labels is required (e.g., [verb, noun]), rather than a single action
 
                 self.labels.append(value.action)
-
 
             else:  # if the sequence is invalid then insert in the list of invalid sequence
 
@@ -177,7 +176,6 @@ class Dataset(data.Dataset):
 
         # return a dictionary containing the id of the current sequence
         out = {'id': self.ids[index]}
-
 
         # read representations for past frames
         out['past_features'] = read_data(past_frames, self.env)

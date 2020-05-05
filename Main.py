@@ -21,6 +21,8 @@ path_to_lmdb = [root_path+"egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfu
                     root_path+"egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd/",
                     root_path+"egtea/obj/"]  # the folders that contain the .mdb files
 
+### PATH OF TXT FOR TRAINING AND VALIDATION ###
+
 groundtruth_path_train = [root_path+"egtea/action_annotation/train_split1.txt",
                           root_path+"egtea/action_annotation/train_split2.txt",
                           root_path+"egtea/action_annotation/train_split3.txt"]
@@ -28,6 +30,9 @@ groundtruth_path_train = [root_path+"egtea/action_annotation/train_split1.txt",
 groundtruth_path_test = [root_path+"egtea/action_annotation/test_split1.txt",
                           root_path+"egtea/action_annotation/test_split2.txt",
                           root_path+"egtea/action_annotation/test_split3.txt"]
+
+
+###
 
 
 path_to_csv_trainval = [root_path+"egtea/training1.csv", root_path+"egtea/validation1.csv"]  # path of train val csv
@@ -39,7 +44,7 @@ path_to_csv_trainval = [root_path+"egtea/training1.csv", root_path+"egtea/valida
 ### SOME MODEL'S VARIABLES ###
 
 input_dim = [1024, 1024, 352]
-batch_size = 128
+batch_size = 4
 seq_len = 14
 
 learning_rate = 0.001
@@ -61,17 +66,6 @@ def get_dataset(ground_truth, batch_size, num_workers):
     return DataLoader(a, batch_size=batch_size, num_workers=num_workers,
                       pin_memory=True, shuffle=True)  # suffle true for training
 
-"""
-def get_model():
-    rgb_model = LSTMROLLING(input_dim[0], 1024)
-    flow_model = LSTMROLLING(input_dim[1], 1024)
-    obj_model = LSTMROLLING(input_dim[2], 352)
-
-    model = RLSTMFusion([rgb_model, flow_model, obj_model], 1024)  # the model is the fusion of the three branches
-
-    return model
-    
-"""
 
 def initialize_trainval_csv(which_split):
     """
@@ -79,7 +73,6 @@ def initialize_trainval_csv(which_split):
     :param which_split: {1,2,3} the split of egtea gaze +
     :return:
     """
-
 
     path = [txt_to_csv(groundtruth_path_train[which_split-1], "training"+str(which_split))]
     path.append(txt_to_csv(groundtruth_path_test[which_split-1], "validation"+str(which_split)))
@@ -228,57 +221,6 @@ def train_val(model, loaders, optimizer, epochs):
         torch.save({'state_dict': model.state_dict(), 'epoch': epoch}, root_path+"egtea/model.pth.tar")
 
 
-
-
-
-
-def get_scores(model, loader):
-    pass
-    """
-    model.eval()
-    predictions = []
-    labels = []
-    ids = []
-    with torch.set_grad_enabled(False):
-        for batch in tqdm(loader, 'Evaluating...', len(loader)):
-            x = batch['past_features']
-            
-            x = [xx.to(device) for xx in x]
-        
-
-            y = batch['label'].numpy()
-
-            ids.append(batch['id'].numpy())
-
-            preds = model(x).cpu().numpy()[:, -args.S_ant:, :]
-
-            predictions.append(preds)
-            labels.append(y)
-
-    action_scores = np.concatenate(predictions)
-    labels = np.concatenate(labels)
-    ids = np.concatenate(ids)
-
-    actions = pd.read_csv(
-        join(args.path_to_data, 'actions.csv'), index_col='id')
-
-    vi = get_marginal_indexes(actions, 'verb')
-    ni = get_marginal_indexes(actions, 'noun')
-
-    action_probs = softmax(action_scores.reshape(-1, action_scores.shape[-1]))
-
-    verb_scores = marginalize(action_probs, vi).reshape(
-        action_scores.shape[0], action_scores.shape[1], -1)
-    noun_scores = marginalize(action_probs, ni).reshape(
-        action_scores.shape[0], action_scores.shape[1], -1)
-
-    if labels.max() > 0:
-        return verb_scores, noun_scores, action_scores, labels[:, 0], labels[:, 1], labels[:, 2]
-    else:
-        return verb_scores, noun_scores, action_scores, ids
-"""
-
-
 def load_model(model):
     """
     load the saved state in the model passed as a parameter
@@ -292,7 +234,6 @@ def load_model(model):
     chk = torch.load(root_path+"egtea/model.pth.tar")
 
     model.load_state_dict(chk['state_dict'])
-
 
 
 def label_smmothing(set_modality="standard", alpha=0.1, temperature = 0):
