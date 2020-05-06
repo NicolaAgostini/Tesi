@@ -83,7 +83,7 @@ def main():
 
     path = initialize_trainval_csv(1)  # to generate training and validation csv depending on split defined by authors of egtea gaze +
 
-    #smoothed_labels = label_smmothing("prior")  # for smoothed labels
+    smoothed_labels = label_smmothing("prior")  # for smoothed labels
 
     model = BaselineModel(batch_size, seq_len, input_dim).cuda()
     #model = BaselineModel(batch_size, seq_len, input_dim)
@@ -98,16 +98,16 @@ def main():
 
         optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-        # train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, smoothed_labels)  # with smoothed labels
+        train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, smoothed_labels)  # with smoothed labels
 
-        train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
-
-
+        #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
 
 
 
 
-def train_val(model, loaders, optimizer, epochs):
+
+
+def train_val(model, loaders, optimizer, epochs, smoothed_labels):
     """
 
     :param model:
@@ -137,24 +137,25 @@ def train_val(model, loaders, optimizer, epochs):
                     y = batch['label'].cuda()  # get the label of the batch (batch, 1)
                     #y = batch['label']
                     ###  FOR SMOOTHED LABELS ###
-                    """
+
                     y_temp = y  # label (batch_size, 1) to use for top-k accuracy
                     bs = y.shape[0]  # batch size
+                    preds = model(x)
+                    preds = preds.contiguous()
 
                     temp = []
                     for j in range(bs):
                         temp += 8*[smoothed_labels[y[j]]]
                     y = temp  # y size (batch*8, 106) and contains the smoothed labels for every y where 8 is 8 anticipation steps
-                    y = torch.FloatTensor(y)
+                    y = torch.FloatTensor(y).cuda()
 
-                    USE WITH :
-                    
-                    
+                    # USE WITH :
+
                     linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106) ogni riga ha una label corrispondente al timestamp
                     
                     linear_labels = y
                      
-                     loss = nn.BCEWithLogitsLoss()(linear_preds, linear_labels)  # loss function for smoothed labels
+                    loss = nn.BCEWithLogitsLoss()(linear_preds, linear_labels)  # loss function for smoothed labels
 
                     #print(y[1])
                     """
@@ -177,6 +178,7 @@ def train_val(model, loaders, optimizer, epochs):
                     loss = F.cross_entropy(linear_preds, linear_labels)
                     # loss = nn.CrossEntropyLoss()(linear_preds, linear_labels)
                     #print(loss)
+                    """
 
                     # get the predictions for anticipation time = 1s (index -4) (anticipation)
                     # or for the last time-step (100%) (early recognition)
@@ -185,8 +187,9 @@ def train_val(model, loaders, optimizer, epochs):
 
                     k = 5  # top 5 anticipation
 
-                    acc = topk_accuracy(preds[:, idx, :].detach().cpu().numpy(), y.detach().cpu().numpy(), (k,))[0] * 100  # top 5 accuracy percentage
+                    #acc = topk_accuracy(preds[:, idx, :].detach().cpu().numpy(), y.detach().cpu().numpy(), (k,))[0] * 100  # top 5 accuracy percentage
                     #print(acc)
+                    acc = topk_accuracy(preds[:, idx, :].detach().cpu().numpy(), y_temp.detach().cpu().numpy(), (k,))[0] * 100  # for smoothed labels
 
                     # store the values in the meters to keep incremental averages
                     loss_meter[str(mode)].add(loss.item(), bs)
@@ -242,7 +245,7 @@ def label_smmothing(set_modality="standard", alpha=0.1, temperature = 0):
     :param temperature: provided for softmax
     :return: smoothed labels depending on the specific modality
     """
-    a = Glove(root_path+"/Glove.6B/", alpha, set_modality, temperature)
+    a = Glove(root_path+"Glove.6B/", alpha, set_modality, temperature)
 
     # print(a.find_similar("move")[1:6])
     b = a.get_ysoft()

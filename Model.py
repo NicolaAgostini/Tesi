@@ -66,7 +66,7 @@ class BaselineModel(torch.nn.Module):
         #print(x.size())
         # Fully connected
         x = self.fc(x)  # output x has shape [batch_size, 8, num_classes]
-        x = torch.nn.functional.softmax(x, -1)
+        #x = torch.nn.functional.softmax(x, -1)  # transform last layer (106 vector) to probabilities sum to one
 
         '''
         For example, if each feature input is sampled every 0.25, then
