@@ -6,9 +6,10 @@ import tqdm
 import re
 from functools import reduce
 import math
+from Main import root_path
 
 
-path_dsk = "/Users/nicolago/Desktop/"
+#path_dsk = "/Users/nicolago/Desktop/"
 
 class Glove():
     def __init__(self, path_glove, alpha, which_methods = "", temperature = 0):
@@ -85,7 +86,7 @@ class Glove():
         ([verb1,verb2,...], [noun1,noun2,..])
         """
         actions = {}
-        with open(path_dsk + "action_annotation/action_idx.txt", 'r') as f:
+        with open(root_path + "action_annotation/action_idx.txt", 'r') as f:
             for line in f:
                 line = line.strip()
                 values = re.split("/| |_|,",line)
@@ -150,7 +151,7 @@ class Glove():
         """
         n_dim = self.Pi.shape[0]
         y = np.zeros((n_dim, n_dim))
-        with open(path_dsk + "action_annotation/action_idx.txt", 'r') as f:
+        with open(root_path + "action_annotation/action_idx.txt", 'r') as f:
             for line in f:
                 line = line.strip()
                 values = re.split("/| |_|,", line)
