@@ -83,7 +83,7 @@ def main():
 
     path = initialize_trainval_csv(1)  # to generate training and validation csv depending on split defined by authors of egtea gaze +
 
-    smoothed_labels = label_smmothing("prior")  # for smoothed labels
+    #smoothed_labels = label_smmothing("prior")  # for smoothed labels
 
     model = BaselineModel(batch_size, seq_len, input_dim).cuda()
     #model = BaselineModel(batch_size, seq_len, input_dim)
@@ -98,16 +98,16 @@ def main():
 
         optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-        train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, smoothed_labels)  # with smoothed labels
+        #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, smoothed_labels)  # with smoothed labels
 
-        #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
-
-
+        train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
 
 
 
 
-def train_val(model, loaders, optimizer, epochs, smoothed_labels):
+
+
+def train_val(model, loaders, optimizer, epochs):
     """
 
     :param model:
@@ -136,6 +136,8 @@ def train_val(model, loaders, optimizer, epochs, smoothed_labels):
 
                     y = batch['label'].cuda()  # get the label of the batch (batch, 1)
                     #y = batch['label']
+
+                    """
                     ###  FOR SMOOTHED LABELS ###
 
                     y_temp = y  # label (batch_size, 1) to use for top-k accuracy
@@ -178,7 +180,6 @@ def train_val(model, loaders, optimizer, epochs, smoothed_labels):
                     loss = F.cross_entropy(linear_preds, linear_labels)
                     # loss = nn.CrossEntropyLoss()(linear_preds, linear_labels)
                     #print(loss)
-                    """
 
                     # get the predictions for anticipation time = 1s (index -4) (anticipation)
                     # or for the last time-step (100%) (early recognition)
@@ -187,9 +188,9 @@ def train_val(model, loaders, optimizer, epochs, smoothed_labels):
 
                     k = 5  # top 5 anticipation
 
-                    #acc = topk_accuracy(preds[:, idx, :].detach().cpu().numpy(), y.detach().cpu().numpy(), (k,))[0] * 100  # top 5 accuracy percentage
+                    acc = topk_accuracy(preds[:, idx, :].detach().cpu().numpy(), y.detach().cpu().numpy(), (k,))[0] * 100  # top 5 accuracy percentage
                     #print(acc)
-                    acc = topk_accuracy(preds[:, idx, :].detach().cpu().numpy(), y_temp.detach().cpu().numpy(), (k,))[0] * 100  # for smoothed labels
+                    #acc = topk_accuracy(preds[:, idx, :].detach().cpu().numpy(), y_temp.detach().cpu().numpy(), (k,))[0] * 100  # for smoothed labels
 
                     # store the values in the meters to keep incremental averages
                     loss_meter[str(mode)].add(loss.item(), bs)
