@@ -6,8 +6,8 @@ import tqdm
 import re
 from functools import reduce
 import math
-from Main import root_path
 
+root_path = "/home/2/2014/nagostin/Desktop/"
 
 #path_dsk = "/Users/nicolago/Desktop/"
 
