@@ -43,7 +43,7 @@ path_to_csv_trainval = [root_path+"egtea/training1.csv", root_path+"egtea/valida
 ### SOME MODEL'S VARIABLES ###
 
 input_dim = [1024, 1024, 352]
-batch_size = 64
+batch_size = 16
 seq_len = 14
 
 learning_rate = 0.001
@@ -84,7 +84,7 @@ def main():
     path = initialize_trainval_csv(1)  # to generate training and validation csv depending on split defined by authors of egtea gaze +
 
     #smoothed_labels = label_smmothing("prior")  # for smoothed labels
-    torch.cuda.clear_memory_allocated()
+    
 
     model = BaselineModel(batch_size, seq_len, input_dim).cuda()
     #model = BaselineModel(batch_size, seq_len, input_dim)
