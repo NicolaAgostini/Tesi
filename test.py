@@ -225,7 +225,7 @@ class Mock_Dataset(data.Dataset):
 def get_mock_dataloader():
     a = Mock_Dataset(["rgb", "flow", "obj"])
     #print(a.__getitem__(1))
-    return DataLoader(a, batch_size=1)  # change batch size
+    return DataLoader(a, batch_size=2)  # change batch size
 
 
 def test_model():

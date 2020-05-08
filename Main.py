@@ -46,7 +46,7 @@ path_to_csv_trainval = [root_path+"egtea/training1.csv", root_path+"egtea/valida
 ### SOME MODEL'S VARIABLES ###
 
 input_dim = [1024, 1024, 352]
-batch_size = 8
+batch_size = 2
 seq_len = 14
 
 learning_rate = 0.001
@@ -95,11 +95,11 @@ def main():
     print(model)
 
     #if mode == "train":
-    data_loader_train = get_dataset(path_to_csv_trainval[0], batch_size, 4)  # loader for training
-    data_loader_val = get_dataset(path_to_csv_trainval[1], batch_size, 4)  # loader for validation
+    #data_loader_train = get_dataset(path_to_csv_trainval[0], batch_size, 4)  # loader for training
+    #data_loader_val = get_dataset(path_to_csv_trainval[1], batch_size, 4)  # loader for validation
 
-    #data_loader_train = get_mock_dataloader()
-    #data_loader_val = get_mock_dataloader()
+    data_loader_train = get_mock_dataloader()
+    data_loader_val = get_mock_dataloader()
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
@@ -121,6 +121,7 @@ def train_val(model, loaders, optimizer, epochs):
     :param epochs:
     :return:
     """
+    best_perf = 0
     for epoch in range(epochs):
 
         loss_meter = {'0': ValueMeter(), '1': ValueMeter()}
@@ -169,6 +170,7 @@ def train_val(model, loaders, optimizer, epochs):
                     """
 
                     bs = y.shape[0]  # batch size
+                    print(bs)
 
                     preds = model(x)
                     preds = preds.contiguous()
@@ -216,16 +218,18 @@ def train_val(model, loaders, optimizer, epochs):
                     # avoid logging the very first batch. It can be biased.
 
                     if mode == 0 and i != 0 and i % display_every == 0:
-                        print(mode, e, loss_meter[str(mode)].value(), accuracy_meter[str(mode)].value())
+                        log(mode, e, loss_meter[mode], accuracy_meter[mode])
                     
 
                 # log at the end of each epoch
-                print(mode, epoch + 1, loss_meter[str(mode)].value(), accuracy_meter[str(mode)].value())
-                
-
+                log(mode, epoch + 1, loss_meter[mode], accuracy_meter[mode],
+                    max(accuracy_meter[mode].value(), best_perf)
+                    if mode == 'validation' else None, green=True)
 
         # save checkpoint at the end of each train/val epoch
         #save_model(model, epoch + 1, accuracy_meter['validation'].value())
+
+
 
         torch.save({'state_dict': model.state_dict(), 'epoch': epoch}, root_path+"egtea/model.pth.tar")
 
@@ -243,6 +247,21 @@ def load_model(model):
     chk = torch.load(root_path+"egtea/model.pth.tar")
 
     model.load_state_dict(chk['state_dict'])
+
+def log(mode, epoch, loss_meter, accuracy_meter, best_perf=None, green=False):
+    if green:
+        print('\033[92m', end="")
+
+    print(
+        f"[{mode}] Epoch: {epoch:0.2f}. "
+        f"Loss: {loss_meter.value():.2f}. "
+        f"Accuracy: {accuracy_meter.value():.2f}% ", end="")
+
+    if best_perf:
+        print(f"[best: {best_perf:0.2f}]%", end="")
+
+    print('\033[0m')
+
 
 
 def label_smmothing(set_modality="standard", alpha=0.1, temperature = 0):
