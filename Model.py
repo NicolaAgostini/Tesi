@@ -11,7 +11,8 @@ class BaselineModel(torch.nn.Module):
         super(BaselineModel, self).__init__()
 
         self.branches = nn.ModuleList([torch.nn.LSTM(input_size[0], 1024, seq_len),
-                         torch.nn.LSTM(input_size[1], 1024, seq_len)])
+                         torch.nn.LSTM(input_size[1], 1024, seq_len),
+                         torch.nn.LSTM(input_size[2], 1024, seq_len)])
         """
         self.branches = nn.ModuleDict({
             "rgb": torch.nn.LSTM(input_size[0], 1024, seq_len),  # input of lstm is 1024 (vector of input), hidden units are 1024, num layers is 14 (6 enc + 8 dec)
@@ -21,12 +22,12 @@ class BaselineModel(torch.nn.Module):
         """
         self.batch_size = batch_size
         self.dropout = torch.nn.Dropout(dropout)
-        self.fc = torch.nn.Linear(1024*2, num_classes)  # without seq_len because i want my output on every timestamp from 0 to 2s of observations
+        self.fc = torch.nn.Linear(1024*3, num_classes)  # without seq_len because i want my output on every timestamp from 0 to 2s of observations
         #self.dropout = torch.nn.Dropout(dropout)
         #self.fc = torch.nn.Linear(1024*3, num_classes)
         self.num_classes = num_classes
 
-    def forward(self, feat):  # input will be batch_size * sequence length * input_dim
+    def forward(self, feat, hidden):  # input will be batch_size * sequence length * input_dim
         '''
         input feat: list like {key: np.ndarray of shape [batch_size, 14, len(key)] for key in modalities}  where
                     key€{rgb, flow, obj} and if key="rgb" => len(key) = 1024
@@ -45,8 +46,10 @@ class BaselineModel(torch.nn.Module):
         """
 
         for key in range(len(feat)):
-
-            x_mod, hidden = self.branches[key](feat[key])  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
+            print(key)
+            print(feat[key])
+            print(" === ")
+            x_mod, hidden = self.branches[key](feat[key], hidden)  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
             # print(x_mod.size())
             x.append(x_mod)  # append to a list
             #x.append(x_mod)
@@ -77,5 +80,12 @@ class BaselineModel(torch.nn.Module):
         etc...
         '''
 
-        return x
+        return x, hidden
 
+    def init_hidden(self, batch_size):
+        weight = next(self.parameters()).data
+        hidden = (weight.new(14, 14, 1024).zero_().to(device),
+                  weight.new(14, 14, 1024).zero_().to(device))
+
+
+        return hidden
