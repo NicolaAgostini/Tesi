@@ -218,13 +218,13 @@ def train_val(model, loaders, optimizer, epochs):
                     # avoid logging the very first batch. It can be biased.
 
                     if mode == 0 and i != 0 and i % display_every == 0:
-                        log(mode, e, loss_meter[mode], accuracy_meter[mode])
+                        log(mode, e, loss_meter[str(mode)], accuracy_meter[str(mode)])
                     
 
                 # log at the end of each epoch
-                log(mode, epoch + 1, loss_meter[mode], accuracy_meter[mode],
-                    max(accuracy_meter[mode].value(), best_perf)
-                    if mode == 'validation' else None, green=True)
+                log(mode, epoch + 1, loss_meter[str(mode)], accuracy_meter[str(mode)],
+                    max(accuracy_meter[str(mode)].value(), best_perf)
+                    if mode == '1' else None, green=True)
 
         # save checkpoint at the end of each train/val epoch
         #save_model(model, epoch + 1, accuracy_meter['validation'].value())
@@ -249,6 +249,10 @@ def load_model(model):
     model.load_state_dict(chk['state_dict'])
 
 def log(mode, epoch, loss_meter, accuracy_meter, best_perf=None, green=False):
+    if mode == 0:
+        mode = "Training"
+    elif mode == 1:
+        mode = "Validation"
     if green:
         print('\033[92m', end="")
 
