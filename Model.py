@@ -46,6 +46,7 @@ class BaselineModel(torch.nn.Module):
         """
 
         for key in range(len(feat)):
+            print(key)
             print(feat[key])
             print(" === ")
             x_mod, hidden = self.branches[key](feat[key], hidden)  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
