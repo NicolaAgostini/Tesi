@@ -20,8 +20,8 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 alpha = 0.2
 
 path_to_lmdb = [root_path+"egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd/",
-                    root_path+"egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd/",
-                    root_path+"egtea/obj/"]  # the folders that contain the .mdb files
+                    root_path+"egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd/"]
+                   # root_path+"egtea/obj/"]  # the folders that contain the .mdb files
 
 ### PATH OF TXT FOR TRAINING AND VALIDATION ###
 
@@ -45,7 +45,7 @@ path_to_csv_trainval = [root_path+"egtea/training1.csv", root_path+"egtea/valida
 
 ### SOME MODEL'S VARIABLES ###
 
-input_dim = [1024, 1024, 352]
+input_dim = [1024, 1024]
 batch_size = 4
 seq_len = 14
 
@@ -123,7 +123,7 @@ def train_val(model, loaders, optimizer, epochs):
     """
     best_perf = 0
     for epoch in range(epochs):
-        h = model.init_hidden(batch_size)
+
 
         loss_meter = {'0': ValueMeter(), '1': ValueMeter()}
         accuracy_meter = {'0': ValueMeter(), '1': ValueMeter()}
@@ -140,7 +140,7 @@ def train_val(model, loaders, optimizer, epochs):
 
                 for i, batch in enumerate(loaders[mode]):
 
-                    h = tuple([e.data for e in h])
+
 
                     x = batch['past_features']  # load in batch the next "past_features" datas of size (batch_size * 14 * 1024(352)
 
@@ -177,7 +177,7 @@ def train_val(model, loaders, optimizer, epochs):
                     bs = y.shape[0]  # batch size
                     #print(bs)
 
-                    preds = model(x, h)
+                    preds = model(x)
                     preds = preds.contiguous()
                     #print("output of the model " + str(preds.size()))
 
