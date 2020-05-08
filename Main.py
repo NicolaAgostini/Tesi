@@ -123,19 +123,24 @@ def train_val(model, loaders, optimizer, epochs):
     """
     best_perf = 0
     for epoch in range(epochs):
+        h = model.init_hidden(batch_size)
 
         loss_meter = {'0': ValueMeter(), '1': ValueMeter()}
         accuracy_meter = {'0': ValueMeter(), '1': ValueMeter()}
 
         for mode in [0, 1]:  # 0 for training, 1 for validation
+
             # enable gradients only if training
             with torch.set_grad_enabled(mode == 0):
                 if mode == 0:
+
                     model.train()
                 else:
                     model.eval()
 
                 for i, batch in enumerate(loaders[mode]):
+
+                    h = tuple([e.data for e in h])
 
                     x = batch['past_features']  # load in batch the next "past_features" datas of size (batch_size * 14 * 1024(352)
 
@@ -172,7 +177,7 @@ def train_val(model, loaders, optimizer, epochs):
                     bs = y.shape[0]  # batch size
                     #print(bs)
 
-                    preds = model(x)
+                    preds = model(x, h)
                     preds = preds.contiguous()
                     #print("output of the model " + str(preds.size()))
 

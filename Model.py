@@ -4,6 +4,7 @@ from torch.nn.init import normal, constant
 import numpy as np
 from torch.nn import functional as F
 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 class BaselineModel(torch.nn.Module):
     def __init__(self, batch_size, seq_len, input_size, dropout=0.2, num_classes=106):
@@ -26,7 +27,7 @@ class BaselineModel(torch.nn.Module):
         #self.fc = torch.nn.Linear(1024*3, num_classes)
         self.num_classes = num_classes
 
-    def forward(self, feat):  # input will be batch_size * sequence length * input_dim
+    def forward(self, feat, hidden):  # input will be batch_size * sequence length * input_dim
         '''
         input feat: list like {key: np.ndarray of shape [batch_size, 14, len(key)] for key in modalities}  where
                     key€{rgb, flow, obj} and if key="rgb" => len(key) = 1024
@@ -45,7 +46,7 @@ class BaselineModel(torch.nn.Module):
         """
 
         for key, value in enumerate(feat):
-            x_mod, hidden = self.branches[key](value)  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
+            x_mod, hidden = self.branches[key](value, hidden)  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
             # print(x_mod.size())
             x.append(x_mod)  # append to a list
             #x.append(x_mod)
@@ -77,3 +78,9 @@ class BaselineModel(torch.nn.Module):
         '''
 
         return x
+
+    def init_hidden(self, batch_size):
+        weight = next(self.parameters()).data
+        hidden = (weight.new(14, batch_size, 1024).zero_().to(device),
+                  weight.new(14, batch_size, 1024).zero_().to(device))
+        return hidden
