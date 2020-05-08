@@ -6,7 +6,7 @@ from torch.nn import functional as F
 
 
 class BaselineModel(torch.nn.Module):
-    def __init__(self, batch_size, seq_len, input_size, dropout=0.8, num_classes=106):
+    def __init__(self, batch_size, seq_len, input_size, dropout=0.2, num_classes=106):
         super(BaselineModel, self).__init__()
 
         self.branches = nn.ModuleList([torch.nn.LSTM(input_size[0], 1024, seq_len),
