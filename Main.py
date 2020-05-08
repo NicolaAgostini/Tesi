@@ -195,7 +195,7 @@ def train_val(model, loaders, optimizer, epochs):
                     k = 5  # top 5 anticipation
 
                     acc = topk_accuracy(preds[:, idx, :].detach().cpu().numpy(), y.detach().cpu().numpy(), (k,))[0] * 100  # top 5 accuracy percentage
-                    #print(acc)
+                    print(acc)
                     #acc = topk_accuracy(preds[:, idx, :].detach().cpu().numpy(), y_temp.detach().cpu().numpy(), (k,))[0] * 100  # for smoothed labels
 
                     # store the values in the meters to keep incremental averages
