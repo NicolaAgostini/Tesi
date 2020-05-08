@@ -92,6 +92,7 @@ def main():
     model = BaselineModel(batch_size, seq_len, input_dim)
     #model = BaselineModel(batch_size, seq_len, input_dim)
     model.to(device)
+    print(model)
 
     if mode == "train":
         data_loader_train = get_dataset(path_to_csv_trainval[0], batch_size, 4)  # loader for training
@@ -136,9 +137,9 @@ def train_val(model, loaders, optimizer, epochs):
                 for i, batch in enumerate(loaders[mode]):
                     x = batch['past_features']  # load in batch the next "past_features" datas of size (batch_size * 14 * 1024(352)
 
-                    x = [xx.cuda() for xx in x]  # if input is a list (for multiple branch) then load in the device gpu
+                    x = [xx.to(device) for xx in x]  # if input is a list (for multiple branch) then load in the device gpu
 
-                    y = batch['label'].cuda()  # get the label of the batch (batch, 1)
+                    y = batch['label'].to(device)  # get the label of the batch (batch, 1)
                     #y = batch['label']
 
                     """
