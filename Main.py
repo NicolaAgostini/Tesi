@@ -15,7 +15,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
 
-mode = "train"  # if train or test
+# mode = "train"  # if train or test
 
 alpha = 0.2
 
@@ -94,18 +94,18 @@ def main():
     model.to(device)
     print(model)
 
-    if mode == "train":
-        data_loader_train = get_dataset(path_to_csv_trainval[0], batch_size, 4)  # loader for training
-        data_loader_val = get_dataset(path_to_csv_trainval[1], batch_size, 4)  # loader for validation
+    #if mode == "train":
+    data_loader_train = get_dataset(path_to_csv_trainval[0], batch_size, 4)  # loader for training
+    data_loader_val = get_dataset(path_to_csv_trainval[1], batch_size, 4)  # loader for validation
 
-        #data_loader_train = get_mock_dataloader()
-        #data_loader_val = get_mock_dataloader()
+    #data_loader_train = get_mock_dataloader()
+    #data_loader_val = get_mock_dataloader()
 
-        optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-        #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, smoothed_labels)  # with smoothed labels
+    #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, smoothed_labels)  # with smoothed labels
 
-        train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
+    train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
 
 
 
