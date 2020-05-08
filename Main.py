@@ -11,6 +11,9 @@ from Utils import topk_accuracy, ValueMeter, topk_accuracy_multiple_timesteps, g
 root_path = "/home/2/2014/nagostin/Desktop/"
 
 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+
 
 mode = "train"  # if train or test
 
@@ -86,9 +89,9 @@ def main():
     #smoothed_labels = label_smmothing("prior")  # for smoothed labels
     
 
-    model = BaselineModel(batch_size, seq_len, input_dim).cuda()
+    model = BaselineModel(batch_size, seq_len, input_dim)
     #model = BaselineModel(batch_size, seq_len, input_dim)
-    #model.to(device)
+    model.to(device)
 
     if mode == "train":
         data_loader_train = get_dataset(path_to_csv_trainval[0], batch_size, 4)  # loader for training
@@ -179,7 +182,7 @@ def train_val(model, loaders, optimizer, epochs):
                     #print("labels ", linear_labels)
 
                     loss = F.cross_entropy(linear_preds, linear_labels)
-                    # loss = nn.CrossEntropyLoss()(linear_preds, linear_labels)
+
                     #print(loss)
 
                     # get the predictions for anticipation time = 1s (index -4) (anticipation)
