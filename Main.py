@@ -49,7 +49,7 @@ input_dim = [1024, 1024, 352]
 batch_size = 8
 seq_len = 14
 
-learning_rate = 0.1
+learning_rate = 0.001
 
 
 epochs = 100
@@ -84,13 +84,13 @@ def initialize_trainval_csv(which_split):
 
 def main():
 
-    path = initialize_trainval_csv(1)  # to generate training and validation csv depending on split defined by authors of egtea gaze +
+    #path = initialize_trainval_csv(1)  # to generate training and validation csv depending on split defined by authors of egtea gaze +
 
     #smoothed_labels = label_smmothing("prior")  # for smoothed labels
     
 
     model = BaselineModel(batch_size, seq_len, input_dim)
-    #model = BaselineModel(batch_size, seq_len, input_dim)
+
     model.to(device)
     print(model)
 
@@ -135,6 +135,7 @@ def train_val(model, loaders, optimizer, epochs):
                     model.eval()
 
                 for i, batch in enumerate(loaders[mode]):
+
                     x = batch['past_features']  # load in batch the next "past_features" datas of size (batch_size * 14 * 1024(352)
 
                     x = [xx.to(device) for xx in x]  # if input is a list (for multiple branch) then load in the device gpu
