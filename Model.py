@@ -26,7 +26,7 @@ class BaselineModel(torch.nn.Module):
         #self.fc = torch.nn.Linear(1024*3, num_classes)
         self.num_classes = num_classes
 
-    def forward(self, feat, hidden):  # input will be batch_size * sequence length * input_dim
+    def forward(self, feat):  # input will be batch_size * sequence length * input_dim
         '''
         input feat: list like {key: np.ndarray of shape [batch_size, 14, len(key)] for key in modalities}  where
                     key€{rgb, flow, obj} and if key="rgb" => len(key) = 1024
