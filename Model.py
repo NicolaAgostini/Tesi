@@ -45,8 +45,9 @@ class BaselineModel(torch.nn.Module):
             x.append(x_mod)  # append to a list
         """
 
-        for key, value in enumerate(feat):
-            x_mod, hidden = self.branches[key](value, hidden)  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
+        for key in range(len(feat)):
+            print(feat[key].size())
+            x_mod, hidden = self.branches[key](feat[key], hidden)  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
             # print(x_mod.size())
             x.append(x_mod)  # append to a list
             #x.append(x_mod)
