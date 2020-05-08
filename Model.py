@@ -81,6 +81,6 @@ class BaselineModel(torch.nn.Module):
 
     def init_hidden(self, batch_size):
         weight = next(self.parameters()).data
-        hidden = (weight.new(14, batch_size, 1024).zero_().to(device),
-                  weight.new(14, batch_size, 1024).zero_().to(device))
+        hidden = (weight.new(14, 14, 1024).zero_().to(device),
+                  weight.new(14, 14, 1024).zero_().to(device))
         return hidden
