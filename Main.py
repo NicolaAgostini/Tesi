@@ -101,7 +101,8 @@ def main():
     #data_loader_train = get_mock_dataloader()
     #data_loader_val = get_mock_dataloader()
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    # optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
 
     #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, smoothed_labels)  # with smoothed labels
 
@@ -184,11 +185,11 @@ def train_val(model, loaders, optimizer, epochs):
                     # linearize predictions
                     linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106) ogni riga ha una label corrispondente al timestamp
 
-                    print(linear_preds.size())
+                    #print(linear_preds)
 
                     linear_labels = y.view(-1, 1).expand(-1, preds.shape[1]).contiguous().view(-1)
 
-                    print("labels ", linear_labels)
+                    #print("labels ", linear_labels)
 
                     loss = F.cross_entropy(linear_preds, linear_labels)
 
