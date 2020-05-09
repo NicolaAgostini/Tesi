@@ -123,7 +123,7 @@ def train_val(model, loaders, optimizer, epochs):
     """
     best_perf = 0
     for epoch in range(epochs):
-        h = model.init_hidden(batch_size)
+
 
         loss_meter = {'0': ValueMeter(), '1': ValueMeter()}
         accuracy_meter = {'0': ValueMeter(), '1': ValueMeter()}
@@ -177,18 +177,18 @@ def train_val(model, loaders, optimizer, epochs):
                     bs = y.shape[0]  # batch size
                     #print(bs)
 
-                    preds, h = model(x, h)
+                    preds = model(x)
                     preds = preds.contiguous()
                     #print("output of the model " + str(preds.size()))
 
                     # linearize predictions
                     linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106) ogni riga ha una label corrispondente al timestamp
 
-                    #print(linear_preds.size())
+                    print(linear_preds.size())
 
                     linear_labels = y.view(-1, 1).expand(-1, preds.shape[1]).contiguous().view(-1)
 
-                    #print("labels ", linear_labels)
+                    print("labels ", linear_labels)
 
                     loss = F.cross_entropy(linear_preds, linear_labels)
 
