@@ -47,6 +47,7 @@ def read_representations(frames, env):
             dd = e.get(f.strip().encode('utf-8'))  # method to read .mdb file and save in dd the raw image
         if dd is None:
             print(f)  # frame not found
+            print("NOT FOUND")
         # convert to numpy array
         data = np.frombuffer(dd, 'float32')
         # append to list
@@ -179,6 +180,7 @@ class Dataset(data.Dataset):
 
         # read representations for past frames
         out['past_features'] = read_data(past_frames, self.env)
+        print(out["id"])  # print the id of the sequence
 
         # get the label of the current sequence
         label = self.labels[index]
