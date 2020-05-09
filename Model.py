@@ -10,7 +10,7 @@ class BaselineModel(torch.nn.Module):
     def __init__(self, batch_size, seq_len, input_size, dropout=0.2, num_classes=106):
         super(BaselineModel, self).__init__()
 
-        self.branches = nn.ModuleList([torch.nn.LSTM(input_size[0], 1024, seq_len),
+        self.branches = torch.nn.ModuleList([torch.nn.LSTM(input_size[0], 1024, seq_len),
                          torch.nn.LSTM(input_size[1], 1024, seq_len),
                          torch.nn.LSTM(input_size[2], 1024, seq_len)])
         """
@@ -85,8 +85,14 @@ class BaselineModel(torch.nn.Module):
 
     def init_hidden(self, batch_size):
         weight = next(self.parameters()).data
-        hidden = (weight.new(14, 14, 1024).zero_().to(device),
-                  weight.new(14, 14, 1024).zero_().to(device))
+        hid = []
+        hid.append((weight.new(14, 14, 1024).zero_().to(device),
+                  weight.new(14, 14, 1024).zero_().to(device)))
+        hid.append((weight.new(14, 14, 1024).zero_().to(device),
+                    weight.new(14, 14, 1024).zero_().to(device)))
+        hid.append((weight.new(14, 14, 1024).zero_().to(device),
+                    weight.new(14, 14, 1024).zero_().to(device)))
 
 
-        return hidden
+
+        return hid
