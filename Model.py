@@ -7,7 +7,7 @@ from torch.nn import functional as F
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 class BaselineModel(torch.nn.Module):
-    def __init__(self, batch_size, seq_len, input_size, dropout=0.2, num_classes=106):
+    def __init__(self, batch_size, seq_len, input_size, dropout=0.8, num_classes=106):
         super(BaselineModel, self).__init__()
 
         self.branches = torch.nn.ModuleList([torch.nn.LSTM(input_size[0], 1024, 1),
