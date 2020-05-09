@@ -213,7 +213,7 @@ def train_val(model, loaders, optimizer, epochs):
                     # if in training mode
                     if mode == 0:
                         optimizer.zero_grad()
-                        loss.backward()
+                        loss.backward(retain_graph=True)
                         optimizer.step()
 
                     # compute decimal epoch for logging
