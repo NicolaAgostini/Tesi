@@ -180,7 +180,7 @@ class Dataset(data.Dataset):
 
         # read representations for past frames
         out['past_features'] = read_data(past_frames, self.env)
-        print(out["id"])  # print the id of the sequence
+        #print(out["id"])  # print the id of the sequence
 
         # get the label of the current sequence
         label = self.labels[index]
