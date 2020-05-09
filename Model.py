@@ -55,7 +55,7 @@ class BaselineModel(torch.nn.Module):
 
             #print(feat[key].permute(1,0,2))
             x_mod, hid = self.branches[key](feat[key].permute(1,0,2))  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
-            print(x_mod.size())
+            #print(x_mod.size())
             x.append(x_mod)  # append to a list
 
 
@@ -67,7 +67,7 @@ class BaselineModel(torch.nn.Module):
         # Concatenate
         x = torch.cat(x, -1)  # x has shape [batch_size, 14, 3 * lstm_hidden_size]
 
-        print("otput lstm" + str(x.size()))
+        #print("otput lstm" + str(x.size()))
 
         # Take last time samples
         x = x[-8:, :, :]  # x has shape [batch_size, 8, 3 * lstm_hidden_size]
@@ -75,11 +75,11 @@ class BaselineModel(torch.nn.Module):
         # Dropout
         x = self.dropout(x)  # apply dropout otherwise ll encounter overfitting
         #x = x.view(self.batch_size, -1)  # prepare input to FC linear
-        print(x.size())
+        #print(x.size())
         # Fully connected
         y = self.fc(x)  # output x has shape [batch_size, 8, num_classes]
         #x = torch.nn.functional.softmax(x, -1)  # transform last layer (106 vector) to probabilities sum to one
-        print(y.size())
+        #print(y.size())
 
         '''
         For example, if each feature input is sampled every 0.25, then
