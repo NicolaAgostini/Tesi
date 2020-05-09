@@ -44,14 +44,15 @@ class BaselineModel(torch.nn.Module):
             #print(x_mod.size())
             x.append(x_mod)  # append to a list
         """
-
+        new_hid = []
         for key in range(len(feat)):
             print(key)
             print(feat[key])
             print(" === ")
-            x_mod, hidden = self.branches[key](feat[key], hidden)  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
+            x_mod, hid = self.branches[key](feat[key], hidden[key])  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
             # print(x_mod.size())
             x.append(x_mod)  # append to a list
+            new_hid.append(hid)
             #x.append(x_mod)
 
 
@@ -80,7 +81,7 @@ class BaselineModel(torch.nn.Module):
         etc...
         '''
 
-        return x, hidden
+        return x, new_hid
 
     def init_hidden(self, batch_size):
         weight = next(self.parameters()).data
