@@ -52,7 +52,7 @@ seq_len = 14
 learning_rate = 0.001
 
 
-epochs = 10
+epochs = 100
 
 display_every = 10
 
@@ -102,7 +102,7 @@ def main():
     #data_loader_val = get_mock_dataloader()
 
     # optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
     #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, smoothed_labels)  # with smoothed labels
 
@@ -124,6 +124,7 @@ def train_val(model, loaders, optimizer, epochs):
     """
     best_perf = 0
     for epoch in range(epochs):
+        model.zero_grad()
 
 
         loss_meter = {'0': ValueMeter(), '1': ValueMeter()}
@@ -214,7 +215,7 @@ def train_val(model, loaders, optimizer, epochs):
                     # if in training mode
                     if mode == 0:
                         optimizer.zero_grad()
-                        loss.backward(retain_graph=True)
+                        loss.backward()
                         optimizer.step()
 
                     # compute decimal epoch for logging
