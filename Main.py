@@ -46,7 +46,7 @@ path_to_csv_trainval = [root_path+"egtea/training1.csv", root_path+"egtea/valida
 ### SOME MODEL'S VARIABLES ###
 
 input_dim = [1024, 1024, 352]
-batch_size = 2
+batch_size = 4
 seq_len = 14
 
 learning_rate = 0.001
@@ -95,11 +95,11 @@ def main():
     print(model)
 
     #if mode == "train":
-    #data_loader_train = get_dataset(path_to_csv_trainval[0], batch_size, 4)  # loader for training
-    #data_loader_val = get_dataset(path_to_csv_trainval[1], batch_size, 4)  # loader for validation
+    data_loader_train = get_dataset(path_to_csv_trainval[0], batch_size, 4)  # loader for training
+    data_loader_val = get_dataset(path_to_csv_trainval[1], batch_size, 4)  # loader for validation
 
-    data_loader_train = get_mock_dataloader()
-    data_loader_val = get_mock_dataloader()
+    #data_loader_train = get_mock_dataloader()
+    #data_loader_val = get_mock_dataloader()
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
