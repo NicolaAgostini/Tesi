@@ -46,7 +46,7 @@ path_to_csv_trainval = [root_path+"egtea/training1.csv", root_path+"egtea/valida
 ### SOME MODEL'S VARIABLES ###
 
 input_dim = [1024, 1024, 352]
-batch_size = 64
+batch_size = 4
 seq_len = 14
 
 learning_rate = 0.001
@@ -124,7 +124,7 @@ def train_val(model, loaders, optimizer, epochs):
     """
     best_perf = 0
     for epoch in range(epochs):
-        model.zero_grad()
+        #model.zero_grad()
 
 
         loss_meter = {'0': ValueMeter(), '1': ValueMeter()}
@@ -187,7 +187,7 @@ def train_val(model, loaders, optimizer, epochs):
                     # linearize predictions
                     linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106) ogni riga ha una label corrispondente al timestamp
 
-                    #print(linear_preds)
+                    #print(linear_preds.size())
 
                     linear_labels = y.view(-1, 1).expand(-1, preds.shape[1]).contiguous().view(-1)
 
