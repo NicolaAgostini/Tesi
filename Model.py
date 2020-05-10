@@ -68,9 +68,10 @@ class BaselineModel(torch.nn.Module):
         x = torch.cat(x, -1)  # x has shape [batch_size, 14, 3 * lstm_hidden_size]
 
         #print("otput lstm" + str(x.size()))
+        x = x.permute(1,0,2)
 
         # Take last time samples
-        x = x[-8:, :, :]  # x has shape [batch_size, 8, 3 * lstm_hidden_size]
+        x = x[:, -8:, :]  # x has shape [batch_size, 8, 3 * lstm_hidden_size]
 
         # Dropout
         x = self.dropout(x)  # apply dropout otherwise ll encounter overfitting

@@ -180,7 +180,7 @@ def train_val(model, loaders, optimizer, epochs):
                     #print(bs)
 
                     preds = model(x)
-                    preds = preds.permute(1,0,2)
+                    #preds = preds.permute(1,0,2)
                     preds = preds.contiguous()
                     #print("output of the model " + str(preds.size()))
 
