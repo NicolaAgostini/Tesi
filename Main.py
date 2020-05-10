@@ -142,7 +142,6 @@ def train_val(model, loaders, optimizer, epochs):
 
                 for i, batch in enumerate(loaders[mode]):
 
-                    #h = tuple([e.data for e in h])
 
                     x = batch['past_features']  # load in batch the next "past_features" datas of size (batch_size * 14 * 1024(352)
 
