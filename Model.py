@@ -9,9 +9,9 @@ class BaselineModel(torch.nn.Module):
     def __init__(self, batch_size, seq_len, input_size, dropout=0.8, num_classes=106):
         super(BaselineModel, self).__init__()
 
-        self.branches = torch.nn.ModuleList([torch.nn.LSTM(input_size[0], 1024, 1, batch_first=True),
-                         torch.nn.LSTM(input_size[1], 1024, 1, batch_first=True),
-                         torch.nn.LSTM(input_size[2], 1024, 1, batch_first=True)])
+        self.branches = torch.nn.ModuleList([torch.nn.LSTM(input_size[0], 1024, 3, batch_first=True),
+                         torch.nn.LSTM(input_size[1], 1024, 3, batch_first=True),
+                         torch.nn.LSTM(input_size[2], 1024, 3, batch_first=True)])
         """
         self.branches = nn.ModuleDict({
             "rgb": torch.nn.LSTM(input_size[0], 1024, seq_len),  # input of lstm is 1024 (vector of input), hidden units are 1024, num layers is 14 (6 enc + 8 dec)
@@ -28,23 +28,14 @@ class BaselineModel(torch.nn.Module):
         self.num_classes = num_classes
 
     def forward(self, feat):  # input will be batch_size * sequence length * input_dim
-        '''
-        input feat: list like {key: np.ndarray of shape [batch_size, 14, len(key)] for key in modalities}  where
-                    key€{0=rgb, 1=flow, 2=obj} and if key="rgb" => len(key) = 1024
-
-        '''
+        """
+        :param feat: input as a list [rgb, flow, obj] where each is size [batch_size, 14, len(rgb)]
+        :return:
+        """
 
         # LSTM forward
         x = []
 
-        """
-        ### first type of input ###
-        
-        for key, value in feat.items():
-            x_mod, hidden = self.branches[key](value)  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
-            #print(x_mod.size())
-            x.append(x_mod)  # append to a list
-        """
         for key in range(len(feat)):  # len feat = 3
             x_mod, hid = self.branches[key](feat[key])  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
             x.append(x_mod)  # append to a list
