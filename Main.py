@@ -19,8 +19,8 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 alpha = 0.2
 
-path_to_lmdb = [root_path+"egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd/",
-                    root_path+"egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd/",
+path_to_lmdb = [root_path+"egtea/TSN-C_3_egtea_action_CE_rgb_model_best_fcfull_hd/",
+                    root_path+"egtea/TSN-C_3_egtea_action_CE_flow_model_best_fcfull_hd/",
                     root_path+"egtea/obj/"]  # the folders that contain the .mdb files
 
 ### PATH OF TXT FOR TRAINING AND VALIDATION ###
@@ -52,7 +52,7 @@ seq_len = 14
 learning_rate = 0.001
 
 
-epochs = 100
+epochs = 50
 
 display_every = 10
 
@@ -176,25 +176,19 @@ def train_val(model, loaders, optimizer, epochs):
                     """
 
                     bs = y.shape[0]  # batch size
-                    #print(bs)
 
                     preds = model(x)
-                    #preds = preds.permute(1,0,2)
+
                     preds = preds.contiguous()
-                    #print("output of the model " + str(preds.size()))
+                    preds = preds[:, -8:, :]  # take only last 8 anticipation steps
 
                     # linearize predictions
                     linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106) ogni riga ha una label corrispondente al timestamp
 
-                    #print(linear_preds.size())
 
                     linear_labels = y.view(-1, 1).expand(-1, preds.shape[1]).contiguous().view(-1)
 
-                    #print("labels ", linear_labels)
-
                     loss = F.cross_entropy(linear_preds, linear_labels)
-
-                    #print(loss)
 
                     # get the predictions for anticipation time = 1s (index -4) (anticipation)
                     # or for the last time-step (100%) (early recognition)
@@ -204,7 +198,7 @@ def train_val(model, loaders, optimizer, epochs):
                     k = 5  # top 5 anticipation
 
                     acc = topk_accuracy(preds[:, idx, :].detach().cpu().numpy(), y.detach().cpu().numpy(), (k,))[0] * 100  # top 5 accuracy percentage
-                    #print(acc)
+
                     #acc = topk_accuracy(preds[:, idx, :].detach().cpu().numpy(), y_temp.detach().cpu().numpy(), (k,))[0] * 100  # for smoothed labels
 
                     # store the values in the meters to keep incremental averages

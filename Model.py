@@ -4,15 +4,14 @@ from torch.nn.init import normal, constant
 import numpy as np
 from torch.nn import functional as F
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 class BaselineModel(torch.nn.Module):
     def __init__(self, batch_size, seq_len, input_size, dropout=0.8, num_classes=106):
         super(BaselineModel, self).__init__()
 
-        self.branches = torch.nn.ModuleList([torch.nn.LSTM(input_size[0], 256, 1, batch_first=True),
-                         torch.nn.LSTM(input_size[1], 256, 1, batch_first=True),
-                         torch.nn.LSTM(input_size[2], 256, 1, batch_first=True)])
+        self.branches = torch.nn.ModuleList([torch.nn.LSTM(input_size[0], 1024, 1, batch_first=True),
+                         torch.nn.LSTM(input_size[1], 1024, 1, batch_first=True),
+                         torch.nn.LSTM(input_size[2], 1024, 1, batch_first=True)])
         """
         self.branches = nn.ModuleDict({
             "rgb": torch.nn.LSTM(input_size[0], 1024, seq_len),  # input of lstm is 1024 (vector of input), hidden units are 1024, num layers is 14 (6 enc + 8 dec)
@@ -23,7 +22,7 @@ class BaselineModel(torch.nn.Module):
         self.seq_len = seq_len
         self.batch_size = batch_size
         self.dropout = torch.nn.Dropout(dropout)
-        self.fc = torch.nn.Linear(256*3, num_classes)  # without seq_len because i want my output on every timestamp from 0 to 2s of observations
+        self.fc = torch.nn.Linear(1024*3, num_classes)  # without seq_len because i want my output on every timestamp from 0 to 2s of observations
         #self.dropout = torch.nn.Dropout(dropout)
         #self.fc = torch.nn.Linear(1024*3, num_classes)
         self.num_classes = num_classes
@@ -31,7 +30,7 @@ class BaselineModel(torch.nn.Module):
     def forward(self, feat):  # input will be batch_size * sequence length * input_dim
         '''
         input feat: list like {key: np.ndarray of shape [batch_size, 14, len(key)] for key in modalities}  where
-                    key€{rgb, flow, obj} and if key="rgb" => len(key) = 1024
+                    key€{0=rgb, 1=flow, 2=obj} and if key="rgb" => len(key) = 1024
 
         '''
 
@@ -46,41 +45,21 @@ class BaselineModel(torch.nn.Module):
             #print(x_mod.size())
             x.append(x_mod)  # append to a list
         """
-        #print(len(feat))
         for key in range(len(feat)):  # len feat = 3
-            #print(key)
-            #print(feat[key])
-            #print(" === ")
-
-
-            #print(feat[key].permute(1,0,2))
             x_mod, hid = self.branches[key](feat[key])  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
-            #print(x_mod.size())
             x.append(x_mod)  # append to a list
 
-
-
-            #x.append(x_mod)
-
-
-        #print(np.shape(x))
         # Concatenate
         x = torch.cat(x, -1)  # x has shape [batch_size, 14, 3 * lstm_hidden_size]
 
-        #print("otput lstm" + str(x.size()))
-
-
         # Take last time samples
-        x = x[:, -8:, :]  # x has shape [batch_size, 8, 3 * lstm_hidden_size]
+        #x = x[:, -8:, :]  # x has shape [batch_size, 8, 3 * lstm_hidden_size]
 
         # Dropout
-        x = self.dropout(x)  # apply dropout otherwise ll encounter overfitting
-        #x = x.view(self.batch_size, -1)  # prepare input to FC linear
-        #print(x.size())
+        x = self.dropout(x)  # apply dropout against overfitting
+
         # Fully connected
-        y = self.fc(x)  # output x has shape [batch_size, 8, num_classes]
-        #x = torch.nn.functional.softmax(x, -1)  # transform last layer (106 vector) to probabilities sum to one
-        #print(y.size())
+        y = self.fc(x)  # output y has shape [batch_size, 8, num_classes]
 
         '''
         For example, if each feature input is sampled every 0.25, then
