@@ -46,7 +46,7 @@ path_to_csv_trainval = [root_path+"egtea/training1.csv", root_path+"egtea/valida
 ### SOME MODEL'S VARIABLES ###
 
 input_dim = [1024, 1024, 352]
-batch_size = 128
+batch_size = 8
 seq_len = 14
 
 learning_rate = 0.001
@@ -101,7 +101,6 @@ def main():
     #data_loader_train = get_mock_dataloader()
     #data_loader_val = get_mock_dataloader()
 
-    # optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
     #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, smoothed_labels)  # with smoothed labels
@@ -142,7 +141,6 @@ def train_val(model, loaders, optimizer, epochs):
 
                 for i, batch in enumerate(loaders[mode]):
 
-
                     x = batch['past_features']  # load in batch the next "past_features" datas of size (batch_size * 14 * 1024(352)
 
                     x = [xx.to(device) for xx in x]  # if input is a list (for multiple branch) then load in the device gpu
@@ -179,8 +177,7 @@ def train_val(model, loaders, optimizer, epochs):
 
                     preds = model(x)
 
-                    preds = preds.contiguous()
-                    preds = preds[:, -8:, :]  # take only last 8 anticipation steps
+                    preds = preds[:, -8:, :].contiguous()  # take only last 8 anticipation steps
 
                     # linearize predictions
                     linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106) ogni riga ha una label corrispondente al timestamp
