@@ -1,17 +1,8 @@
 from __future__ import with_statement
-import json
-import os
-import tensorflow as tf
 import cv2
-import numpy as np
-import time
-import lmdb
 from Model import *
 from Dataset import *
 from torch.utils.data import DataLoader
-import math
-
-from shutil import copyfile
 
 
 

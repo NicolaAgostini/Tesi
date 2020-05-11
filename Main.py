@@ -19,8 +19,8 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 alpha = 0.2
 
-path_to_lmdb = [root_path+"egtea/TSN-C_3_egtea_action_CE_rgb_model_best_fcfull_hd/",
-                    root_path+"egtea/TSN-C_3_egtea_action_CE_flow_model_best_fcfull_hd/",
+path_to_lmdb = [root_path+"egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd/",
+                    root_path+"egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd/",
                     root_path+"egtea/obj/"]  # the folders that contain the .mdb files
 
 ### PATH OF TXT FOR TRAINING AND VALIDATION ###
@@ -183,7 +183,6 @@ def train_val(model, loaders, optimizer, epochs):
 
                     # linearize predictions
                     linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106) ogni riga ha una label corrispondente al timestamp
-
 
                     linear_labels = y.view(-1, 1).expand(-1, preds.shape[1]).contiguous().view(-1)
 
