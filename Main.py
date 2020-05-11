@@ -177,7 +177,9 @@ def train_val(model, loaders, optimizer, epochs):
 
                     preds = model(x)
 
-                    preds = preds[:, -8:, :].contiguous()  # take only last 8 anticipation steps
+                    preds = preds.contiguous()
+
+                    #preds = preds[:, -8:, :].contiguous()  # take only last 8 anticipation steps
 
                     # linearize predictions
                     linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106) ogni riga ha una label corrispondente al timestamp
