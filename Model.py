@@ -38,7 +38,7 @@ class BaselineModel(torch.nn.Module):
 
 
         # Concatenate
-        x = torch.cat(x, -1)  # x has shape [batch_size, 14, 3 * lstm_hidden_size]
+        #x = torch.cat(x, -1)  # x has shape [batch_size, 14, 3 * lstm_hidden_size]
 
         # Take last time samples
         x = x[:, -8:, :]  # x has shape [batch_size, 8, 3 * lstm_hidden_size]
