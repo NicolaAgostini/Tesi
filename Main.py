@@ -149,7 +149,7 @@ def train_val(model, loaders, optimizer, epochs):
 
                     x = [xx.to(device) for xx in x]  # if input is a list (for multiple branch) then load in the device gpu
 
-                    print(x.size())
+                    print(x[0].size())
 
                     y = batch['label'].to(device)  # get the label of the batch (batch, 1)
                     #y = batch['label']
