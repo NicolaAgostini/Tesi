@@ -9,7 +9,8 @@ class BaselineModel(torch.nn.Module):
     def __init__(self, batch_size, seq_len, input_size, dropout=0.8, num_classes=106):
         super(BaselineModel, self).__init__()
 
-        self.branches = torch.nn.LSTM(input_size[0], 1024, 3, batch_first=True)
+        self.branches = torch.nn.ModuleList([torch.nn.LSTM(input_size[0], 256, 1, batch_first=True),
+                                             torch.nn.LSTM(input_size[1], 256, 1, batch_first=True)])
         """
         self.branches = nn.ModuleDict({
             "rgb": torch.nn.LSTM(input_size[0], 1024, seq_len),  # input of lstm is 1024 (vector of input), hidden units are 1024, num layers is 14 (6 enc + 8 dec)
@@ -20,7 +21,7 @@ class BaselineModel(torch.nn.Module):
         self.seq_len = seq_len
         self.batch_size = batch_size
         self.dropout = torch.nn.Dropout(dropout)
-        self.fc = torch.nn.Linear(1024*1, num_classes)  # without seq_len because i want my output on every timestamp from 0 to 2s of observations
+        self.fc = torch.nn.Linear(256*2, num_classes)  # without seq_len because i want my output on every timestamp from 0 to 2s of observations
 
         #self.fc = torch.nn.Linear(1024*3, num_classes)
         self.num_classes = num_classes
@@ -33,18 +34,19 @@ class BaselineModel(torch.nn.Module):
 
         # LSTM forward
         x = []
-
-        x_mod, hid = self.branches(feat[0])  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
+        for i, j in enumerate(feat):
+            x_mod, hid = self.branches[i](j)  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
+            x.append(x_mod)
 
 
         # Concatenate
-        #x = torch.cat(x, -1)  # x has shape [batch_size, 14, 3 * lstm_hidden_size]
+        x = torch.cat(x, -1)  # x has shape [batch_size, 14, 3 * lstm_hidden_size]
 
         # Take last time samples
-        x_mod = x_mod[:, -8:, :]  # x has shape [batch_size, 8, 3 * lstm_hidden_size]
+        x = x[:, -8:, :]  # x has shape [batch_size, 8, 3 * lstm_hidden_size]
 
         # Dropout
-        x = self.dropout(x_mod)  # apply dropout against overfitting
+        x = self.dropout(x)  # apply dropout against overfitting
 
         # Fully connected
         y = self.fc(x)  # output y has shape [batch_size, 8, num_classes]
