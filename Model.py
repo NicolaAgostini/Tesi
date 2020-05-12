@@ -10,8 +10,7 @@ class BaselineModel(torch.nn.Module):
         super(BaselineModel, self).__init__()
 
         self.branches = torch.nn.ModuleList([torch.nn.LSTM(input_size[0], 1024, 3, batch_first=True),
-                         torch.nn.LSTM(input_size[1], 1024, 3, batch_first=True),
-                         torch.nn.LSTM(input_size[2], 1024, 3, batch_first=True)])
+                         torch.nn.LSTM(input_size[1], 1024, 3, batch_first=True)])
         """
         self.branches = nn.ModuleDict({
             "rgb": torch.nn.LSTM(input_size[0], 1024, seq_len),  # input of lstm is 1024 (vector of input), hidden units are 1024, num layers is 14 (6 enc + 8 dec)
@@ -37,12 +36,8 @@ class BaselineModel(torch.nn.Module):
         x = []
 
         for key in range(len(feat)):  # len feat = 3
-            h0 = torch.zeros(3, 3, 1024).requires_grad_().cuda()
 
-            # Initialize cell state
-            c0 = torch.zeros(3, 3, 1024).requires_grad_().cuda()
-
-            x_mod, hid = self.branches[key](feat[key], (h0.detach(), c0.detach()))  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
+            x_mod, hid = self.branches[key](feat[key])  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
             x.append(x_mod)  # append to a list
 
         # Concatenate
