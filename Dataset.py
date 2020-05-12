@@ -55,7 +55,7 @@ def read_representations(frames, env):
     # convert list to numpy array
     features = np.array(features)
 
-    print("features dim " + str(features.shape))
+    #print("features dim " + str(features.shape))
 
     return features  # dim 14 X 1024 for rgb and flow and 352 for obj
 
@@ -125,7 +125,7 @@ class Dataset(data.Dataset):
             else:  # if the sequence is invalid then insert in the list of invalid sequence
 
                 self.discarded_ids.append(value.id)
-        print("DISCARDED"+str(len(self.discarded_ids)))
+        print("DISCARDED "+str(len(self.discarded_ids)))
 
 
 
