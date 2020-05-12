@@ -144,6 +144,7 @@ def train_val(model, loaders, optimizer, epochs):
                     model.eval()
 
                 for i, batch in enumerate(loaders[mode]):
+                    print(i)
 
                     x = batch['past_features']  # load in batch the next "past_features" datas of size (batch_size * 14 * 1024(352)
 
@@ -188,7 +189,7 @@ def train_val(model, loaders, optimizer, epochs):
                     #preds = preds[:, -8:, :].contiguous()  # take only last 8 anticipation steps
 
                     # linearize predictions
-                    linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106) ogni riga ha una label corrispondente al timestamp
+                    linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106)
 
                     linear_labels = y.view(-1, 1).expand(-1, preds.shape[1]).contiguous().view(-1)
 
@@ -229,7 +230,7 @@ def train_val(model, loaders, optimizer, epochs):
                 # log at the end of each epoch
                 log(mode, epoch + 1, loss_meter[str(mode)], accuracy_meter[str(mode)],
                     max(accuracy_meter[str(mode)].value(), best_perf)
-                    if mode == '1' else None, green=True)
+                    if mode == 1 else None, green=True)
 
         # save checkpoint at the end of each train/val epoch
         #save_model(model, epoch + 1, accuracy_meter['validation'].value())
