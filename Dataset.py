@@ -119,7 +119,7 @@ class Dataset(data.Dataset):
                 self.ids.append(value.id)  # append the id of the video  # FIXME : ID OR CLIP NAME ???
 
                 # handle whether a list of labels is required (e.g., [verb, noun]), rather than a single action
-                print(value.action)
+                #print(value.action)
                 self.labels.append(value.action)
 
             else:  # if the sequence is invalid then insert in the list of invalid sequence
