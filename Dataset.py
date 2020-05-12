@@ -23,8 +23,8 @@ def txt_to_csv(path_oftxt, which_part):
                 v_name = values[0]+"-"+values[1]+"-"+values[2]
                 # start_time = values[3]  # Not used
                 # end_time = values[4]  # Not used
-                start_frame = values[5].replace("F", "00")
-                end_frame = values[6].replace("F", "00")
+                start_frame = values[5].replace("F", "0000")
+                end_frame = values[6].replace("F", "0000")
                 action_id = int(values[7])-1
 
                 writer = csv.writer(file)
