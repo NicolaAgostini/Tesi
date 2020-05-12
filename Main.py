@@ -20,8 +20,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 # alpha = 0.2
 
 path_to_lmdb = [root_path+"egtea/TSN-C_3_egtea_action_CE_rgb_model_best_fcfull_hd/",
-                root_path + "egtea/TSN-C_3_egtea_action_CE_flow_model_best_fcfull_hd",
-                root_path+"egtea/obj/"]  # the folders that contain the .mdb files
+                root_path + "egtea/TSN-C_3_egtea_action_CE_flow_model_best_fcfull_hd"]  # the folders that contain the .mdb files
 
 ### PATH OF TXT FOR TRAINING AND VALIDATION ###
 
@@ -150,7 +149,7 @@ def train_val(model, loaders, optimizer, epochs):
 
                     x = [xx.to(device) for xx in x]  # if input is a list (for multiple branch) then load in the device gpu
 
-                    #print(x.size())
+                    print(x.size())
 
                     y = batch['label'].to(device)  # get the label of the batch (batch, 1)
                     #y = batch['label']
