@@ -9,8 +9,7 @@ class BaselineModel(torch.nn.Module):
     def __init__(self, batch_size, seq_len, input_size, dropout=0.8, num_classes=106):
         super(BaselineModel, self).__init__()
 
-        self.branches = torch.nn.ModuleList([torch.nn.LSTM(input_size[0], 1024, 3, batch_first=True),
-                         torch.nn.LSTM(input_size[1], 1024, 3, batch_first=True)])
+        self.branches = torch.nn.LSTM(input_size[0], 1024, 3, batch_first=True)
         """
         self.branches = nn.ModuleDict({
             "rgb": torch.nn.LSTM(input_size[0], 1024, seq_len),  # input of lstm is 1024 (vector of input), hidden units are 1024, num layers is 14 (6 enc + 8 dec)
@@ -21,7 +20,7 @@ class BaselineModel(torch.nn.Module):
         self.seq_len = seq_len
         self.batch_size = batch_size
         self.dropout = torch.nn.Dropout(dropout)
-        self.fc = torch.nn.Linear(1024*2, num_classes)  # without seq_len because i want my output on every timestamp from 0 to 2s of observations
+        self.fc = torch.nn.Linear(1024*1, num_classes)  # without seq_len because i want my output on every timestamp from 0 to 2s of observations
 
         #self.fc = torch.nn.Linear(1024*3, num_classes)
         self.num_classes = num_classes
@@ -35,10 +34,8 @@ class BaselineModel(torch.nn.Module):
         # LSTM forward
         x = []
 
-        for key in range(len(feat)):  # len feat = 3
+        x_mod, hid = self.branches(feat[0])  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
 
-            x_mod, hid = self.branches[key](feat[key])  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
-            x.append(x_mod)  # append to a list
 
         # Concatenate
         x = torch.cat(x, -1)  # x has shape [batch_size, 14, 3 * lstm_hidden_size]
