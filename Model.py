@@ -41,10 +41,10 @@ class BaselineModel(torch.nn.Module):
         #x = torch.cat(x, -1)  # x has shape [batch_size, 14, 3 * lstm_hidden_size]
 
         # Take last time samples
-        x = x[:, -8:, :]  # x has shape [batch_size, 8, 3 * lstm_hidden_size]
+        x_mod = x_mod[:, -8:, :]  # x has shape [batch_size, 8, 3 * lstm_hidden_size]
 
         # Dropout
-        x = self.dropout(x)  # apply dropout against overfitting
+        x = self.dropout(x_mod)  # apply dropout against overfitting
 
         # Fully connected
         y = self.fc(x)  # output y has shape [batch_size, 8, num_classes]
