@@ -37,10 +37,10 @@ class BaselineModel(torch.nn.Module):
         x = []
 
         for key in range(len(feat)):  # len feat = 3
-            h0 = torch.zeros(3, self.batch_size, 1024).requires_grad_().cuda()
+            h0 = torch.zeros(3, 3, 1024).requires_grad_().cuda()
 
             # Initialize cell state
-            c0 = torch.zeros(3, self.batch_size, 1024).requires_grad_().cuda()
+            c0 = torch.zeros(3, 3, 1024).requires_grad_().cuda()
 
             x_mod, hid = self.branches[key](feat[key], (h0.detach(), c0.detach()))  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
             x.append(x_mod)  # append to a list
