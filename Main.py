@@ -20,7 +20,8 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 alpha = 0.2
 
 path_to_lmdb = [root_path+"egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd/",
-                root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd"]  # the folders that contain the .mdb files
+                root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd",
+                root_path+"egtea/obj/"]  # the folders that contain the .mdb files
 
 ### PATH OF TXT FOR TRAINING AND VALIDATION ###
 
@@ -89,7 +90,7 @@ def main():
 
 
 
-    path = initialize_trainval_csv(1)  # to generate training and validation csv depending on split defined by authors of egtea gaze +
+    #path = initialize_trainval_csv(1)  # to generate training and validation csv depending on split defined by authors of egtea gaze +
 
     #smoothed_labels = label_smmothing("prior")  # for smoothed labels
 
@@ -111,7 +112,7 @@ def main():
 
     train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
 
-    
+
 
 
 
