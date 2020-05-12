@@ -82,7 +82,7 @@ class Dataset(data.Dataset):
         self.lmdb_path = lmdb_path
         self.img_tmpl = "frame_{:010d}.jpg"  # the template used to save the frames in the features .mdb file
 
-        self.alpha = 0.25
+        self.alphaa = 0.25
         self.sequence_length = 14
         self.fps = 30
 
@@ -125,6 +125,7 @@ class Dataset(data.Dataset):
             else:  # if the sequence is invalid then insert in the list of invalid sequence
 
                 self.discarded_ids.append(value.id)
+        print("DISCARDED"+str(len(self.discarded_ids)))
 
 
 
@@ -136,7 +137,7 @@ class Dataset(data.Dataset):
         # generate the relative timestamps, depending on the requested sequence_length
         # e.g., 2.  , 1.75, 1.5 , 1.25, 1.  , 0.75, 0.5 , 0.25
         # in this case "2" means, sample 2s before the beginning of the action
-        time_stamps = np.arange(self.alpha, self.alpha * (self.sequence_length + 1), self.alpha)[::-1]  # reverse order
+        time_stamps = np.arange(self.alphaa, self.alphaa * (self.sequence_length + 1), self.alphaa)[::-1]  # reverse order
 
         # compute the time stamp corresponding to the beginning of the action
         end_time_stamp = point / self.fps

@@ -11,7 +11,7 @@ class BaselineModel(torch.nn.Module):
 
         self.branches = torch.nn.ModuleList([torch.nn.LSTM(input_size[0], 1024, 1, batch_first=True),
                                              torch.nn.LSTM(input_size[1], 1024, 1, batch_first=True),
-                                             torch.nn.LSTM(input_size[2], 1024, 1, batch_first=True),])
+                                             torch.nn.LSTM(input_size[2], 1024, 1, batch_first=True)])
         """
         self.branches = nn.ModuleDict({
             "rgb": torch.nn.LSTM(input_size[0], 1024, seq_len),  # input of lstm is 1024 (vector of input), hidden units are 1024, num layers is 14 (6 enc + 8 dec)
