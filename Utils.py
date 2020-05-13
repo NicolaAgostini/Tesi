@@ -161,7 +161,7 @@ def upsample_to30fps(videos_path, destination_folder):
         if not os.path.exists(destination_folder+video):
             os.makedirs(destination_folder+video)
         if (video.endswith(".mp4")):  # or .avi, .mpeg, whatever.
-            os.system('ffmpeg -i $f -vf "scale=-1:256,fps=30" -qscale:v 2 /home/2/2014/nagostin/Desktop/frames/$f/${f}_frame_%010d.jpg'.format(video))
+            os.system('ffmpeg -i {0} -vf "scale=-1:256,fps=30" -qscale:v 2 /home/2/2014/nagostin/Desktop/frames/{0}/{0}_frame_%010d.jpg'.format(video))
 
 
 

@@ -256,6 +256,7 @@ def load_model(model):
 
     model.load_state_dict(chk['state_dict'])
 
+
 def log(mode, epoch, loss_meter, accuracy_meter, best_perf=None, green=False):
     if mode == 0:
         mode = "Training"
