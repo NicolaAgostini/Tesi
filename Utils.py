@@ -159,12 +159,13 @@ def upsample_to30fps(videos_path, destination_folder):
     """
     for video in os.listdir(videos_path):
         if video.endswith(".mp4"):
+
             video = video.split(".")[0]
             if not os.path.exists(destination_folder+video):
                 os.makedirs(destination_folder+video)
-            if (video.endswith(".mp4")):  # or .avi, .mpeg, whatever
 
-                os.system('ffmpeg -i /home/2/2014/nagostin/Desktop/video/{0}.mp4 -vf "scale=-1:256,fps=30" -qscale:v 2 /home/2/2014/nagostin/Desktop/frames/{0}/{0}_frame_%010d.jpg'.format(video))
+
+            os.system('ffmpeg -i /home/2/2014/nagostin/Desktop/video/{0}.mp4 -vf "scale=-1:256,fps=30" -qscale:v 2 /home/2/2014/nagostin/Desktop/frames/{0}/{0}_frame_%010d.jpg'.format(video))
 
 
 
