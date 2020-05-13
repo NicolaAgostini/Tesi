@@ -42,10 +42,12 @@ class BaselineModel(torch.nn.Module):
             #print(j)
             x_mod, hid = self.branches[i](j)  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
             x.append(x_mod)
+            print(x_mod.size())
 
-
+        print(x)
         # Concatenate
         x = torch.cat(x, -1)  # x has shape [batch_size, 14, 3 * lstm_hidden_size]
+        print(x.size())
 
         # Take last time samples
         x = x[:, -8:, :]  # x has shape [batch_size, 8, 3 * lstm_hidden_size]
@@ -55,6 +57,7 @@ class BaselineModel(torch.nn.Module):
 
         # Fully connected
         y = self.fc(x)  # output y has shape [batch_size, 8, num_classes]
+        print(y.size())
 
         '''
         For example, if each feature input is sampled every 0.25, then
