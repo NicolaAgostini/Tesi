@@ -89,7 +89,7 @@ def main():
 
 
 
-    #path = initialize_trainval_csv(1)  # to generate training and validation csv depending on split defined by authors of egtea gaze +
+    path = initialize_trainval_csv(1)  # to generate training and validation csv depending on split defined by authors of egtea gaze +
 
     #smoothed_labels = label_smmothing("prior")  # for smoothed labels
 
