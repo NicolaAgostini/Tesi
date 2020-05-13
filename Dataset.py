@@ -23,12 +23,14 @@ def txt_to_csv(path_oftxt, which_part):
                 v_name = values[0]+"-"+values[1]+"-"+values[2]
                 # start_time = values[3]  # Not used
                 # end_time = values[4]  # Not used
-                start_frame = values[5].replace("F", "0000")
-                end_frame = values[6].replace("F", "0000")
+                start_sec = str(int(values[3]) / 1000)
+
+                end_sec = str(int(values[4]) / 1000)
+
                 action_id = int(values[7])-1
 
                 writer = csv.writer(file)
-                writer.writerow([count, v_name, start_frame, end_frame, action_id])
+                writer.writerow([count, v_name, start_sec, end_sec, action_id])
 
                 count += 1
     return root_path+"egtea/"+which_part+".csv"
@@ -140,8 +142,8 @@ class Dataset(data.Dataset):
         time_stamps = np.arange(self.alphaa, self.alphaa * (self.sequence_length + 1), self.alphaa)[::-1]  # reverse order
 
         # compute the time stamp corresponding to the beginning of the action
-        end_time_stamp = point / self.fps
-
+        #end_time_stamp = point / self.fps
+        end_time_stamp = point
         # subtract time stamps to the timestamp of the last frame
         time_stamps = end_time_stamp - time_stamps
 
