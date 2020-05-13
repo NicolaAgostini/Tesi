@@ -84,7 +84,7 @@ class Dataset(data.Dataset):
 
         self.alphaa = 0.25
         self.sequence_length = 14
-        self.fps = 24
+        self.fps = 30
 
         self.ids = []  # action ids
         self.discarded_ids = []  # list of ids discarded (e.g., if there were no enough frames before the beginning of the action

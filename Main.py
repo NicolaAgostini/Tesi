@@ -20,8 +20,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 # alpha = 0.2
 
 path_to_lmdb = [root_path+"egtea/TSN-C_3_egtea_action_CE_rgb_model_best_fcfull_hd/",
-                root_path + "egtea/TSN-C_3_egtea_action_CE_flow_model_best_fcfull_hd",
-                root_path+"egtea/obj/"]  # the folders that contain the .mdb files
+                root_path + "egtea/TSN-C_3_egtea_action_CE_flow_model_best_fcfull_hd"]  # the folders that contain the .mdb files
 
 ### PATH OF TXT FOR TRAINING AND VALIDATION ###
 
@@ -49,7 +48,7 @@ input_dim = [1024, 1024, 352]
 batch_size = 4
 seq_len = 14
 
-learning_rate = 0.001
+learning_rate = 0.00001
 
 
 epochs = 50
