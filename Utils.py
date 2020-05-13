@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 
 class ValueMeter(object):
@@ -147,3 +148,20 @@ def predictions_to_json(verb_scores, noun_scores, action_scores, action_ids, a_t
         predictions['results'][str(i)]['action'] = {
             "%d,%d" % a_to_vn[ii]: float(aa) for ii, aa in zip(ai, a)}
     return predictions
+
+
+def upsample_to30fps(videos_path, destination_folder):
+    """
+    from a list of videos in a folder generate a list of images corresponing to frames
+    :param video_path: like "/home/2/2014/nagostin/Desktop/video/"
+    :param destination_folder: like "/home/2/2014/nagostin/Desktop/frames/"
+    :return:
+    """
+    for video in os.listdir(videos_path):
+        if not os.path.exists(destination_folder+video):
+            os.makedirs(destination_folder+video)
+        if (video.endswith(".mp4")):  # or .avi, .mpeg, whatever.
+            os.system('ffmpeg -i $f -vf "scale=-1:256,fps=30" -qscale:v 2 /home/2/2014/nagostin/Desktop/frames/$f/${f}_frame_%010d.jpg'.format(video))
+
+
+

@@ -6,7 +6,7 @@ from Dataset import *
 from Model import *
 from torch.utils.data import DataLoader
 from torch.nn import functional as F
-from Utils import topk_accuracy, ValueMeter, topk_accuracy_multiple_timesteps, get_marginal_indexes, marginalize, softmax,  topk_recall_multiple_timesteps, tta, predictions_to_json
+from Utils import *
 
 root_path = "/home/2/2014/nagostin/Desktop/"
 
@@ -83,13 +83,15 @@ def initialize_trainval_csv(which_split):
 
 def main():
 
+    upsample_to30fps("/home/2/2014/nagostin/Desktop/video/", "/home/2/2014/nagostin/Desktop/frames/")
+
     #inspect_lmdb("/volumes/Bella_li/egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd/")
 
     #print_data("/volumes/Bella_li/obj/")
 
-
-
-    path = initialize_trainval_csv(1)  # to generate training and validation csv depending on split defined by authors of egtea gaze +
+    """
+    
+    #path = initialize_trainval_csv(1)  # to generate training and validation csv depending on split defined by authors of egtea gaze +
 
     #smoothed_labels = label_smmothing("prior")  # for smoothed labels
 
@@ -112,7 +114,7 @@ def main():
     train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
 
 
-
+    """
 
 
 
