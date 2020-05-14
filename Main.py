@@ -45,10 +45,10 @@ path_to_csv_trainval = [root_path+"egtea/training1.csv", root_path+"egtea/valida
 ### SOME MODEL'S VARIABLES ###
 
 input_dim = [1024, 1024, 352]
-batch_size = 4
+batch_size = 128
 seq_len = 14
 
-learning_rate = 0.00001
+learning_rate = 0.001
 
 
 epochs = 50
@@ -85,13 +85,13 @@ def main():
 
     #upsample_to30fps("/home/2/2014/nagostin/Desktop/video/", "/home/2/2014/nagostin/Desktop/frames/")
 
-    fromframes_tovideo("/home/2/2014/nagostin/Desktop/frames/")
+
 
     #inspect_lmdb("/volumes/Bella_li/egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd/")
 
     #print_data("/volumes/Bella_li/obj/")
 
-    """
+
     
     #path = initialize_trainval_csv(1)  # to generate training and validation csv depending on split defined by authors of egtea gaze +
 
@@ -116,7 +116,7 @@ def main():
     train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
 
 
-    """
+
 
 
 
