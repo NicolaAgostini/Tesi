@@ -177,7 +177,7 @@ def fromframes_tovideo(frames_path):
     :return:
     """
     for folder in os.listdir(frames_path):
-        for frame in folder:
+        for frame in os.listdir(frames_path + folder):
             if frame.endswith(".jpg"):
                 os.system("ffmpeg -f image2 -r 30 -i /home/2/2014/nagostin/Desktop/frames/folder/folder_frame_%010d.jpg -vcodec mpeg4 -y /home/2/2014/nagostin/Desktop/video/folder.mp4")
 
