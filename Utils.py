@@ -169,3 +169,15 @@ def upsample_to30fps(videos_path, destination_folder):
 
 
 
+def fromframes_tovideo(frames_path):
+    """
+
+    :param frames_path: "/home/2/2014/nagostin/Desktop/frames/"
+    :param video_path_30fps: "/home/2/2014/nagostin/Desktop/video/"
+    :return:
+    """
+    for folder in os.listdir(frames_path):
+        for frame in folder:
+            if frame.endswith(".jpg"):
+                os.system("ffmpeg -f image2 -r 30 -i /home/2/2014/nagostin/Desktop/frames/folder/folder_frame_%010d.jpg -vcodec mpeg4 -y /home/2/2014/nagostin/Desktop/video/folder.mp4")
+

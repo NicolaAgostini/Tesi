@@ -83,7 +83,9 @@ def initialize_trainval_csv(which_split):
 
 def main():
 
-    upsample_to30fps("/home/2/2014/nagostin/Desktop/video/", "/home/2/2014/nagostin/Desktop/frames/")
+    #upsample_to30fps("/home/2/2014/nagostin/Desktop/video/", "/home/2/2014/nagostin/Desktop/frames/")
+
+    fromframes_tovideo("/home/2/2014/nagostin/Desktop/frames/")
 
     #inspect_lmdb("/volumes/Bella_li/egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd/")
 
