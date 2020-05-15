@@ -45,10 +45,10 @@ path_to_csv_trainval = [root_path+"egtea/training1.csv", root_path+"egtea/valida
 ### SOME MODEL'S VARIABLES ###
 
 input_dim = [1024, 1024, 352]
-batch_size = 128
+batch_size = 8
 seq_len = 14
 
-learning_rate = 0.001
+learning_rate = 0.00001
 
 
 epochs = 50
