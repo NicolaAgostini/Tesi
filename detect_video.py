@@ -120,16 +120,16 @@ def main(args):
     model = infer_engine.initialize_model_from_cfg(args.weights)
     dummy_coco_dataset = dummy_datasets.get_coco_dataset()
 
-    for file in os.listdir("/aulahomes2/2/2014/nagostin/Desktop/frames/"):
+    for file in os.listdir("/aulahomes2/2/2014/nagostin/Desktop/frames06/"):
         print(file)
         all_boxes = []
-        for img in tqdm(sorted(os.listdir("/aulahomes2/2/2014/nagostin/Desktop/frames/"+ file))):
+        for img in tqdm(sorted(os.listdir("/aulahomes2/2/2014/nagostin/Desktop/frames06/"+ file))):
             if img.endswith(".jpg"):
                 
                 
                 #vid = cv2.VideoCapture("/aulahomes2/2/2014/nagostin/Desktop/frames/"+file)
                 
-                im = cv2.imread("/aulahomes2/2/2014/nagostin/Desktop/frames/"+ file+ "/"+img)
+                im = cv2.imread("/aulahomes2/2/2014/nagostin/Desktop/frames06/"+ file+ "/"+img)
 
                 
                 
