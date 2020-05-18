@@ -47,7 +47,7 @@ path_to_csv_trainval = [root_path+"egtea/training1.csv", root_path+"egtea/valida
 ### SOME MODEL'S VARIABLES ###
 
 input_dim = [1024, 1024, 352]
-batch_size = 8
+batch_size = 64
 seq_len = 14
 
 learning_rate = 0.00001
@@ -248,6 +248,9 @@ def train_val(model, loaders, optimizer, epochs, criterion):
                 log(mode, epoch + 1, loss_meter[str(mode)], accuracy_meter[str(mode)],
                     max(accuracy_meter[str(mode)].value(), best_perf)
                     if mode == 1 else None, green=True)
+
+                if accuracy_meter[str(mode)].value() > best_perf :
+                    best_perf = accuracy_meter[str(mode)].value()
 
         # save checkpoint at the end of each train/val epoch
         #save_model(model, epoch + 1, accuracy_meter['validation'].value())
