@@ -7,7 +7,7 @@ __pycache__/
 *$py.class
 
 *.so
-
+.csv
 .Python
 build/
 develop-eggs/
