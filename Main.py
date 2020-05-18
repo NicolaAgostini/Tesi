@@ -204,13 +204,13 @@ def train_val(model, loaders, optimizer, epochs, criterion):
 
                     linear_labels = y.unsqueeze(1).expand(-1, preds.shape[1]).contiguous()
 
-                    print(linear_labels.size())
+                    #print(linear_labels.size())
 
                     # loss = F.cross_entropy(linear_preds, linear_labels)
 
                     loss = criterion(preds, linear_labels)  # for smoothed labels
 
-                    print(loss)
+                    #print(loss)
 
                     # get the predictions for anticipation time = 1s (index -4) (anticipation)
                     # or for the last time-step (100%) (early recognition)
