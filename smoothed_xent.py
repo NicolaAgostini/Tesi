@@ -4,7 +4,8 @@
 
 import numpy as np
 import torch
-import pandas as pd
+import pandas
+import matplotlib.pyplot as plt
 
 
 class SmoothedCrossEntropy(torch.nn.Module):
@@ -23,7 +24,7 @@ class SmoothedCrossEntropy(torch.nn.Module):
         ############################
         # Need to modify this
         ############################
-        self.action_embeddings_csv_path = action_embeddings_csv_path
+        self.action_embeddings_csv_path = action_embeddings_csv_path  # sarebbe il phi
         self.prior_matrix = self.get_prior()
         ############################
         ############################
@@ -34,9 +35,11 @@ class SmoothedCrossEntropy(torch.nn.Module):
         '''
         This function load the prior matrix
         '''
-        def str2float_np(e):
-            e = [val.strip().replace('[', '').replace(']', '') for val in e.split(' ')]
-            e = [float(val) for val in e if len(val) > 0]
+        def str2float_np(e):  #trasforma ogni riga in float e la concatena
+            #print(e)
+            #e = [val for val in e[1:].split(',')]
+            e = e[1:]
+            e = [float(val) for val in e if val != 0]
             e = np.array(e, dtype=np.float32)
             return e
         
@@ -46,23 +49,29 @@ class SmoothedCrossEntropy(torch.nn.Module):
             prior = np.ones([self.num_classes, self.num_classes], dtype=np.float32) / self.num_classes
         elif self.smooth_prior == 'glove':
     
-            embeddings = pd.read_csv(self.action_embeddings_csv_path)
-            embeddings['action_embeddings'] = embeddings['action_embeddings'].map(lambda e: str2float_np(e))
+            embeddings = pandas.read_csv(self.action_embeddings_csv_path).values.tolist()
+            #print(np.shape(embeddings))
+            emb = []
+            for index, row in enumerate(embeddings):
+                riga = str2float_np(row)
+                emb.append(riga)
 
             # Action embedings
             act_emb = []
-            for e in embeddings['action_embeddings'].values:
+            for e in emb:  # e è una riga della phi
                 act_emb += [e]
             act_emb = np.array(act_emb)
 
             # Compute prior
-            temp = 1.0
             act_sim = np.absolute(act_emb.dot(act_emb.T))
             act_sim = act_sim / act_sim.sum(axis=-1, keepdims=True)
             prior = act_sim
-        elif self.smooth_prior == 'glove-soft':
+            # uncomment to show the heatmap
+            #plt.imshow(prior, cmap='hot', interpolation='nearest')
+            #plt.show()
+        elif self.smooth_prior == 'glove-soft':  # temp>0 softmax
     
-            embeddings = pd.read_csv(self.action_embeddings_csv_path)
+            embeddings = pandas.read_csv(self.action_embeddings_csv_path)
             embeddings['action_embeddings'] = embeddings['action_embeddings'].map(lambda e: str2float_np(e))
 
             # Action embedings
@@ -101,7 +110,7 @@ class SmoothedCrossEntropy(torch.nn.Module):
         output xent: scalar
         '''
             
-        # Converto to torch tensors, if needed
+        # Convert to torch tensors, if needed
         if isinstance(y_pred, np.ndarray):
             y_pred = torch.tensor(y_pred, dtype=torch.float32)
         if isinstance(y_true, np.ndarray):
@@ -125,7 +134,8 @@ class SmoothedCrossEntropy(torch.nn.Module):
         y_pred = torch.clamp(y_pred, min=eps, max=1.0 - eps)
         
         # Label smoothing
-        prior = self.prior_matrix[torch.argmax(y_true.view(-1, self.num_classes), -1), :]
+        prior = self.prior_matrix[torch.argmax(y_true.view(-1, self.num_classes), -1), :]  # cioè prendo la riga corrispondente all'etichetta dove c'è 1
+        #print(prior.size())
         prior = prior.view(*y_pred.shape)
         if self.smooth_factor > 0.0:
             y_true = (1.0 - self.smooth_factor) * y_true + self.smooth_factor * prior
@@ -145,20 +155,19 @@ class SmoothedCrossEntropy(torch.nn.Module):
             if mask is not None:
                 seq_len = torch.sum(mask, -1)
                 xent = torch.where(mask > 0, xent, torch.zeros_like(xent))
-                xent = torch.sum(xent, 1) / seq_len # [batch_size, num_classes]
+                xent = torch.sum(xent, 1) / seq_len  # [batch_size, num_classes]
             else:
                 if self.reduce_time == 'mean':
-                    xent = torch.mean(xent, 1) # [batch_size, num_classes]
+                    xent = torch.mean(xent, 1)  # [batch_size, num_classes]
                 if self.reduce_time == 'sum':
-                    xent = torch.sum(xent, 1) # [batch_size, num_classes]
+                    xent = torch.sum(xent, 1)  # [batch_size, num_classes]
                 if 'idx' in self.reduce_time:
                     idx_t = int(self.reduce_time.replace('idx=', ''))
-                    xent = xent[:, idx_t, :] # [batch_size, num_classes]
-        xent = torch.sum(xent, -1) # [batch_size]
+                    xent = xent[:, idx_t, :]  # [batch_size, num_classes]
+        xent = torch.sum(xent, -1)  # [batch_size]
         if self.reduce_batch:
             
             # Remove nan values
             xent = torch.where(torch.isnan(xent), torch.zeros_like(xent, device=xent.device), xent)
-            xent = torch.mean(xent, 0) # scalar
+            xent = torch.mean(xent, 0)  # scalar
         return xent  # This is a scalar
-    

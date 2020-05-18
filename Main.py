@@ -7,6 +7,8 @@ from Model import *
 from torch.utils.data import DataLoader
 from torch.nn import functional as F
 from Utils import *
+from smoothed_xent import SmoothedCrossEntropy
+import pandas
 
 root_path = "/home/2/2014/nagostin/Desktop/"
 
@@ -82,7 +84,7 @@ def initialize_trainval_csv(which_split):
 
 
 def main():
-
+    #generate_action_embeddings_csv()
     #upsample_to30fps("/home/2/2014/nagostin/Desktop/video/", "/home/2/2014/nagostin/Desktop/frames/")
 
 
@@ -97,30 +99,35 @@ def main():
 
     #smoothed_labels = label_smmothing("prior")  # for smoothed labels
 
+
+
     model = BaselineModel(batch_size, seq_len, input_dim)
 
     model.to(device)
     print(model)
 
     #if mode == "train":
-    data_loader_train = get_dataset(path_to_csv_trainval[0], batch_size, 4)  # loader for training
-    data_loader_val = get_dataset(path_to_csv_trainval[1], batch_size, 4)  # loader for validation
+    #data_loader_train = get_dataset(path_to_csv_trainval[0], batch_size, 4)  # loader for training
+    #data_loader_val = get_dataset(path_to_csv_trainval[1], batch_size, 4)  # loader for validation
 
-    #data_loader_train = get_mock_dataloader()
-    #data_loader_val = get_mock_dataloader()
+    data_loader_train = get_mock_dataloader()
+    data_loader_val = get_mock_dataloader()
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-    #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, smoothed_labels)  # with smoothed labels
+    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="glove", action_embeddings_csv_path="action_embeddings.csv",
+                                     reduce_time="mean")
 
-    train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
+    train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)  # with smoothed labels
+
+    #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
 
 
 
 
 
 
-def train_val(model, loaders, optimizer, epochs):
+def train_val(model, loaders, optimizer, epochs, criterion):
     """
 
     :param model:
@@ -193,11 +200,17 @@ def train_val(model, loaders, optimizer, epochs):
                     #preds = preds[:, -8:, :].contiguous()  # take only last 8 anticipation steps
 
                     # linearize predictions
-                    linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106)
+                    #linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106)
 
-                    linear_labels = y.view(-1, 1).expand(-1, preds.shape[1]).contiguous().view(-1)
+                    linear_labels = y.unsqueeze(1).expand(-1, preds.shape[1]).contiguous()
 
-                    loss = F.cross_entropy(linear_preds, linear_labels)
+                    print(linear_labels.size())
+
+                    # loss = F.cross_entropy(linear_preds, linear_labels)
+
+                    loss = criterion(preds, linear_labels)  # for smoothed labels
+
+                    print(loss)
 
                     # get the predictions for anticipation time = 1s (index -4) (anticipation)
                     # or for the last time-step (100%) (early recognition)
@@ -291,6 +304,15 @@ def label_smmothing(set_modality="standard", alpha=0.1, temperature = 0):
     # print(a.find_similar("move")[1:6])
     b = a.get_ysoft()
     return b
+
+def generate_action_embeddings_csv():
+    """
+    generate the action_embeddings csv file loading glove from path, never mind about alpha, modality and temperature
+    """
+    path_of_glove = "/Users/nicolago/Desktop/Glove.6B/"
+    a = Glove(path_of_glove)
+    phi = a.get_phi()
+    pandas.DataFrame(phi).to_csv("action_embeddings.csv")
 
 
 if __name__ == '__main__':

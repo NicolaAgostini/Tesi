@@ -7,12 +7,12 @@ import re
 from functools import reduce
 import math
 
-root_path = "/home/2/2014/nagostin/Desktop/"
+#root_path = "/home/2/2014/nagostin/Desktop/"
 
-#path_dsk = "/Users/nicolago/Desktop/"
+root_path = "/Users/nicolago/Desktop/"
 
 class Glove():
-    def __init__(self, path_glove, alpha, which_methods = "", temperature = 0):
+    def __init__(self, path_glove, alpha = 0.0, which_methods = "", temperature = 0):
         """
         :param path_glove:
         :param alpha:
@@ -86,7 +86,7 @@ class Glove():
         ([verb1,verb2,...], [noun1,noun2,..])
         """
         actions = {}
-        with open(root_path + "egtea/action_annotation/action_idx.txt", 'r') as f:
+        with open(root_path + "action_annotation/action_idx.txt", 'r') as f:
             for line in f:
                 line = line.strip()
                 values = re.split("/| |_|,",line)
@@ -108,7 +108,7 @@ class Glove():
     def compute_Pi(self):
         """
         :param temperature:
-        Pi[k,i] which is the absolute value of scalar producto between phi(k) and phi(i) divided by
+        Pi[k,i] which is the absolute value of scalar product between phi(k) and phi(i) divided by
             the summation over all j of the abs value of scalar product between phi(k) and phi(j)
         """
         n_dim = self.phi.shape[0]  # is the number of labels in my classification problem
@@ -193,3 +193,10 @@ class Glove():
         self.compute_ysoft()
         return self.y_soft
 
+    def get_phi(self):
+        """
+        :return:
+        """
+        self.load_glove()  # always load glove first
+        self.compute_phi()
+        return self.phi
