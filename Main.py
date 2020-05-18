@@ -22,7 +22,8 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 # alpha = 0.2
 
 path_to_lmdb = [
-                root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd"]  # the folders that contain the .mdb files
+                root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",
+                root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd"]  # the folders that contain the .mdb files
 
 ### PATH OF TXT FOR TRAINING AND VALIDATION ###
 
@@ -47,7 +48,7 @@ path_to_csv_trainval = [root_path+"egtea/training1.csv", root_path+"egtea/valida
 ### SOME MODEL'S VARIABLES ###
 
 input_dim = [1024, 1024, 352]
-batch_size = 64
+batch_size = 8
 seq_len = 14
 
 learning_rate = 0.00001
@@ -249,7 +250,7 @@ def train_val(model, loaders, optimizer, epochs, criterion):
                     max(accuracy_meter[str(mode)].value(), best_perf)
                     if mode == 1 else None, green=True)
 
-                if accuracy_meter[str(mode)].value() > best_perf :
+                if accuracy_meter[str(mode)].value() > best_perf and mode == 1:
                     best_perf = accuracy_meter[str(mode)].value()
 
         # save checkpoint at the end of each train/val epoch
