@@ -126,7 +126,7 @@ def main():
 
 
 
-def train_val(model, loaders, optimizer, epochs, criterion):
+def train_val(model, loaders, optimizer, epochs):
     """
 
     :param model:
