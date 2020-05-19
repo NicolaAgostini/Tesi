@@ -115,12 +115,11 @@ def main():
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="glove", action_embeddings_csv_path="action_embeddings.csv",
-                                     reduce_time="mean")
+    #criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="glove", action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean")
 
-    train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)  # with smoothed labels
+    #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)  # with smoothed labels
 
-    #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
+    train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
 
 
 
@@ -197,18 +196,17 @@ def train_val(model, loaders, optimizer, epochs, criterion):
 
                     preds = preds.contiguous()
 
-                    #preds = preds[:, -8:, :].contiguous()  # take only last 8 anticipation steps
-
                     # linearize predictions
-                    #linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106)
+                    linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106)
 
-                    linear_labels = y.unsqueeze(1).expand(-1, preds.shape[1]).contiguous()
+                    #linear_labels = y.unsqueeze(1).expand(-1, preds.shape[1]).contiguous()  # for smoothed label
 
                     #print(linear_labels.size())
+                    linear_labels = y.view(-1, 1).expand(-1, preds.shape[1]).contiguous().view(-1)
 
-                    # loss = F.cross_entropy(linear_preds, linear_labels)
+                    loss = F.cross_entropy(linear_preds, linear_labels)
 
-                    loss = criterion(preds, linear_labels)  # for smoothed labels
+                    # loss = criterion(preds, linear_labels)  # for smoothed labels
 
                     #print(loss)
 
