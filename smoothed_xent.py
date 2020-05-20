@@ -70,13 +70,17 @@ class SmoothedCrossEntropy(torch.nn.Module):
             #plt.imshow(prior, cmap='hot', interpolation='nearest')
             #plt.show()
         elif self.smooth_prior == 'glove-soft':  # temp>0 softmax
-    
-            embeddings = pandas.read_csv(self.action_embeddings_csv_path)
-            embeddings['action_embeddings'] = embeddings['action_embeddings'].map(lambda e: str2float_np(e))
+
+            embeddings = pandas.read_csv(self.action_embeddings_csv_path).values.tolist()
+            # print(np.shape(embeddings))
+            emb = []
+            for index, row in enumerate(embeddings):
+                riga = str2float_np(row)
+                emb.append(riga)
 
             # Action embedings
             act_emb = []
-            for e in embeddings['action_embeddings'].values:
+            for e in emb:  # e è una riga della phi
                 act_emb += [e]
             act_emb = np.array(act_emb)
 
