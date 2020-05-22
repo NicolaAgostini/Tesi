@@ -42,7 +42,8 @@ path_to_csv_trainval = [root_path+"egtea/training1.csv", root_path+"egtea/valida
 
 
 
-
+experiment = "lr5_3br_ls"
+saveModel = False
 
 ### SOME MODEL'S VARIABLES ###
 
@@ -50,7 +51,7 @@ input_dim = [1024, 1024, 352]
 batch_size = 8
 seq_len = 14
 
-learning_rate = 0.00001
+learning_rate = 0.001
 
 
 epochs = 50
@@ -115,18 +116,18 @@ def main():
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-    #criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="glove", action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean")
+    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.6, smooth_prior="glove", action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean")
 
-    #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)  # with smoothed labels
+    train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)  # with smoothed labels
 
-    train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
-
-
+    #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
 
 
 
 
-def train_val(model, loaders, optimizer, epochs):
+
+
+def train_val(model, loaders, optimizer, epochs, criterion, resume = False):
     """
 
     :param model:
@@ -135,7 +136,10 @@ def train_val(model, loaders, optimizer, epochs):
     :param epochs:
     :return:
     """
-    best_perf = 0
+    if resume == True:
+        start_epoch, _, best_perf, experiment = load_model(model)
+    else:
+        best_perf = 0
     for epoch in range(epochs):
         #model.zero_grad()
 
@@ -197,16 +201,16 @@ def train_val(model, loaders, optimizer, epochs):
                     preds = preds.contiguous()
 
                     # linearize predictions
-                    linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106)
+                    #linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106)
 
-                    #linear_labels = y.unsqueeze(1).expand(-1, preds.shape[1]).contiguous()  # for smoothed label
+                    linear_labels = y.unsqueeze(1).expand(-1, preds.shape[1]).contiguous()  # for smoothed label
 
                     #print(linear_labels.size())
-                    linear_labels = y.view(-1, 1).expand(-1, preds.shape[1]).contiguous().view(-1)
+                    #linear_labels = y.view(-1, 1).expand(-1, preds.shape[1]).contiguous().view(-1)
 
-                    loss = F.cross_entropy(linear_preds, linear_labels)
+                    #loss = F.cross_entropy(linear_preds, linear_labels)
 
-                    #loss = criterion(preds, linear_labels)  # for smoothed labels
+                    loss = criterion(preds, linear_labels)  # for smoothed labels
 
                     #print(loss)
 
@@ -247,18 +251,19 @@ def train_val(model, loaders, optimizer, epochs):
                     max(accuracy_meter[str(mode)].value(), best_perf)
                     if mode == 1 else None, green=True)
 
+
                 if accuracy_meter[str(mode)].value() > best_perf and mode == 1:
                     best_perf = accuracy_meter[str(mode)].value()
+
 
         # save checkpoint at the end of each train/val epoch
         #save_model(model, epoch + 1, accuracy_meter['validation'].value())
 
+        if saveModel == True:
+            save_model(model, epoch + 1, accuracy_meter['validation'].value(), best_perf, experiment=experiment)
 
 
-        torch.save({'state_dict': model.state_dict(), 'epoch': epoch}, root_path+"egtea/model.pth.tar")
-
-
-def load_model(model):
+def load_model(model, path_to_model = "/home/2/2014/nagostin/Desktop/egtea/model.pth.tar"):
     """
     load the saved state in the model passed as a parameter
     to load in main:
@@ -268,9 +273,21 @@ def load_model(model):
 
     :return:
     """
-    chk = torch.load(root_path+"egtea/model.pth.tar")
+    chk = torch.load(path_to_model)
+
+    experiment = chk["experiment"]
+    epoch = chk['epoch']
+    best_perf = chk['best_perf']
+    perf = chk['perf']
 
     model.load_state_dict(chk['state_dict'])
+
+    return epoch, perf, best_perf, experiment
+
+def save_model(model, epoch, perf, best_perf, experiment, path_to_model = "/home/2/2014/nagostin/Desktop/egtea/model.pth.tar"):
+
+    torch.save({'state_dict': model.state_dict(), 'epoch': epoch, 'perf': perf, 'best_perf': best_perf, "experiment": experiment}, path_to_model)
+
 
 
 def log(mode, epoch, loss_meter, accuracy_meter, best_perf=None, green=False):
