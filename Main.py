@@ -51,7 +51,7 @@ input_dim = [1024, 1024, 352]
 batch_size = 8
 seq_len = 14
 
-learning_rate = 0.001
+learning_rate = 0.00001
 
 
 epochs = 50
@@ -116,7 +116,7 @@ def main():
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.6, smooth_prior="glove", action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean")
+    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="glove", action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean")
 
     train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)  # with smoothed labels
 
