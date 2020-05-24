@@ -22,7 +22,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 # alpha = 0.2
 
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd",root_path + "obj"]  # the folders that contain the .mdb files
-path_to_lmdb = [root_path + "obj"]
+path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd"]
 
 ### PATH OF TXT FOR TRAINING AND VALIDATION ###
 
