@@ -10,7 +10,8 @@ import matplotlib.pyplot as plt
 
 class SmoothedCrossEntropy(torch.nn.Module):
     def __init__(self, logits=True, smooth_factor=0.0, smooth_prior='uniform', reduce_batch=True, 
-                 is_target_oh=False, device=None, reduce_time=None, num_classes=106, action_embeddings_csv_path=None, actions_weights=None):
+                 is_target_oh=False, device=None, reduce_time=None, num_classes=106, action_embeddings_csv_path=None, actions_weights=None,
+                 verb_noun_csv_path=None, batch_size = 2):
         super(SmoothedCrossEntropy, self).__init__()
         self.logits = logits
         self.smooth_factor = smooth_factor
@@ -20,11 +21,13 @@ class SmoothedCrossEntropy(torch.nn.Module):
         self.device = device
         self.reduce_time = reduce_time
         self.num_classes = num_classes
+        self.batch_size = batch_size
 
         ############################
         # Need to modify this
         ############################
         self.action_embeddings_csv_path = action_embeddings_csv_path  # sarebbe il phi
+        self.verb_noun_csv_path = verb_noun_csv_path  # verb-noun sl
         self.prior_matrix = self.get_prior()
         ############################
         ############################
@@ -89,6 +92,16 @@ class SmoothedCrossEntropy(torch.nn.Module):
             act_sim = act_emb.dot(act_emb.T)
             act_sim = np.exp(temp * act_sim) / np.exp(temp * act_sim).sum(axis=-1, keepdims=True)
             prior = act_sim
+
+        elif self.smooth_prior == 'verb-noun':  # verb noun ls
+            embeddings = pandas.read_csv(self.verb_noun_csv_path).values.tolist()
+            prior = []
+            for index, row in enumerate(embeddings):
+                prior.append(row)
+            print(prior)
+            return prior
+
+
         else:
             raise Exception(f'Label smoothing {self.smooth_prior} not supported.')
         return torch.tensor(prior, dtype=torch.float32, device=self.device) 
@@ -136,13 +149,32 @@ class SmoothedCrossEntropy(torch.nn.Module):
             
         # Clip prediction for numerical stability
         y_pred = torch.clamp(y_pred, min=eps, max=1.0 - eps)
-        
+        if self.smooth_prior != 'verb-noun':
         # Label smoothing
-        prior = self.prior_matrix[torch.argmax(y_true.view(-1, self.num_classes), -1), :]  # cioè prendo la riga corrispondente all'etichetta dove c'è 1
-        #print(prior.size())
-        prior = prior.view(*y_pred.shape)
-        if self.smooth_factor > 0.0:
-            y_true = (1.0 - self.smooth_factor) * y_true + self.smooth_factor * prior
+            prior = self.prior_matrix[torch.argmax(y_true.view(-1, self.num_classes), -1), :]  # cioè prendo la riga corrispondente all'etichetta dove c'è 1
+            #print(prior.size())
+            prior = prior.view(*y_pred.shape)
+            if self.smooth_factor > 0.0:
+                y_true = (1.0 - self.smooth_factor) * y_true + self.smooth_factor * prior
+
+        if self.smooth_prior == 'verb-noun':
+
+            values, indices = y_true.max(2)
+            indices = indices.max(1)[0]  # take size_batch elements that are indices of true label
+            for i in range(self.batch_size):
+                for index, el in enumerate(self.prior_matrix):
+                    if self.prior_matrix[indices[i]][0] in el or self.prior_matrix[indices[i]][1] in el:
+                        for j in range(8):
+                            y_true[i][j][index] = 1
+
+            den = torch.sum(y_true, 2)
+            den = torch.mean(den, -1)
+
+            for i in range(self.batch_size):
+
+                y_true[i] = torch.div(y_true[i], den[i])
+
+
             
         # Weight
         if self.actions_weights is not None:

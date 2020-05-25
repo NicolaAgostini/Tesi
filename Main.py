@@ -108,15 +108,15 @@ def main():
     print(model)
 
     #if mode == "train":
-    data_loader_train = get_dataset(path_to_csv_trainval[0], batch_size, 4)  # loader for training
-    data_loader_val = get_dataset(path_to_csv_trainval[1], batch_size, 4)  # loader for validation
+    #data_loader_train = get_dataset(path_to_csv_trainval[0], batch_size, 4)  # loader for training
+    #data_loader_val = get_dataset(path_to_csv_trainval[1], batch_size, 4)  # loader for validation
 
-    #data_loader_train = get_mock_dataloader()
-    #data_loader_val = get_mock_dataloader()
+    data_loader_train = get_mock_dataloader()
+    data_loader_val = get_mock_dataloader()
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="uniform", action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean")
+    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="verb-noun", action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean", verb_noun_csv_path= "verb-noun.csv")
 
     train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)  # with smoothed labels
 
