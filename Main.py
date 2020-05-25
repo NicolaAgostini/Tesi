@@ -116,7 +116,7 @@ def main():
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="glove", action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean")
+    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="uniform", action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean")
 
     train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)  # with smoothed labels
 
@@ -219,7 +219,7 @@ def train_val(model, loaders, optimizer, epochs, criterion, resume = False):
                     # top5 accuracy at 1s
                     idx = -4
 
-                    k = 1  # top k = 5 anticipation
+                    k = 5  # top k = 5 anticipation
 
                     acc = topk_accuracy(preds[:, idx, :].detach().cpu().numpy(), y.detach().cpu().numpy(), (k,))[0] * 100  # top 5 accuracy percentage
 
