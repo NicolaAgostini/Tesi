@@ -39,9 +39,13 @@ class SmoothedCrossEntropy(torch.nn.Module):
             #print(e)
             #e = [val for val in e[1:].split(',')]
             e = e[1:]
-            e = [float(val) for val in e if val != 0]
+            if self.smooth_prior !="verb-noun":
+                e = [float(val) for val in e if val != 0]
+            else:
+                e = [float(val) for val in e]
             e = np.array(e, dtype=np.float32)
             return e
+
         
         # Compute prior
         prior = None
@@ -96,7 +100,10 @@ class SmoothedCrossEntropy(torch.nn.Module):
 
             for index, row in enumerate(embeddings):
                 riga = str2float_np(row)
+                #print(riga)
                 prior.append(riga)
+            prior = np.array(prior)
+            #print(prior.shape)
 
 
         else:
