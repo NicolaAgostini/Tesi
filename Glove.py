@@ -87,8 +87,8 @@ class Glove():
         ([verb1,verb2,...], [noun1,noun2,..])
         """
         actions = {}
-        #with open(root_path + "action_annotation/action_idx.txt", 'r') as f:
-        with open(root_path + "action_idx_corretto.txt", 'r') as f:
+        with open(root_path + "action_annotation/action_idx.txt", 'r') as f:
+        #with open(root_path + "action_idx_corretto.txt", 'r') as f:
         #with open("verb-noun.csv", "w") as t:
             #writer = csv.writer(t)
             #with open(root_path + "action_idx.txt", 'r') as f:
@@ -207,3 +207,37 @@ class Glove():
         self.load_glove()  # always load glove first
         self.compute_phi()
         return self.phi
+
+    def compute_vn_prior(self):
+        """
+        :return: prior matrix for verb noun smoothing labels
+        """
+        actions = self.return_all_actions()
+        prior = []
+        for key, values in actions.items():
+            concat = 0
+            # print(values)
+            verbs = values[0]  # verbs può essere anche una lista di verbi
+            nouns = values[1]
+            row = np.zeros(106)
+            C = 0
+            for k, v_col in actions.items():  # for every column
+                k = int(k) - 1
+                all_verbs = True
+                all_nouns = True
+                for v in verbs:
+                    if v not in v_col[0]:  # v_col[0] is the list of nouns
+                        all_verbs = False
+                    else: # action sharing the same verb
+                        C+=1
+                for n in nouns:
+                    if n not in v_col[1]: # v_col[1] is the list of verbs
+                        all_nouns = False
+                    else: # action sharing the same noun
+                        C+=1
+                if all_verbs or all_nouns:
+                    row[k] = 1  # if the action has the same verbs or nouns of the i-th row then put a 1
+            row = np.divide(row, C-1)  #normalize
+            prior.append(row)
+        return prior
+

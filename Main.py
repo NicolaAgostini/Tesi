@@ -86,6 +86,7 @@ def initialize_trainval_csv(which_split):
 
 
 def main():
+    #generate_action_vnprior_csv()
     #generate_action_embeddings_csv()
     #upsample_to30fps("/home/2/2014/nagostin/Desktop/video/", "/home/2/2014/nagostin/Desktop/frames/")
 
@@ -117,7 +118,7 @@ def main():
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="glove", action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean", verb_noun_csv_path= "verb-noun.csv")
+    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="verb-noun", action_embeddings_csv_path="vn_prior.csv", reduce_time="mean")
 
     train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)  # with smoothed labels
 
@@ -334,7 +335,16 @@ def generate_action_embeddings_csv():
     path_of_glove = "/Users/nicolago/Desktop/Glove.6B/"
     a = Glove(path_of_glove)
     phi = a.get_phi()
-    pandas.DataFrame(phi).to_csv("action_embeddings_minimo.csv")
+    pandas.DataFrame(phi).to_csv("action_embeddings.csv")
+
+def generate_action_vnprior_csv():
+    """
+    generate the action_embeddings csv file loading glove from path, never mind about alpha, modality and temperature
+    """
+    path_of_glove = "/Users/nicolago/Desktop/Glove.6B/"
+    a = Glove(path_of_glove)
+    prior = a.compute_vn_prior()
+    pandas.DataFrame(prior).to_csv("vn_prior.csv")
 
 
 if __name__ == '__main__':
