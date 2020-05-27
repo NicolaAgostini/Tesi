@@ -88,26 +88,27 @@ class Glove():
         """
         actions = {}
         #with open(root_path + "action_annotation/action_idx.txt", 'r') as f:
-        with open("verb-noun.csv", "w") as t:
-            writer = csv.writer(t)
-            with open(root_path + "action_idx_corretto.txt", 'r') as f:
-                for line in f:
-                    line = line.strip()
-                    values = re.split("/| |_|,",line)
+        with open(root_path + "action_idx_corretto.txt", 'r') as f:
+        #with open("verb-noun.csv", "w") as t:
+            #writer = csv.writer(t)
+            #with open(root_path + "action_idx.txt", 'r') as f:
+            for line in f:
+                line = line.strip()
+                values = re.split("/| |_|,",line)
 
-                    verbs = []
-                    nouns = []
+                verbs = []
+                nouns = []
 
 
-                    for v in values[:-1]:
-                        #print(v)
-                        if v[0].isupper():  # then it is a verb
-                            verbs.append(v)
-                        else:
-                            nouns.append(v)
+                for v in values[:-1]:
+                    #print(v)
+                    if v[0].isupper():  # then it is a verb
+                        verbs.append(v)
+                    else:
+                        nouns.append(v)
 
-                    writer.writerow(verbs+nouns)
-                    actions[values[-1]] = (verbs, nouns)
+                #writer.writerow(verbs+nouns)
+                actions[values[-1]] = (verbs, nouns)
 
         return actions
 

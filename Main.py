@@ -116,7 +116,7 @@ def main():
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="glove", action_embeddings_csv_path="action_embeddings_corretto.csv", reduce_time="mean", verb_noun_csv_path= "verb-noun.csv")
+    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="glove", action_embeddings_csv_path="action_embeddings_minimo.csv", reduce_time="mean", verb_noun_csv_path= "verb-noun.csv")
 
     train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)  # with smoothed labels
 
@@ -330,7 +330,7 @@ def generate_action_embeddings_csv():
     path_of_glove = "/Users/nicolago/Desktop/Glove.6B/"
     a = Glove(path_of_glove)
     phi = a.get_phi()
-    pandas.DataFrame(phi).to_csv("action_embeddings.csv")
+    pandas.DataFrame(phi).to_csv("action_embeddings_minimo.csv")
 
 
 if __name__ == '__main__':
