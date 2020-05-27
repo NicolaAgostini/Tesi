@@ -44,6 +44,7 @@ path_to_csv_trainval = [root_path+"egtea/training1.csv", root_path+"egtea/valida
 
 experiment = "lr5_3br_ls"
 saveModel = False
+best = 66
 
 ### SOME MODEL'S VARIABLES ###
 
@@ -54,7 +55,7 @@ seq_len = 14
 learning_rate = 0.00001
 
 
-epochs = 50
+epochs = 25
 
 display_every = 10
 
@@ -116,7 +117,7 @@ def main():
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="glove", action_embeddings_csv_path="action_embeddings_minimo.csv", reduce_time="mean", verb_noun_csv_path= "verb-noun.csv")
+    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="glove", action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean", verb_noun_csv_path= "verb-noun.csv")
 
     train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)  # with smoothed labels
 
@@ -254,6 +255,9 @@ def train_val(model, loaders, optimizer, epochs, criterion, resume = False):
 
                 if accuracy_meter[str(mode)].value() > best_perf and mode == 1:
                     best_perf = accuracy_meter[str(mode)].value()
+                    if best_perf > best:
+                        save_model(model, epoch + 1, accuracy_meter['validation'].value(), best_perf,
+                                   experiment=experiment)
 
 
         # save checkpoint at the end of each train/val epoch
