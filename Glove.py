@@ -228,13 +228,15 @@ class Glove():
                 for v in verbs:
                     if v not in v_col[0]:  # v_col[0] is the list of nouns
                         all_verbs = False
-                    else: # action sharing the same verb
-                        C+=1
+                if all_verbs:
+                    C+=1
+
                 for n in nouns:
                     if n not in v_col[1]: # v_col[1] is the list of verbs
                         all_nouns = False
-                    else: # action sharing the same noun
-                        C+=1
+                if all_nouns:
+                    C+=1
+
                 if all_verbs or all_nouns:
                     row[k] = 1  # if the action has the same verbs or nouns of the i-th row then put a 1
             row = np.divide(row, C-1)  #normalize

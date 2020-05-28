@@ -100,10 +100,9 @@ class SmoothedCrossEntropy(torch.nn.Module):
 
             for index, row in enumerate(embeddings):
                 riga = str2float_np(row)
-                #print(riga)
                 prior.append(riga)
+
             prior = np.array(prior)
-            #print(prior.shape)
 
 
         else:

@@ -9,6 +9,7 @@ from torch.nn import functional as F
 from Utils import *
 from smoothed_xent import SmoothedCrossEntropy
 import pandas
+from torchviz import make_dot
 
 root_path = "/home/2/2014/nagostin/Desktop/"
 
@@ -86,7 +87,7 @@ def initialize_trainval_csv(which_split):
 
 
 def main():
-    #generate_action_vnprior_csv()
+    generate_action_vnprior_csv()
     #generate_action_embeddings_csv()
     #upsample_to30fps("/home/2/2014/nagostin/Desktop/video/", "/home/2/2014/nagostin/Desktop/frames/")
 
@@ -200,6 +201,8 @@ def train_val(model, loaders, optimizer, epochs, criterion, resume = False):
 
                     preds = model(x)
 
+
+
                     preds = preds.contiguous()
 
                     # linearize predictions
@@ -221,7 +224,7 @@ def train_val(model, loaders, optimizer, epochs, criterion, resume = False):
                     # top5 accuracy at 1s
                     idx = -4
 
-                    k = 5  # top k = 5 anticipation
+                    k = 1  # top k = 5 anticipation
 
                     acc = topk_accuracy(preds[:, idx, :].detach().cpu().numpy(), y.detach().cpu().numpy(), (k,))[0] * 100  # top 5 accuracy percentage
 
