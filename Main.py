@@ -9,7 +9,7 @@ from torch.nn import functional as F
 from Utils import *
 from smoothed_xent import SmoothedCrossEntropy
 import pandas
-from torchviz import make_dot
+
 
 root_path = "/home/2/2014/nagostin/Desktop/"
 
