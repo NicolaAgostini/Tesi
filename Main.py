@@ -87,7 +87,7 @@ def initialize_trainval_csv(which_split):
 
 
 def main():
-    generate_action_vnprior_csv()
+    #generate_action_vnprior_csv()
     #generate_action_embeddings_csv()
     #upsample_to30fps("/home/2/2014/nagostin/Desktop/video/", "/home/2/2014/nagostin/Desktop/frames/")
 
