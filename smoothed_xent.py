@@ -167,8 +167,9 @@ class SmoothedCrossEntropy(torch.nn.Module):
             y_true = y_true * weights
                 
         # Compute cross-entropy
-        xent = - y_true * torch.log(y_pred) - (1.0 - y_true) * torch.log(1.0 - y_pred) # [batch_size(, time), num_classes]
-        
+        #xent = - y_true * torch.log(y_pred) - (1.0 - y_true) * torch.log(1.0 - y_pred) # [batch_size(, time), num_classes]  TODO:???
+        xent = - y_true * torch.log(y_pred)
+
         # Mask for sequential data of shape [batch_size, time, num_classes]
         if self.reduce_time is not None:
             if mask is not None:
