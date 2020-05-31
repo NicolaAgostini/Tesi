@@ -170,6 +170,7 @@ class SmoothedCrossEntropy(torch.nn.Module):
         #xent = - y_true * torch.log(y_pred) - (1.0 - y_true) * torch.log(1.0 - y_pred) # [batch_size(, time), num_classes]  TODO:???
         xent = - y_true * torch.log(y_pred)
 
+
         # Mask for sequential data of shape [batch_size, time, num_classes]
         if self.reduce_time is not None:
             if mask is not None:
@@ -185,6 +186,7 @@ class SmoothedCrossEntropy(torch.nn.Module):
                     idx_t = int(self.reduce_time.replace('idx=', ''))
                     xent = xent[:, idx_t, :]  # [batch_size, num_classes]
         xent = torch.sum(xent, -1)  # [batch_size]
+
         if self.reduce_batch:
             
             # Remove nan values
