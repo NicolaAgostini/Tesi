@@ -87,6 +87,7 @@ def initialize_trainval_csv(which_split):
 
 
 def main():
+    #loadNPY()
     #generate_action_vnprior_csv()
     #generate_action_embeddings_csv()
     #upsample_to30fps("/home/2/2014/nagostin/Desktop/video/", "/home/2/2014/nagostin/Desktop/frames/")
@@ -119,7 +120,7 @@ def main():
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.6, smooth_prior="uniform", action_embeddings_csv_path="vn_prior.csv", reduce_time="mean")
+    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.4, smooth_prior="glove", action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean")
 
     train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)  # with smoothed labels
 
@@ -348,6 +349,19 @@ def generate_action_vnprior_csv():
     a = Glove(path_of_glove)
     prior = a.compute_vn_prior()
     pandas.DataFrame(prior).to_csv("vn_prior.csv")
+
+
+def loadNPY(file="/Volumes/Bella_li/featureobj/OP01-R01-PastaSalad_detections.npy"):
+    """
+    load npy object extracted and show in images
+    :return:
+    """
+    objs = np.load(file, allow_pickle=True)
+    print(objs[1])
+
+
+
+
 
 
 if __name__ == '__main__':
