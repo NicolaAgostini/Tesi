@@ -45,7 +45,7 @@ path_to_csv_trainval = [root_path+"egtea/training1.csv", root_path+"egtea/valida
 
 experiment = "lr5_3br_ls"
 saveModel = False
-best = 66
+best = 68
 
 ### SOME MODEL'S VARIABLES ###
 
@@ -88,10 +88,11 @@ def initialize_trainval_csv(which_split):
 
 def main():
     #loadNPY()
+
     #generate_action_vnprior_csv()
     #generate_action_embeddings_csv()
     #upsample_to30fps("/home/2/2014/nagostin/Desktop/video/", "/home/2/2014/nagostin/Desktop/frames/")
-
+    #upsample_to30fps("/Volumes/Bella_li/video/", "/Volumes/Bella_li/frames/")
 
 
     #inspect_lmdb("/volumes/Bella_li/egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd/")
@@ -120,7 +121,7 @@ def main():
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.1, smooth_prior="uniform", action_embeddings_csv_path="action_embeddings_corretto.csv", reduce_time="mean")
+    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.4, smooth_prior="glove", action_embeddings_csv_path="action_embeddings_corretto.csv", reduce_time="mean")
 
     train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)  # with smoothed labels
 
@@ -269,7 +270,7 @@ def train_val(model, loaders, optimizer, epochs, criterion, resume = False):
         #save_model(model, epoch + 1, accuracy_meter['validation'].value())
 
         if saveModel == True:
-            save_model(model, epoch + 1, accuracy_meter['validation'].value(), best_perf, experiment=experiment)
+            save_model(model, epoch + 1, accuracy_meter[1].value(), best_perf, experiment=experiment)
 
 
 def load_model(model, path_to_model = "/home/2/2014/nagostin/Desktop/egtea/model.pth.tar"):
@@ -351,13 +352,6 @@ def generate_action_vnprior_csv():
     pandas.DataFrame(prior).to_csv("vn_prior.csv")
 
 
-def loadNPY(file="/Volumes/Bella_li/featureobj/OP01-R01-PastaSalad_detections.npy"):
-    """
-    load npy object extracted and show in images
-    :return:
-    """
-    objs = np.load(file, allow_pickle=True)
-    print(objs[1])
 
 
 

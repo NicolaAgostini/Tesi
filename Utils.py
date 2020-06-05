@@ -1,5 +1,7 @@
 import numpy as np
 import os
+import cv2
+import pandas
 
 
 class ValueMeter(object):
@@ -165,7 +167,56 @@ def upsample_to30fps(videos_path, destination_folder):
                 os.makedirs(destination_folder+video)
 
 
-            os.system('ffmpeg -i /home/2/2014/nagostin/Desktop/video/{0}.mp4 -vf "scale=-1:256,fps=30" -qscale:v 2 /home/2/2014/nagostin/Desktop/frames/{0}/{0}_frame_%010d.jpg'.format(video))
+            os.system('ffmpeg -i /Volumes/Bella_li/video/{0}.mp4 -vf "scale=-1:256,fps=30" -qscale:v 2 /Volumes/Bella_li/frames/{0}/{0}_frame_%010d.jpg'.format(video))
+
+def loadNPY(file="/Volumes/Bella_li/featureobj/OP01-R01-PastaSalad_detections.npy"):
+    """
+    load npy object extracted and show in images
+    :return:
+    """
+    #load csv label objects into dict int_noun
+
+    df_csv = pandas.read_csv('/Users/nicolago/Desktop/EPIC_noun_classes.csv')
+    #print(df_csv[1])
+
+    start_from = 9000
+
+    objs = np.load(file, allow_pickle=True)
+    #print(objs[1])
+    count = 0
+    for vid in os.listdir("/Volumes/Bella_li/frames/"):
+        if not vid.endswith(".DS_Store"):
+            #vid = vid.split(".")[0]
+            print(vid)
+            i=0
+            for frames in os.listdir("/Volumes/Bella_li/frames/"+vid):
+
+                    if frames.endswith(".jpg"):
+                        image = cv2.imread("/Volumes/Bella_li/frames/"+vid+"/"+frames)
+                        #print(objs[count])
+                        if i > start_from:
+                            for n_obj in objs[count]:
+                                if n_obj[5]>0.30:  # if the confidence score is quite high
+                                    #print(int(n_obj[1]))
+                                    image = cv2.rectangle(image, (int(n_obj[1]), int(n_obj[2])), (int(n_obj[3]), int(n_obj[4])), (255, 0, 0), 2)
+                                    cv2.putText(image, df_csv.iat[int(n_obj[0]), 1], (int(n_obj[1]), int(n_obj[2]) + 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (36, 255, 12), 1)
+                            cv2.imshow("framez", image)
+
+                        else:
+                            i += 1
+
+                        count += 1
+                        k = cv2.waitKey(0)
+                        if k == 27:  # Esc key to stop
+                            break
+                        elif k == 32:  # a key to go on
+                            continue
+
+
+
+
+
+
 
 
 
