@@ -169,7 +169,7 @@ def upsample_to30fps(videos_path, destination_folder):
 
             os.system('ffmpeg -i /Volumes/Bella_li/video/{0}.mp4 -vf "scale=-1:256,fps=30" -qscale:v 2 /Volumes/Bella_li/frames/{0}/{0}_frame_%010d.jpg'.format(video))
 
-def loadNPY(file="/Volumes/Bella_li/featureobj/OP01-R01-PastaSalad_detections.npy"):
+def loadNPY(file="/Volumes/Bella_li/featureobj/P26-R05-Cheeseburger_detections.npy"):
     """
     load npy object extracted and show in images
     :return:
