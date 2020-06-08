@@ -9,6 +9,7 @@ from torch.nn import functional as F
 from Utils import *
 from smoothed_xent import SmoothedCrossEntropy
 import pandas
+from gaze_io_sample import *
 
 
 root_path = "/home/2/2014/nagostin/Desktop/"
@@ -87,6 +88,7 @@ def initialize_trainval_csv(which_split):
 
 
 def main():
+    #plot_gaze()
     #loadNPY()
 
     #generate_action_vnprior_csv()
@@ -121,7 +123,7 @@ def main():
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="verb-noun", action_embeddings_csv_path="vn_prior.csv", reduce_time="mean")
+    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.1, smooth_prior="verb-noun", action_embeddings_csv_path="vn_prior.csv", reduce_time="mean")
 
     train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)  # with smoothed labels
 
