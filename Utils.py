@@ -2,6 +2,9 @@ import numpy as np
 import os
 import cv2
 import pandas
+import shutil
+import random
+import tqdm
 
 
 class ValueMeter(object):
@@ -232,3 +235,69 @@ def fromframes_tovideo(frames_path):
             if frame.endswith(".jpg"):
                 os.system("ffmpeg -f image2 -r 30 -i /home/2/2014/nagostin/Desktop/frames/{0}/{0}_frame_%010d.jpg -vcodec mpeg4 -y /home/2/2014/nagostin/Desktop/video/{0}.mp4".format(folder))
 
+
+
+def split_train_val_test_handMask(path_to_folder):
+    """
+    :return:
+    """
+
+    classes = ["Images", "Masks"]
+    frames = os.path.join(path_to_folder, "Images")
+    masks = os.path.join(path_to_folder, "Masks")
+
+
+    os.makedirs(path_to_folder + 'Frames/train')
+    os.makedirs(path_to_folder + 'Frames/val')
+    os.makedirs(path_to_folder + 'Frames/test')
+
+    os.makedirs(path_to_folder + 'Maschere/train')
+    os.makedirs(path_to_folder + 'Maschere/val')
+    os.makedirs(path_to_folder + 'Maschere/test')
+
+    allFileNames = os.listdir(path_to_folder+"Images")
+    np.random.shuffle(allFileNames)
+
+    train_FileNames, val_FileNames, test_FileNames = np.split(np.array(allFileNames),
+                                                              [int(len(allFileNames) * (0.7)),  # train
+                                                               int(len(allFileNames) * (0.85))])  # validation
+
+    print('Total images: ', len(allFileNames))
+    print('Training: ', len(train_FileNames))
+    print('Validation: ', len(val_FileNames))
+    print('Testing: ', len(test_FileNames))
+
+    ### FOR IMAGES ###
+    train_FileNames = [[path_to_folder+"Images" + '/' + name, path_to_folder+"Masks" + '/' + name] for name in train_FileNames.tolist()]
+    val_FileNames = [[path_to_folder+"Images" + '/' + name, path_to_folder+"Masks" + '/' + name] for name in val_FileNames.tolist()]
+    test_FileNames = [[path_to_folder+"Images" + '/' + name, path_to_folder+"Masks" + '/' + name] for name in test_FileNames.tolist()]
+
+    for name in tqdm.tqdm(train_FileNames):
+        shutil.copy(name[0], path_to_folder + 'Frames/train')
+
+    for name in tqdm.tqdm(val_FileNames):
+        shutil.copy(name[0], path_to_folder + 'Frames/val')
+
+    for name in tqdm.tqdm(test_FileNames):
+        shutil.copy(name[0], path_to_folder + 'Frames/test')
+
+    ### FOR MASKS ###
+
+
+
+    print('Total images: ', len(allFileNames))
+    print('Training: ', len(train_FileNames))
+    print('Validation: ', len(val_FileNames))
+    print('Testing: ', len(test_FileNames))
+
+    for name in tqdm.tqdm(train_FileNames):
+        n = name
+        shutil.copy(n[1].split(".")[0]+".png", path_to_folder + 'Maschere/train/'+n[1].split("/")[-1].split(".")[0]+".jpg")
+
+    for name in tqdm.tqdm(val_FileNames):
+        n = name
+        shutil.copy(n[1].split(".")[0]+".png", path_to_folder + 'Maschere/train/'+n[1].split("/")[-1].split(".")[0]+".jpg")
+
+    for name in tqdm.tqdm(test_FileNames):
+        n = name
+        shutil.copy(n[1].split(".")[0]+".png", path_to_folder + 'Maschere/train/'+n[1].split("/")[-1].split(".")[0]+".jpg")
