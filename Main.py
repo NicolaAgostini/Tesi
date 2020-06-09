@@ -88,7 +88,7 @@ def initialize_trainval_csv(which_split):
 
 
 def main():
-    split_train_val_test_handMask("/Volumes/Bella_li/hand14k/")
+    split_train_val_test_handMask(root_path+"hand14k/")
     #plot_gaze()
     #loadNPY()
 

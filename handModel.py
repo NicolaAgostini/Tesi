@@ -15,7 +15,7 @@ import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
 
-DATA_DIR = '/Volumes/Bella_li/hand14k/'
+DATA_DIR = "/home/2/2014/nagostin/Desktop/hand14k/"
 
 x_train_dir = os.path.join(DATA_DIR, 'Frames/train')
 y_train_dir = os.path.join(DATA_DIR, 'Maschere/train')
