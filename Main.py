@@ -16,6 +16,7 @@ root_path = "/home/2/2014/nagostin/Desktop/"
 
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
+print("DEVICE= "+device)
 
 
 
