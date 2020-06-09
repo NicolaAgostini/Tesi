@@ -203,7 +203,7 @@ ENCODER = 'se_resnext50_32x4d'
 ENCODER_WEIGHTS = 'imagenet'
 CLASSES = ['car']
 ACTIVATION = 'sigmoid' # could be None for logits or 'softmax2d' for multicalss segmentation
-DEVICE = 'cuda'
+DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 #DEVICE = 'cpu'
 
 # create segmentation model with pretrained encoder
