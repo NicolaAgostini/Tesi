@@ -88,7 +88,7 @@ def initialize_trainval_csv(which_split):
 
 
 def main():
-    split_train_val_test_handMask(root_path+"hand14k/")
+    #split_train_val_test_handMask(root_path+"hand14k/")
     #plot_gaze()
     #loadNPY()
 
@@ -109,7 +109,7 @@ def main():
     #smoothed_labels = label_smmothing("prior")  # for smoothed labels
 
 
-    """
+
     model = BaselineModel(batch_size, seq_len, input_dim)
 
     model.to(device)
@@ -124,14 +124,14 @@ def main():
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.4, smooth_prior="glove", action_embeddings_csv_path="action_embeddings_corretto.csv", reduce_time="mean")
+    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="verb-noun", action_embeddings_csv_path="vn_prior.csv", reduce_time="mean")
 
     train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)  # with smoothed labels
 
     #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
 
 
-    """
+
 
 
 
