@@ -160,10 +160,16 @@ def get_validation_augmentation():
     ]
     return albu.Compose(test_transform)
 
+def pad_with(vector, pad_width, iaxis, kwargs):
+    pad_value = kwargs.get('padder', 10)
+    vector[:pad_width[0]] = pad_value
+
 
 def to_tensor(x, **kwargs):
     if x.shape[-1] > 3:
         x = np.expand_dims(x, axis=2)
+    print(x.shape)
+    np.pad(x, 8, pad_with)
     print(x.shape)
     return x.transpose(2, 0, 1).astype('float32')
 
