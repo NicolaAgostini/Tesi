@@ -35,13 +35,13 @@ def visualize(**images):
 
         if image.shape[0]<4:
             image = np.transpose(image,(1,2,0))
-        print(image.shape)
+        #print(image.shape)
         #image = image.transpose(1, 2, 0)
         plt.subplot(1, n, i + 1)
         plt.xticks([])
         plt.yticks([])
         plt.title(' '.join(name.split('_')).title())
-        plt.imshow((image * 255).astype(np.uint8))
+        plt.imshow((image * 255).astype(np.uint32))
     plt.savefig('foo.png')
 
 
