@@ -156,7 +156,7 @@ def get_training_augmentation():
 def get_validation_augmentation():
     """Add paddings to make image shape divisible by 32"""
     test_transform = [
-        albu.PadIfNeeded(min_height=320, min_width=320, always_apply=True, border_mode=0)
+        albu.PadIfNeeded(384, 480)
     ]
     return albu.Compose(test_transform)
 
@@ -164,7 +164,7 @@ def get_validation_augmentation():
 def to_tensor(x, **kwargs):
     if x.shape[-1] > 3:
         x = np.expand_dims(x, axis=2)
-    #print(x.shape[-1])
+    print(x.shape[-1])
     return x.transpose(2, 0, 1).astype('float32')
 
 
