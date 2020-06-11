@@ -168,11 +168,12 @@ def pad_with(vector, pad_width, iaxis, kwargs):
 def to_tensor(x, **kwargs):
     if x.shape[-1] > 3:
         x = np.expand_dims(x, axis=2)
+        x = np.stack((x,) * 3, axis=-1)
 
-    #print(x.shape)
+    print(x.shape)
     npad = ((8, 8), (0, 0), (0, 0))
     x = np.pad(x, pad_width=npad, mode='constant', constant_values=0)
-    #print(x.shape)
+    print(x.shape)
     return x.transpose(2, 0, 1).astype('float32')
 
 
@@ -248,7 +249,7 @@ valid_loader = DataLoader(valid_dataset, batch_size=2, shuffle=False, num_worker
 
 loss = smp.utils.losses.DiceLoss()
 metrics = [
-    smp.utils.metrics.IoU(threshold=0.5,ignore_channels=2),
+    smp.utils.metrics.IoU(threshold=0.5),
 ]
 
 optimizer = torch.optim.Adam([
