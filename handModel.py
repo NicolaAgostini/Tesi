@@ -167,13 +167,15 @@ def pad_with(vector, pad_width, iaxis, kwargs):
 
 def to_tensor(x, **kwargs):
     if x.shape[-1] > 3:
+        print(x.shape)
         #x = np.expand_dims(x, axis=2)
         x = np.stack((x,) * 3, axis=-1)
+        print(x.shape)
 
-    print(x.shape)
+
     npad = ((8, 8), (0, 0), (0, 0))
     x = np.pad(x, pad_width=npad, mode='constant', constant_values=0)
-    print(x.shape)
+
     return x.transpose(2, 0, 1).astype('float32')
 
 
