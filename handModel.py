@@ -168,12 +168,12 @@ def pad_with(vector, pad_width, iaxis, kwargs):
 def to_tensor(x, **kwargs):
     if x.shape[-1] > 3:
         x = np.expand_dims(x, axis=2)
-    x = x.transpose(2, 0, 1).astype('float32')
-    print(x.shape)
 
-    x = np.pad(x[1], (8,), 'constant', constant_values=(np.median(x),))
     print(x.shape)
-    return x
+    npad = ((0, 0), (1, 2), (2, 1))
+    x = np.pad(x, pad_width=npad, mode='constant', constant_values=0)
+    print(x.shape)
+    return x.transpose(2, 0, 1).astype('float32')
 
 
 def get_preprocessing(preprocessing_fn):
