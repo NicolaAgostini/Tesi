@@ -246,9 +246,9 @@ visualize(image=image, mask=mask.squeeze())
 train_loader = DataLoader(train_dataset, batch_size=2, shuffle=True, num_workers=4)
 valid_loader = DataLoader(valid_dataset, batch_size=2, shuffle=False, num_workers=4)
 
-loss = smp.utils.losses.DiceLoss(eps=1.)
+loss = smp.utils.losses.DiceLoss()
 metrics = [
-    smp.utils.metrics.IoU(eps=1., activation = None),
+    smp.utils.metrics.IoU(threshold=0.5,ignore_channels=3),
 ]
 
 optimizer = torch.optim.Adam([
