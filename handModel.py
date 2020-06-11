@@ -41,7 +41,7 @@ def visualize(**images):
         plt.xticks([])
         plt.yticks([])
         plt.title(' '.join(name.split('_')).title())
-        plt.imshow((image * 255))
+        plt.imshow((image ))
     plt.savefig('foo.png')
 
 
