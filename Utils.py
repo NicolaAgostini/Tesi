@@ -296,8 +296,8 @@ def split_train_val_test_handMask(path_to_folder):
 
     for name in tqdm.tqdm(val_FileNames):
         n = name
-        shutil.copy(n[1].split(".")[0]+".png", path_to_folder + 'Maschere/train/'+n[1].split("/")[-1].split(".")[0]+".jpg")
+        shutil.copy(n[1].split(".")[0]+".png", path_to_folder + 'Maschere/val/'+n[1].split("/")[-1].split(".")[0]+".jpg")
 
     for name in tqdm.tqdm(test_FileNames):
         n = name
-        shutil.copy(n[1].split(".")[0]+".png", path_to_folder + 'Maschere/train/'+n[1].split("/")[-1].split(".")[0]+".jpg")
+        shutil.copy(n[1].split(".")[0]+".png", path_to_folder + 'Maschere/test/'+n[1].split("/")[-1].split(".")[0]+".jpg")
