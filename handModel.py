@@ -173,7 +173,7 @@ def to_tensor(x, **kwargs):
 
     x = np.asarray([np.pad(i, (8,), 'constant', constant_values=(np.median(x) ,)) for i in x])
     print(x.shape)
-    return x.transpose(1,2,0)
+    return x
 
 
 def get_preprocessing(preprocessing_fn):
