@@ -274,7 +274,7 @@ valid_epoch = smp.utils.train.ValidEpoch(
 
 max_score = 0
 
-for i in range(0, 40):
+for i in range(0, 5):
 
     print('\nEpoch: {}'.format(i))
     train_logs = train_epoch.run(train_loader)
