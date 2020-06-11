@@ -41,7 +41,7 @@ def visualize(**images):
         plt.xticks([])
         plt.yticks([])
         plt.title(' '.join(name.split('_')).title())
-        plt.imshow((image*255))
+        plt.imshow((image * 255).astype(np.uint8))
     plt.savefig('foo.png')
 
 
@@ -173,7 +173,7 @@ def to_tensor(x, **kwargs):
     npad = ((8, 8), (0, 0), (0, 0))
     x = np.pad(x, pad_width=npad, mode='constant', constant_values=0)
     #print(x.shape)
-    return x.transpose(2, 0, 1)
+    return x.transpose(2, 0, 1).astype('float32')
 
 
 def get_preprocessing(preprocessing_fn):
@@ -238,10 +238,10 @@ valid_dataset = Dataset(
     preprocessing=get_preprocessing(preprocessing_fn)
 )
 
-
+"""
 image, mask = train_dataset[81]
 visualize(image=image, mask=mask.squeeze())
-
+"""
 
 train_loader = DataLoader(train_dataset, batch_size=2, shuffle=True, num_workers=4)
 valid_loader = DataLoader(valid_dataset, batch_size=2, shuffle=False, num_workers=4)
