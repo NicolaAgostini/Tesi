@@ -248,7 +248,7 @@ valid_loader = DataLoader(valid_dataset, batch_size=2, shuffle=False, num_worker
 
 loss = smp.utils.losses.DiceLoss()
 metrics = [
-    smp.utils.metrics.IoU(threshold=0.5),
+    smp.utils.metrics.IoU(eps=1., activation = None),
 ]
 
 optimizer = torch.optim.Adam([
