@@ -156,7 +156,7 @@ def get_training_augmentation():
 def get_validation_augmentation():
     """Add paddings to make image shape divisible by 32"""
     test_transform = [
-        albu.PadIfNeeded(384, 480)
+        albu.PadIfNeeded(min_height=320, min_width=320, always_apply=True, border_mode=0)
     ]
     return albu.Compose(test_transform)
 
@@ -180,7 +180,6 @@ def get_preprocessing(preprocessing_fn):
     """
 
     _transform = [
-        albu.PadIfNeeded(min_height=320, min_width=320, always_apply=True, border_mode=0),
         albu.Lambda(image=preprocessing_fn),
         albu.Lambda(image=to_tensor, mask=to_tensor),
     ]
@@ -220,14 +219,14 @@ preprocessing_fn = smp.encoders.get_preprocessing_fn(ENCODER, ENCODER_WEIGHTS)
 train_dataset = Dataset(
     x_train_dir,
     y_train_dir,
-
+    augmentation=get_training_augmentation(),
     preprocessing=get_preprocessing(preprocessing_fn)
 )
 
 valid_dataset = Dataset(
     x_valid_dir,
     y_valid_dir,
-
+    augmentation=get_validation_augmentation(),
     preprocessing=get_preprocessing(preprocessing_fn)
 )
 
@@ -236,8 +235,8 @@ image, mask = train_dataset[8]
 visualize(image=image, mask=mask.squeeze())
 """
 
-train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True, num_workers=4)
-valid_loader = DataLoader(valid_dataset, batch_size=4, shuffle=False, num_workers=4)
+train_loader = DataLoader(train_dataset, batch_size=1, shuffle=True, num_workers=1)
+valid_loader = DataLoader(valid_dataset, batch_size=1, shuffle=False, num_workers=1)
 
 loss = smp.utils.losses.DiceLoss()
 metrics = [
