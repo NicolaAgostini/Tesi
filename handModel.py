@@ -167,7 +167,7 @@ def pad_with(vector, pad_width, iaxis, kwargs):
 
 def to_tensor(x, **kwargs):
     if x.shape[-1] > 3:
-        x = np.expand_dims(x, axis=2)
+        #x = np.expand_dims(x, axis=2)
         x = np.stack((x,) * 3, axis=-1)
 
     print(x.shape)
