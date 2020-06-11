@@ -171,7 +171,7 @@ def to_tensor(x, **kwargs):
     x = x.transpose(2, 0, 1).astype('float32')
     print(x.shape)
 
-    x = np.asarray([np.pad(i, (8,), 'constant', constant_values=(np.median(x) ,)) for i in x])
+    x = np.pad(x[1], (8,), 'constant', constant_values=(np.median(x),))
     print(x.shape)
     return x
 
