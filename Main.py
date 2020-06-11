@@ -89,7 +89,7 @@ def initialize_trainval_csv(which_split):
 
 
 def main():
-    #split_train_val_test_handMask(root_path+"hand14k/")
+    split_train_val_test_handMask(root_path+"hand14k/")
     #plot_gaze()
     #loadNPY()
 
@@ -109,7 +109,7 @@ def main():
 
     #smoothed_labels = label_smmothing("prior")  # for smoothed labels
 
-
+    """
 
     model = BaselineModel(batch_size, seq_len, input_dim)
 
@@ -132,7 +132,7 @@ def main():
     #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
 
 
-
+    """
 
 
 
