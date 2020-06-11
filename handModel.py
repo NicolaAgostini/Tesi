@@ -169,7 +169,7 @@ def to_tensor(x, **kwargs):
     if x.shape[-1] > 3:
         x = np.expand_dims(x, axis=2)
     print(x.shape)
-    x = np.pad(x, 8, pad_with)
+    x = np.asarray([np.pad(i, (8,), 'constant', constant_values=(np.median(x) ,)) for i in x])
     print(x.shape)
     return x.transpose(2, 0, 1).astype('float32')
 
