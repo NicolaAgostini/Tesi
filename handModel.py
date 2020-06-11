@@ -219,12 +219,14 @@ preprocessing_fn = smp.encoders.get_preprocessing_fn(ENCODER, ENCODER_WEIGHTS)
 train_dataset = Dataset(
     x_train_dir,
     y_train_dir,
+    augmentation=get_training_augmentation(),
     preprocessing=get_preprocessing(preprocessing_fn)
 )
 
 valid_dataset = Dataset(
     x_valid_dir,
     y_valid_dir,
+    augmentation=get_validation_augmentation(),
     preprocessing=get_preprocessing(preprocessing_fn)
 )
 
@@ -233,8 +235,8 @@ image, mask = train_dataset[8]
 visualize(image=image, mask=mask.squeeze())
 """
 
-train_loader = DataLoader(train_dataset, batch_size=1, shuffle=True, num_workers=4)
-valid_loader = DataLoader(valid_dataset, batch_size=1, shuffle=False, num_workers=4)
+train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True, num_workers=4)
+valid_loader = DataLoader(valid_dataset, batch_size=8, shuffle=False, num_workers=4)
 
 loss = smp.utils.losses.DiceLoss()
 metrics = [
