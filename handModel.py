@@ -171,6 +171,7 @@ def to_tensor(x, **kwargs):
         #x = np.expand_dims(x, axis=2)
         x = np.stack((x,) * 3, axis=-1)
         print(x.shape)
+        print(x)
 
 
     npad = ((8, 8), (0, 0), (0, 0))
