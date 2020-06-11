@@ -170,6 +170,7 @@ def to_tensor(x, **kwargs):
         print(x.shape)
         #x = np.expand_dims(x, axis=2)
         x = np.stack((x,) * 3, axis=-1)
+        x = x/255
         print(x.shape)
         print(x)
 
