@@ -170,7 +170,7 @@ def to_tensor(x, **kwargs):
         x = np.expand_dims(x, axis=2)
 
     print(x.shape)
-    npad = ((0, 0), (1, 2), (2, 1))
+    npad = ((8, 8), (0, 0), (0, 0))
     x = np.pad(x, pad_width=npad, mode='constant', constant_values=0)
     print(x.shape)
     return x.transpose(2, 0, 1).astype('float32')
