@@ -219,13 +219,13 @@ preprocessing_fn = smp.encoders.get_preprocessing_fn(ENCODER, ENCODER_WEIGHTS)
 train_dataset = Dataset(
     x_train_dir,
     y_train_dir,
-
+    preprocessing=get_preprocessing(preprocessing_fn)
 )
 
 valid_dataset = Dataset(
     x_valid_dir,
     y_valid_dir,
-
+    preprocessing=get_preprocessing(preprocessing_fn)
 )
 
 """
