@@ -180,6 +180,7 @@ def get_preprocessing(preprocessing_fn):
     """
 
     _transform = [
+        albu.PadIfNeeded(min_height=320, min_width=320, always_apply=True, border_mode=0),
         albu.Lambda(image=preprocessing_fn),
         albu.Lambda(image=to_tensor, mask=to_tensor),
     ]
@@ -219,12 +220,14 @@ preprocessing_fn = smp.encoders.get_preprocessing_fn(ENCODER, ENCODER_WEIGHTS)
 train_dataset = Dataset(
     x_train_dir,
     y_train_dir,
+
     preprocessing=get_preprocessing(preprocessing_fn)
 )
 
 valid_dataset = Dataset(
     x_valid_dir,
     y_valid_dir,
+
     preprocessing=get_preprocessing(preprocessing_fn)
 )
 
@@ -233,8 +236,8 @@ image, mask = train_dataset[8]
 visualize(image=image, mask=mask.squeeze())
 """
 
-train_loader = DataLoader(train_dataset, batch_size=2, shuffle=True, num_workers=4)
-valid_loader = DataLoader(valid_dataset, batch_size=2, shuffle=False, num_workers=4)
+train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True, num_workers=4)
+valid_loader = DataLoader(valid_dataset, batch_size=8, shuffle=False, num_workers=4)
 
 loss = smp.utils.losses.DiceLoss()
 metrics = [
