@@ -173,7 +173,7 @@ def to_tensor(x, **kwargs):
     npad = ((8, 8), (0, 0), (0, 0))
     x = np.pad(x, pad_width=npad, mode='constant', constant_values=0)
     #print(x.shape)
-    return x.transpose(2, 0, 1).astype('float32')
+    return x.transpose(2, 0, 1)
 
 
 def get_preprocessing(preprocessing_fn):
