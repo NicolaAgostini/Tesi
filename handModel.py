@@ -307,8 +307,7 @@ test_dataset = Dataset(
     x_test_dir,
     y_test_dir,
     augmentation=get_validation_augmentation(),
-    preprocessing=get_preprocessing(preprocessing_fn),
-    classes=CLASSES,
+    preprocessing=get_preprocessing(preprocessing_fn)
 )
 
 test_dataloader = DataLoader(test_dataset)
