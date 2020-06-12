@@ -89,13 +89,13 @@ def initialize_trainval_csv(which_split):
 
 
 def main():
-    split_train_val_test_handMask(root_path+"hand14k/")
+    #split_train_val_test_handMask(root_path+"hand14k/")
     #plot_gaze()
     #loadNPY()
 
     #generate_action_vnprior_csv()
     #generate_action_embeddings_csv()
-    #upsample_to30fps("/home/2/2014/nagostin/Desktop/video/", "/home/2/2014/nagostin/Desktop/frames/")
+    upsample_to30fps("/home/2/2014/nagostin/Desktop/video/", "/home/2/2014/nagostin/Desktop/frames/")
     #upsample_to30fps("/Volumes/Bella_li/video/", "/Volumes/Bella_li/frames/")
 
 

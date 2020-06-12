@@ -170,7 +170,7 @@ def upsample_to30fps(videos_path, destination_folder):
                 os.makedirs(destination_folder+video)
 
 
-            os.system('ffmpeg -i /Volumes/Bella_li/video/{0}.mp4 -vf "scale=-1:256,fps=30" -qscale:v 2 /Volumes/Bella_li/frames/{0}/{0}_frame_%010d.jpg'.format(video))
+            os.system('ffmpeg -i /home/2/2014/nagostin/Desktop/video/{0}.mp4 -vf "scale=-1:256,fps=30" -qscale:v 2 /home/2/2014/nagostin/Desktop/frames/{0}/{0}_frame_%010d.jpg'.format(video))
 
 def loadNPY(file="/Volumes/Bella_li/featureobj/P26-R05-Cheeseburger_detections.npy"):
     """
