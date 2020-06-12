@@ -279,6 +279,8 @@ valid_epoch = smp.utils.train.ValidEpoch(
 
 max_score = 0
 
+### TRAINING ###
+"""
 for i in range(0, 5):
 
     print('\nEpoch: {}'.format(i))
@@ -294,3 +296,36 @@ for i in range(0, 5):
     if i == 25:
         optimizer.param_groups[0]['lr'] = 1e-5
         print('Decrease decoder learning rate to 1e-5!')
+
+"""
+### TEST ###
+test_dataset = Dataset(
+    x_test_dir,
+    y_test_dir,
+    preprocessing=get_preprocessing(preprocessing_fn)
+)
+
+
+test_dataset_vis = Dataset(
+    x_test_dir, y_test_dir
+)
+
+best_model = torch.load('./best_model.pth') #load best model
+
+for i in range(5):
+    n = np.random.choice(len(test_dataset))
+
+    image_vis = test_dataset_vis[n][0].astype('uint8')
+    image, gt_mask = test_dataset[n]
+
+    gt_mask = gt_mask.squeeze()
+
+    x_tensor = torch.from_numpy(image).to(DEVICE).unsqueeze(0)
+    pr_mask = best_model.predict(x_tensor)
+    pr_mask = (pr_mask.squeeze().cpu().numpy().round())
+
+    visualize(
+        image=image_vis,
+        ground_truth_mask=gt_mask,
+        predicted_mask=pr_mask
+    )
