@@ -182,7 +182,7 @@ def loadNPY(file="/Volumes/Bella_li/featureobj/P26-R05-Cheeseburger_detections.n
     df_csv = pandas.read_csv('/Users/nicolago/Desktop/EPIC_noun_classes.csv')
     #print(df_csv[1])
 
-    start_from = 9000
+    start_from = 10000
 
     objs = np.load(file, allow_pickle=True)
     #print(objs[1])
