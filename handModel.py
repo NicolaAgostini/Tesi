@@ -298,34 +298,26 @@ for i in range(0, 5):
         print('Decrease decoder learning rate to 1e-5!')
 
 """
+
+
+best_model = torch.load('./best_model.pth')  # load best model
+
 ### TEST ###
 test_dataset = Dataset(
     x_test_dir,
     y_test_dir,
-    preprocessing=get_preprocessing(preprocessing_fn)
+    augmentation=get_validation_augmentation(),
+    preprocessing=get_preprocessing(preprocessing_fn),
+    classes=CLASSES,
 )
 
+test_dataloader = DataLoader(test_dataset)
 
-test_dataset_vis = Dataset(
-    x_test_dir, y_test_dir
+test_epoch = smp.utils.train.ValidEpoch(
+    model=best_model,
+    loss=loss,
+    metrics=metrics,
+    device=DEVICE,
 )
 
-best_model = torch.load('./best_model.pth') #load best model
-
-for i in range(5):
-    n = np.random.choice(len(test_dataset))
-
-    image_vis = test_dataset_vis[n][0].astype('uint8')
-    image, gt_mask = test_dataset[n]
-
-    gt_mask = gt_mask.squeeze()
-
-    x_tensor = torch.from_numpy(image).to(DEVICE).unsqueeze(0)
-    pr_mask = best_model.predict(x_tensor)
-    pr_mask = (pr_mask.squeeze().cpu().numpy().round())
-
-    visualize(
-        image=image_vis,
-        ground_truth_mask=gt_mask,
-        predicted_mask=pr_mask
-    )
+logs = test_epoch.run(test_dataloader)
