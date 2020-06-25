@@ -95,7 +95,7 @@ def main():
 
     #generate_action_vnprior_csv()
     #generate_action_embeddings_csv()
-    upsample_to30fps("/home/2/2014/nagostin/Desktop/video/", "/home/2/2014/nagostin/Desktop/frames/")
+    #upsample_to30fps("/home/2/2014/nagostin/Desktop/video/", "/home/2/2014/nagostin/Desktop/frames/")
     #upsample_to30fps("/Volumes/Bella_li/video/", "/Volumes/Bella_li/frames/")
 
 
@@ -109,7 +109,7 @@ def main():
 
     #smoothed_labels = label_smmothing("prior")  # for smoothed labels
 
-    """
+
 
     model = BaselineModel(batch_size, seq_len, input_dim)
 
@@ -132,7 +132,7 @@ def main():
     #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
 
 
-    """
+
 
 
 
