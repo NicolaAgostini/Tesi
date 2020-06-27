@@ -25,7 +25,8 @@ print("DEVICE= "+device)
 # alpha = 0.2
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd"]
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd",root_path + "obj"]  # the folders that contain the .mdb files
-path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd"]
+path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd"]
+#path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd"]
 #path_to_lmdb = [root_path + "obj"]
 
 ### PATH OF TXT FOR TRAINING AND VALIDATION ###
@@ -231,7 +232,7 @@ def train_val(model, loaders, optimizer, epochs, criterion, resume = False):
                     # top5 accuracy at 1s
                     idx = -4
 
-                    k = 5  # top k = 5 anticipation
+                    k = 1  # top k = 5 anticipation
 
                     acc = topk_accuracy(preds[:, idx, :].detach().cpu().numpy(), y.detach().cpu().numpy(), (k,))[0] * 100  # top 5 accuracy percentage
 
