@@ -232,7 +232,7 @@ def train_val(model, loaders, optimizer, epochs, criterion, resume = False):
                     # top5 accuracy at 1s
                     idx = -4
 
-                    k = 5  # top k = 5 anticipation
+                    k = 1  # top k = 5 anticipation
 
                     acc = topk_accuracy(preds[:, idx, :].detach().cpu().numpy(), y.detach().cpu().numpy(), (k,))[0] * 100  # top 5 accuracy percentage
 
