@@ -23,8 +23,8 @@ print("DEVICE= "+device)
 # mode = "train"  # if train or test
 
 # alpha = 0.2
-path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd"]
-#path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd",root_path + "obj"]  # the folders that contain the .mdb files
+#path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd"]
+path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd",root_path + "obj"]  # the folders that contain the .mdb files
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd"]
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd"]
 #path_to_lmdb = [root_path + "obj"]
@@ -91,6 +91,7 @@ def initialize_trainval_csv(which_split):
 
 
 def main():
+    #drawBBox()
     #split_train_val_test_handMask(root_path+"hand14k/")
     #plot_gaze()
     #loadNPY()
@@ -127,7 +128,7 @@ def main():
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="glove", action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean")
+    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.4, smooth_prior="glove", action_embeddings_csv_path="action_embeddings_corretto.csv", reduce_time="mean")
 
     train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)  # with smoothed labels
 
