@@ -303,6 +303,72 @@ def split_train_val_test_handMask(path_to_folder):
         n = name
         shutil.copy(n[1].split(".")[0]+".png", path_to_folder + 'Maschere/test/'+n[1].split("/")[-1].split(".")[0]+".jpg")
 
+
+
+def split_frames_objDect(path_of_buckets):
+    """
+    :param path_of_buckets:
+    :return:
+    """
+    n, p = 1, .2  # number of trials, probability of each trial
+    random = np.random.binomial(n, p, 86)
+    validation=[]
+    train=[]
+    with open("train.txt", "w+") as train_file:
+        with open("val.txt", "w+") as val_file:
+            for i,folder in enumerate(os.listdir(path_of_buckets)):
+                print(folder)
+                if ".DS_Store" in folder:
+                    continue
+                if random[i-1] == 1:
+                    validation.append(folder)
+                    #val_file.write(folder+"\n")
+                else:
+                    train.append(folder)
+                    #train_file.write(folder+"\n")
+            for files in os.listdir("/Volumes/Bella_li/Frames_da_labellare"):
+                if files.split("_")[0] in validation:
+                    val_file.write(files.split(".")[0] + "\n")
+                if files.split("_")[0] in train:
+                    train_file.write(files.split(".")[0] + "\n")
+
+    #print(len(validation))
+
+
+def csv_to_txt(file = "labelz.txt"):
+    """ parse the files in label352 noun .csv into a labels.txt file for voc2coco
+    :param file:
+    :return:
+    """
+    with open("labels.txt", "w+") as val_file:
+        with open(file) as fp:
+            line = fp.readline()
+            while line:
+                label = line.split(",")[1]
+                val_file.write(label + "\n")
+                line = fp.readline()
+
+def split_train_val_detectron(train = "/Volumes/Bella_li/train.txt", val = "/Volumes/Bella_li/val.txt"):
+    """ split the dataset into train and val defined in txt files
+    :return:
+    """
+    #os.makedirs("/Volumes/Bella_li/train")
+    #os.makedirs("/Volumes/Bella_li/val")
+    with open(train) as fp:
+        line = fp.readline().rstrip()
+        while line:
+            shutil.copy("/Volumes/Bella_li/Frames_da_labellare/"+line+ ".jpg",
+                        "/Volumes/Bella_li/train/"+line+".jpg")
+            line = fp.readline().rstrip()
+    with open(val) as fp:
+        line = fp.readline().rstrip()
+        while line:
+            shutil.copy("/Volumes/Bella_li/Frames_da_labellare/"+line+ ".jpg",
+                        "/Volumes/Bella_li/val/"+line+".jpg")
+            line = fp.readline().rstrip()
+
+
+
 def drawBBox(file="/Users/nicolanico/Desktop/data"):
     """
     load npy object extracted and show in images
@@ -331,7 +397,7 @@ def drawBBox(file="/Users/nicolanico/Desktop/data"):
                             #print(int(bb["bbox"][0]))
                             image = cv2.rectangle(image, (int(bb["bbox"][0]), int(bb["bbox"][1])), (int(bb["bbox"][2]+bb["bbox"][0]), int(bb["bbox"][3]+bb["bbox"][1])),
                                                   (255, 0, 0), 2)
-                            cv2.putText(image, df_csv.iat[bb["category_id"]-1, 1], (int(bb["bbox"][0]), int(bb["bbox"][1git] + 10)),
+                            cv2.putText(image, df_csv.iat[bb["category_id"]-1, 1], (int(bb["bbox"][0]), int(bb["bbox"][1] + 10)),
                                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (36, 255, 12), 1)
                 cv2.imshow(name, image)
                 k = cv2.waitKey(0)
@@ -339,4 +405,5 @@ def drawBBox(file="/Users/nicolanico/Desktop/data"):
                     break
                 elif k == 32:  # a key to go on
                     continue
+
 
