@@ -5,6 +5,7 @@ import pandas
 import shutil
 import random
 import tqdm
+import json
 
 
 class ValueMeter(object):
@@ -303,6 +304,7 @@ def split_train_val_test_handMask(path_to_folder):
         shutil.copy(n[1].split(".")[0]+".png", path_to_folder + 'Maschere/test/'+n[1].split("/")[-1].split(".")[0]+".jpg")
 
 
+
 def split_frames_objDect(path_of_buckets):
     """
     :param path_of_buckets:
@@ -365,5 +367,43 @@ def split_train_val_detectron(train = "/Volumes/Bella_li/train.txt", val = "/Vol
                         "/Volumes/Bella_li/val/"+line+".jpg")
             line = fp.readline().rstrip()
 
+
+
+def drawBBox(file="/Users/nicolanico/Desktop/data"):
+    """
+    load npy object extracted and show in images
+    :return:
+    """
+    #load csv label objects into dict int_noun
+
+    df_csv = pandas.read_csv('/Users/nicolanico/Desktop/EPIC_noun_classes.csv')
+
+    with open('/Users/nicolanico/Desktop/bbox_coco_2014_val_results.json') as json_file:
+        with open('/Users/nicolanico/Desktop/data/annotations/instances_val2014.json') as val_data:
+            data = json.load(json_file)
+            images = json.load(val_data)
+            for el in data:
+                for obj in images["images"]:
+                    if obj["id"] == el["image_id"]:
+                        id = obj["id"]
+                        name = obj["file_name"]
+                        #print(name)
+                        #print(id)
+
+                image = cv2.imread("/Users/nicolanico/Desktop/data/val/" + name)
+                for bb in data:
+                    if bb["image_id"] == id:
+                        if bb["score"] >0.6:
+                            #print(int(bb["bbox"][0]))
+                            image = cv2.rectangle(image, (int(bb["bbox"][0]), int(bb["bbox"][1])), (int(bb["bbox"][2]), int(bb["bbox"][3])),
+                                                  (255, 0, 0), 2)
+                            cv2.putText(image, df_csv.iat[bb["category_id"]-1, 1], (int(bb["bbox"][1]), int(bb["bbox"][2] + 10)),
+                                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (36, 255, 12), 1)
+                cv2.imshow("framez", image)
+                k = cv2.waitKey(0)
+                if k == 27:  # Esc key to stop
+                    break
+                elif k == 32:  # a key to go on
+                    continue
 
 
