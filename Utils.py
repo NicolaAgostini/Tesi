@@ -329,11 +329,11 @@ def drawBBox(file="/Users/nicolanico/Desktop/data"):
                     if bb["image_id"] == id:
                         if bb["score"] >0.6:
                             #print(int(bb["bbox"][0]))
-                            image = cv2.rectangle(image, (int(bb["bbox"][0]), int(bb["bbox"][1])), (int(bb["bbox"][2]), int(bb["bbox"][3])),
+                            image = cv2.rectangle(image, (int(bb["bbox"][0]), int(bb["bbox"][1])), (int(bb["bbox"][2]+bb["bbox"][0]), int(bb["bbox"][3]+bb["bbox"][1])),
                                                   (255, 0, 0), 2)
-                            cv2.putText(image, df_csv.iat[bb["category_id"]-1, 1], (int(bb["bbox"][1]), int(bb["bbox"][2] + 10)),
+                            cv2.putText(image, df_csv.iat[bb["category_id"]-1, 1], (int(bb["bbox"][0]), int(bb["bbox"][1git] + 10)),
                                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (36, 255, 12), 1)
-                cv2.imshow("framez", image)
+                cv2.imshow(name, image)
                 k = cv2.waitKey(0)
                 if k == 27:  # Esc key to stop
                     break
