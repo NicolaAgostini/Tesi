@@ -158,7 +158,7 @@ def predictions_to_json(verb_scores, noun_scores, action_scores, action_ids, a_t
 
 def upsample_to30fps(videos_path, destination_folder):
     """
-    from a list of videos in a folder generate a list of images corresponing to frames
+    from a list of videos in a folder generate a list of images corresponing to frames at 30 fps
     :param video_path: like "/home/2/2014/nagostin/Desktop/video/"
     :param destination_folder: like "/home/2/2014/nagostin/Desktop/frames/"
     :return:
@@ -175,7 +175,7 @@ def upsample_to30fps(videos_path, destination_folder):
 
 def loadNPY(file="/Volumes/Bella_li/featureobj/OP01-R05-Cheeseburger_detections.npy"):
     """
-    load npy object extracted and show in images
+    load npy object extracted and show in images from files computed as shown here https://github.com/fpv-iplab/rulstm/blob/master/FasterRCNN/tools/detect_video.py
     :return:
     """
     #load csv label objects into dict int_noun
@@ -226,9 +226,8 @@ def loadNPY(file="/Volumes/Bella_li/featureobj/OP01-R05-Cheeseburger_detections.
 
 def fromframes_tovideo(frames_path):
     """
-
+    this function is opposite of upsample_to30fps because it sticks together frames to get a video
     :param frames_path: "/home/2/2014/nagostin/Desktop/frames/"
-    :param video_path_30fps: "/home/2/2014/nagostin/Desktop/video/"
     :return:
     """
     for folder in os.listdir(frames_path):
@@ -240,6 +239,7 @@ def fromframes_tovideo(frames_path):
 
 def split_train_val_test_handMask(path_to_folder):
     """
+    split train and validation and test for hand mask segmenter giving the folder of hand masks as https://www.dropbox.com/s/ysi2jv8qr9xvzli/hand14k.zip?dl=0  EGTEA GAZE + DATASET
     :return:
     """
 
@@ -371,7 +371,7 @@ def split_train_val_detectron(train = "/Volumes/Bella_li/train.txt", val = "/Vol
 
 def drawBBox(file="/Users/nicolanico/Desktop/data"):
     """
-    load npy object extracted and show in images
+    load npy object extracted and show in images for json output from validation of detectron fine tuning on EGTEA gaze + obj detector
     :return:
     """
     #load csv label objects into dict int_noun
