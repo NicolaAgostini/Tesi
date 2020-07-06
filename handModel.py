@@ -7,8 +7,9 @@ import numpy as np
 import segmentation_models_pytorch as smp
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+print("DEVICE= "+device)
 
-import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 import ssl
