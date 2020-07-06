@@ -69,15 +69,17 @@ class Dataset(BaseDataset):
     def __init__(
             self,
             images_dir,
-            masks_dir,
+            masks_dir= None,
             augmentation=None,
             preprocessing=None,
     ):
         self.ids = os.listdir(images_dir)
         self.images_fps = [os.path.join(images_dir, image_id) for image_id in self.ids]
-        self.masks_fps = [os.path.join(masks_dir, image_id) for image_id in self.ids]
-
-        # convert str names to class values on masks
+        if masks_dir is not None:
+            self.masks_fps = [os.path.join(masks_dir, image_id) for image_id in self.ids]
+        else:
+            self.masks_fps = masks_dir
+            # convert str names to class values on masks
         #self.class_values = [self.CLASSES.index(cls.lower()) for cls in classes]
 
         self.augmentation = augmentation
@@ -88,21 +90,28 @@ class Dataset(BaseDataset):
         # read data
         image = cv2.imread(self.images_fps[i])
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        mask = cv2.imread(self.masks_fps[i], 0)
+        if self.masks_fps is not None:
+            mask = cv2.imread(self.masks_fps[i], 0)
         #print(self.masks_fps[0])
         #print(mask)
 
         # apply augmentations
-        if self.augmentation:
-            sample = self.augmentation(image=image, mask=mask)
-            image, mask = sample['image'], sample['mask']
+            if self.augmentation:
+                sample = self.augmentation(image=image, mask=mask)
+                image, mask = sample['image'], sample['mask']
 
-        # apply preprocessing
-        if self.preprocessing:
-            sample = self.preprocessing(image=image, mask=mask)
-            image, mask = sample['image'], sample['mask']
+            # apply preprocessing
+            if self.preprocessing:
+                sample = self.preprocessing(image=image, mask=mask)
+                image, mask = sample['image'], sample['mask']
+            return image, mask
+        else:
+            # apply preprocessing
+            if self.preprocessing:
+                sample = self.preprocessing(image=image)
+                image, mask = sample['image'], sample['mask']
 
-        return image, mask
+            return image
 
     def __len__(self):
         return len(self.ids)
@@ -322,14 +331,19 @@ def predict_folder(best_model, pathFrames = "/home/2/2014/nagostin/Desktop/frame
     """
     :return:
     """
-    test_dir = pathFrames
 
+    test_dataset = Dataset(
+        x_test_dir,
+        preprocessing=get_preprocessing(preprocessing_fn)
+    )
 
     image_files = [f for f in glob.glob('/home/2/2014/nagostin/Desktop/frames/OP01-R01-PastaSalad/*.jpg')]
+    count = 0
     for filepath in tqdm.tqdm(image_files):
-        image = Image.open(filepath)
-        train_x = np.asarray(image)
-        x_tensor = torch.from_numpy(train_x).to(DEVICE).unsqueeze(0)
+
+        image = test_dataset[count]
+        count += 1
+        x_tensor = torch.from_numpy(image).to(DEVICE).unsqueeze(0)
         pr_mask = best_model.predict(x_tensor)
         pr_mask = (pr_mask.squeeze().cpu().numpy().round())
         visualize(
