@@ -6,7 +6,8 @@ import torch
 import numpy as np
 import segmentation_models_pytorch as smp
 
-os.environ['CUDA_VISIBLE_DEVICES'] = 'cpu'
+#os.environ['CUDA_VISIBLE_DEVICES'] = 'cpu'
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print("DEVICE= "+device)
 
