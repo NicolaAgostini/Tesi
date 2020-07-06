@@ -28,7 +28,7 @@ y_valid_dir = os.path.join(DATA_DIR, 'Maschere/val')
 x_test_dir = os.path.join(DATA_DIR, 'Frames/test')
 y_test_dir = os.path.join(DATA_DIR, 'Maschere/test')
 
-def visualize(**images):
+def visualize(iter, **images):
     """PLot images in one row."""
     n = len(images)
 
@@ -44,7 +44,7 @@ def visualize(**images):
         plt.yticks([])
         plt.title(' '.join(name.split('_')).title())
         plt.imshow((image * 255).astype('uint8'))
-    plt.savefig('foo' + name +'.png')
+    plt.savefig('prediction' + iter +'.png')
 
 
 
@@ -328,6 +328,7 @@ for i in range(10):
     pr_mask = (pr_mask.squeeze().cpu().numpy().round())
 
     visualize(
+        i,
         image=image_vis,
         ground_truth_mask=gt_mask,
         predicted_mask=pr_mask
