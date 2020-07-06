@@ -109,7 +109,7 @@ class Dataset(BaseDataset):
             # apply preprocessing
             if self.preprocessing:
                 sample = self.preprocessing(image=image)
-                image, mask = sample['image'], sample['mask']
+                image= sample['image']
 
             return image
 
