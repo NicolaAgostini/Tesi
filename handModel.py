@@ -38,7 +38,7 @@ def visualize(iter, **images):
     plt.figure(figsize=(16, 5))
     for i, (name, image) in enumerate(images.items()):
         name = name
-        print(name)
+
         if image.shape[0]<4:
             image = np.transpose(image,(1,2,0))
         #print(image.shape)
