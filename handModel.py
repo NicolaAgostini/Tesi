@@ -328,7 +328,8 @@ def predict_folder(best_model, pathFrames = "/home/2/2014/nagostin/Desktop/frame
     image_files = [f for f in glob.glob('/home/2/2014/nagostin/Desktop/frames/OP01-R01-PastaSalad/*.jpg')]
     for filepath in tqdm.tqdm(image_files):
         image = Image.open(filepath)
-        x_tensor = torch.from_numpy(image).to(DEVICE).unsqueeze(0)
+        train_x = np.asarray(image)
+        x_tensor = torch.from_numpy(train_x).to(DEVICE).unsqueeze(0)
         pr_mask = best_model.predict(x_tensor)
         pr_mask = (pr_mask.squeeze().cpu().numpy().round())
         visualize(
