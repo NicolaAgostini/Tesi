@@ -31,7 +31,7 @@ y_valid_dir = os.path.join(DATA_DIR, 'Maschere/val')
 x_test_dir = os.path.join(DATA_DIR, 'Frames/test')
 y_test_dir = os.path.join(DATA_DIR, 'Maschere/test')
 
-def visualize( **images):
+def visualize(iter, **images):
     """PLot images in one row."""
     n = len(images)
 
@@ -47,7 +47,8 @@ def visualize( **images):
         plt.yticks([])
         plt.title(' '.join(name.split('_')).title())
         plt.imshow((image * 255).astype('uint8'))
-    plt.savefig('/home/2/2014/nagostin/Desktop/Tesi/predictions/' + name +'.png')
+    plt.savefig('/home/2/2014/nagostin/Desktop/Tesi/predictions/' + iter +'.png')
+    plt.close()
 
 
 
@@ -346,7 +347,7 @@ def predict_folder(best_model, pathFrames = "/home/2/2014/nagostin/Desktop/frame
         x_tensor = torch.from_numpy(image).to(DEVICE).unsqueeze(0)
         pr_mask = best_model.predict(x_tensor)
         pr_mask = (pr_mask.squeeze().cpu().numpy().round())
-        visualize(
+        visualize(filepath.split("/")[-1].split(".")[0],
             predicted_mask=pr_mask
         )
 
