@@ -7,7 +7,7 @@ import numpy as np
 import segmentation_models_pytorch as smp
 
 #os.environ['CUDA_VISIBLE_DEVICES'] = 'cpu'
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+#os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print("DEVICE= "+device)
 
@@ -308,10 +308,32 @@ best_model = torch.load('./best_model.pth', map_location=torch.device('cpu'))  #
 test_dataset = Dataset(
     x_test_dir,
     y_test_dir,
-    augmentation=get_validation_augmentation(),
     preprocessing=get_preprocessing(preprocessing_fn)
 )
 
+test_dataset_vis = Dataset(
+    x_test_dir, y_test_dir,
+)
+
+for i in range(10):
+    n = np.random.choice(len(test_dataset))
+
+    image_vis = test_dataset_vis[n][0].astype('uint8')
+    image, gt_mask = test_dataset[n]
+
+    gt_mask = gt_mask.squeeze()
+
+    x_tensor = torch.from_numpy(image).to(DEVICE).unsqueeze(0)
+    pr_mask = best_model.predict(x_tensor)
+    pr_mask = (pr_mask.squeeze().cpu().numpy().round())
+
+    visualize(
+        image=image_vis,
+        ground_truth_mask=gt_mask,
+        predicted_mask=pr_mask
+    )
+
+"""
 test_dataloader = DataLoader(test_dataset)
 
 test_epoch = smp.utils.train.ValidEpoch(
@@ -322,3 +344,4 @@ test_epoch = smp.utils.train.ValidEpoch(
 )
 
 logs = test_epoch.run(test_dataloader)
+"""
