@@ -344,28 +344,29 @@ def predict_folder(best_model, pathFrames = "/home/2/2014/nagostin/Desktop/frame
     for filepath in tqdm.tqdm(image_files):
 
         image = pred_dataset[count]
-        #print(image.shape)
+        print(image.shape)
         count += 1
-        x_tensor = torch.from_numpy(image).to(DEVICE)
-        #print(x_tensor.size())
+        x_tensor = torch.from_numpy(image).to(DEVICE).unsqueeze(0)
+        print(x_tensor.size())
         pr_mask = best_model.predict(x_tensor)
         pr_mask = (pr_mask.squeeze().cpu().numpy().round())
         visualize(filepath.split("/")[-1].split(".")[0],
             predicted_mask=pr_mask
         )
 
-predict_folder(best_model)
+#predict_folder(best_model)
 #  show a sample of predictions
-"""
+
 for i in range(10):
     n = np.random.choice(len(test_dataset))
 
     image_vis = test_dataset_vis[n][0].astype('uint8')
     image, gt_mask = test_dataset[n]
-
+    print(image.shape)
     gt_mask = gt_mask.squeeze()
 
     x_tensor = torch.from_numpy(image).to(DEVICE).unsqueeze(0)
+    print(x_tensor.size())
     pr_mask = best_model.predict(x_tensor)
     pr_mask = (pr_mask.squeeze().cpu().numpy().round())
 
@@ -375,7 +376,7 @@ for i in range(10):
         ground_truth_mask=gt_mask,
         predicted_mask=pr_mask
     )
-"""
+
 """
 test_dataloader = DataLoader(test_dataset)
 
