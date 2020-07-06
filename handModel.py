@@ -1,10 +1,12 @@
 import os
+from PIL import Image
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset as BaseDataset
 import albumentations as albu
 import torch
 import numpy as np
 import segmentation_models_pytorch as smp
+import glob
 
 #os.environ['CUDA_VISIBLE_DEVICES'] = 'cpu'
 #os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
@@ -34,7 +36,7 @@ def visualize(iter, **images):
 
     plt.figure(figsize=(16, 5))
     for i, (name, image) in enumerate(images.items()):
-
+        name = name
         if image.shape[0]<4:
             image = np.transpose(image,(1,2,0))
         #print(image.shape)
@@ -44,7 +46,7 @@ def visualize(iter, **images):
         plt.yticks([])
         plt.title(' '.join(name.split('_')).title())
         plt.imshow((image * 255).astype('uint8'))
-    plt.savefig('prediction' + str(iter) +'.png')
+    plt.savefig('/home/2/2014/nagostin/Desktop/Tesi/predictions/' + name +'.png')
 
 
 
@@ -315,6 +317,26 @@ test_dataset_vis = Dataset(
     x_test_dir, y_test_dir,
 )
 
+def predict_folder(best_model, pathFrames = "/home/2/2014/nagostin/Desktop/frames/OP01-R01-PastaSalad"):
+    """
+    :return:
+    """
+    test_dir = pathFrames
+
+
+    image_files = [pathFrames + '/' + f for f in glob.glob('*.png')]
+    for filepath in image_files:
+        image = Image.open(filepath)
+        x_tensor = torch.from_numpy(image).to(DEVICE).unsqueeze(0)
+        pr_mask = best_model.predict(x_tensor)
+        pr_mask = (pr_mask.squeeze().cpu().numpy().round())
+        visualize(
+            predicted_mask=pr_mask
+        )
+
+predict_folder(best_model)
+#  show a sample of predictions
+"""
 for i in range(10):
     n = np.random.choice(len(test_dataset))
 
@@ -333,7 +355,7 @@ for i in range(10):
         ground_truth_mask=gt_mask,
         predicted_mask=pr_mask
     )
-
+"""
 """
 test_dataloader = DataLoader(test_dataset)
 
@@ -346,3 +368,7 @@ test_epoch = smp.utils.train.ValidEpoch(
 
 logs = test_epoch.run(test_dataloader)
 """
+
+
+
+
