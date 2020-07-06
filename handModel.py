@@ -344,10 +344,10 @@ def predict_folder(best_model, pathFrames = "/home/2/2014/nagostin/Desktop/frame
     for filepath in tqdm.tqdm(image_files):
 
         image = pred_dataset[count]
-        print(image.shape)
+        #print(image.shape)
         count += 1
-        x_tensor = torch.from_numpy(image).to(DEVICE).unsqueeze(0)
-        print(x_tensor.size())
+        x_tensor = torch.from_numpy(image).to(DEVICE)
+        #print(x_tensor.size())
         pr_mask = best_model.predict(x_tensor)
         pr_mask = (pr_mask.squeeze().cpu().numpy().round())
         visualize(filepath.split("/")[-1].split(".")[0],
