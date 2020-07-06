@@ -31,7 +31,7 @@ y_valid_dir = os.path.join(DATA_DIR, 'Maschere/val')
 x_test_dir = os.path.join(DATA_DIR, 'Frames/test')
 y_test_dir = os.path.join(DATA_DIR, 'Maschere/test')
 
-def visualize(iter, **images):
+def visualize( **images):
     """PLot images in one row."""
     n = len(images)
 
