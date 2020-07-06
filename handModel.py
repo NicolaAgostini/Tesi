@@ -9,7 +9,7 @@ import segmentation_models_pytorch as smp
 import glob
 import tqdm
 
-#os.environ['CUDA_VISIBLE_DEVICES'] = 'cpu'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 #os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print("DEVICE= "+device)
@@ -315,8 +315,8 @@ for i in range(0, 5):
 """
 
 
-best_model = torch.load('./best_model.pth', map_location=torch.device('cpu'))  # load best model
-
+#best_model = torch.load('./best_model.pth', map_location=torch.device('cpu'))  # load best model into cpu
+best_model = torch.load('./best_model.pth')
 ### TEST ###  # best model giving IoU 0.80
 test_dataset = Dataset(
     x_test_dir,
