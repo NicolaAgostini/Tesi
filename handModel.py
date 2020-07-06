@@ -91,6 +91,7 @@ class Dataset(BaseDataset):
         # read data
         image = cv2.imread(self.images_fps[i])
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        print(image.shape)
         if self.masks_fps is not None:
             mask = cv2.imread(self.masks_fps[i], 0)
         #print(self.masks_fps[0])
@@ -111,7 +112,7 @@ class Dataset(BaseDataset):
             if self.preprocessing:
                 sample = self.preprocessing(image=image)
                 image= sample['image']
-            print(image.shape)
+
             return image
 
     def __len__(self):
