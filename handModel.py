@@ -326,7 +326,7 @@ def predict_folder(best_model, pathFrames = "/home/2/2014/nagostin/Desktop/frame
 
 
     image_files = [pathFrames + '/' + f for f in glob.glob('*.png')]
-    for filepath in tqdm(image_files):
+    for filepath in tqdm.tqdm(image_files):
         image = Image.open(filepath)
         x_tensor = torch.from_numpy(image).to(DEVICE).unsqueeze(0)
         pr_mask = best_model.predict(x_tensor)
