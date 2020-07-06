@@ -111,7 +111,7 @@ class Dataset(BaseDataset):
             if self.preprocessing:
                 sample = self.preprocessing(image=image)
                 image= sample['image']
-
+            print(image.shape)
             return image
 
     def __len__(self):
@@ -354,9 +354,9 @@ def predict_folder(best_model, pathFrames = "/home/2/2014/nagostin/Desktop/frame
             predicted_mask=pr_mask
         )
 
-#predict_folder(best_model)
+predict_folder(best_model)
 #  show a sample of predictions
-
+"""
 for i in range(10):
     n = np.random.choice(len(test_dataset))
 
@@ -376,7 +376,7 @@ for i in range(10):
         ground_truth_mask=gt_mask,
         predicted_mask=pr_mask
     )
-
+"""
 """
 test_dataloader = DataLoader(test_dataset)
 
