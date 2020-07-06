@@ -38,6 +38,7 @@ def visualize(iter, **images):
     plt.figure(figsize=(16, 5))
     for i, (name, image) in enumerate(images.items()):
         name = name
+        print(name)
         if image.shape[0]<4:
             image = np.transpose(image,(1,2,0))
         #print(image.shape)
@@ -91,7 +92,7 @@ class Dataset(BaseDataset):
         # read data
         image = cv2.imread(self.images_fps[i])
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        print(image.shape)
+        #print(image.shape)
         if self.masks_fps is not None:
             mask = cv2.imread(self.masks_fps[i], 0)
         #print(self.masks_fps[0])
@@ -345,10 +346,10 @@ def predict_folder(best_model, pathFrames = "/home/2/2014/nagostin/Desktop/frame
     for filepath in tqdm.tqdm(image_files):
 
         image = pred_dataset[count]
-        print(image.shape)
+
         count += 1
         x_tensor = torch.from_numpy(image).to(DEVICE).unsqueeze(0)
-        print(x_tensor.size())
+
         pr_mask = best_model.predict(x_tensor)
         pr_mask = (pr_mask.squeeze().cpu().numpy().round())
         visualize(filepath.split("/")[-1].split(".")[0],
