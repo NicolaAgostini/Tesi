@@ -302,7 +302,7 @@ for i in range(0, 5):
 """
 
 
-best_model = torch.load('./best_model.pth')  # load best model
+best_model = torch.load('./best_model.pth', map_location=torch.device('cpu'))  # load best model
 
 ### TEST ###  # best model giving IoU 0.80
 test_dataset = Dataset(
