@@ -50,7 +50,7 @@ path_to_csv_trainval = [root_path+"egtea/training1.csv", root_path+"egtea/valida
 
 experiment = "lr5_3br_ls"
 saveModel = False
-best = 68
+best = 69
 
 ### SOME MODEL'S VARIABLES ###
 
