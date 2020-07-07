@@ -417,20 +417,73 @@ def correct_HM(path_of_folder):
     :return:
     """
     image_files = [f for f in glob.glob(path_of_folder+'*.png')]  # the outputs are in PGN format
-    print(image_files[40])
-    img = cv2.imread(image_files[40], 0)
+    print(image_files[12500])
+    img = cv2.imread(image_files[12500], 0)
     #print(img)
     #img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)[1]  # ensure binary
     num_labels, labels_im = cv2.connectedComponents(img)
 
 
+
     #print(im_bw)
     #for image in tqdm.tqdm(image_files):
-    print(np.amax(labels_im))
+    #print(labels_im)
+    unique, counts = np.unique(labels_im, return_counts=True)
+    print(unique)
+    print(counts)
+    to_delete = []
+    for i,el in enumerate(counts):
+        if el<100:  # threshold for hand
+            to_delete.append(i)
 
-    def imshow_components(labels):
+    for i,row in enumerate(labels_im):
+        for j,item in enumerate(row):
+            if item > 2 or item in to_delete:
+                labels_im[i][j] = 0  # consider only 2 hands because the index of cc are given following decreasing cardinality
+
+    #now find the 4 vertex of every cc
+
+    h = [(0, 0),(0, 0)]
+    lsx = [(0, 0),(0, 0)]
+    ldx = [(0, 0),(0, 0)]
+
+    last_row = labels_im.shape[0]
+
+    for con in[1,2]:
+        for i, row in enumerate(labels_im):
+            for j, el in enumerate(row):
+                if el == con and h[con-1] == (0, 0):
+                    h[con-1] = (j,i)
+                if el ==con and i == last_row-1 and lsx[con - 1] == (0, 0):
+                    lsx[con - 1] = (j, i)
+                if el == con and i == last_row-1 and j > ldx[con-1][0]:
+                    ldx[con - 1] = (j, i)
+
+    print(h, lsx, ldx)
+
+    # compute weighted centroid
+
+    bar=[(0,0),(0,0)]
+
+    weight = 3
+
+    for con in [0, 1]:
+        sum_x=h[con][0]*weight + lsx[con][0] + ldx[con][0]
+        x = int(np.floor(sum_x/(2+weight)))
+
+        sum_y = h[con][1] * weight + lsx[con][1] + ldx[con][1]
+        y = int(np.floor(sum_y / (2 + weight)))
+
+        bar[con] = (x,y)
+    print(bar)
+
+
+
+    def imshow_components(labels, bar):
         # Map component labels to hue val
         label_hue = np.uint8(179 * labels / np.max(labels))
+        for con in [0, 1]:
+            label_hue[bar[con][1]][bar[con][0]] = 0
         blank_ch = 255 * np.ones_like(label_hue)
         labeled_img = cv2.merge([label_hue, blank_ch, blank_ch])
 
@@ -443,6 +496,6 @@ def correct_HM(path_of_folder):
         cv2.imshow('labeled.png', labeled_img)
         cv2.waitKey()
 
-    imshow_components(labels_im)
+    imshow_components(labels_im, bar)
 
 

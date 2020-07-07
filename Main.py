@@ -92,7 +92,7 @@ def initialize_trainval_csv(which_split):
 
 
 def main():
-    #correct_HM("/Volumes/Bella_li/predictions/")
+    correct_HM("/Volumes/Bella_li/predictions/")
     #split_train_val_detectron()
     #csv_to_txt()
     #split_frames_objDect("/Volumes/Bella_li/frames")
@@ -120,7 +120,7 @@ def main():
 
     #smoothed_labels = label_smmothing("prior")  # for smoothed labels
 
-
+    """
     model = BaselineModel(batch_size, seq_len, input_dim)
 
     model.to(device)
@@ -141,7 +141,7 @@ def main():
 
     #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
 
-
+    """
 
 
 
