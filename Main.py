@@ -91,11 +91,12 @@ def initialize_trainval_csv(which_split):
 
 
 def main():
+    correct_HM("/Volumes/Bella_li/predictions/")
     #split_train_val_detectron()
     #csv_to_txt()
     #split_frames_objDect("/Volumes/Bella_li/frames")
 
-    drawBBox()
+    #drawBBox()
 
 
     #split_train_val_test_handMask(root_path+"hand14k/")

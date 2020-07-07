@@ -6,6 +6,8 @@ import shutil
 import random
 import tqdm
 import json
+import glob
+import sys
 
 
 class ValueMeter(object):
@@ -405,5 +407,42 @@ def drawBBox(file="/Users/nicolanico/Desktop/data"):
                     break
                 elif k == 32:  # a key to go on
                     continue
+
+np.set_printoptions(threshold=sys.maxsize)  # to print all np array
+
+def correct_HM(path_of_folder):
+    """
+    this function will correct hand mask in order to get only two hands: it deletes connected components grater
+    than a certain threshold and consider at most two biggest cc
+    :return:
+    """
+    image_files = [f for f in glob.glob(path_of_folder+'*.png')]  # the outputs are in PGN format
+    print(image_files[15294])
+    img = cv2.imread(image_files[15294], 0)
+
+    img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)[1]  # ensure binary
+    num_labels, labels_im = cv2.connectedComponents(img)
+
+
+    #print(im_bw)
+    #for image in tqdm.tqdm(image_files):
+    print(np.amax(labels_im))
+
+    def imshow_components(labels):
+        # Map component labels to hue val
+        label_hue = np.uint8(179 * labels / np.max(labels))
+        blank_ch = 255 * np.ones_like(label_hue)
+        labeled_img = cv2.merge([label_hue, blank_ch, blank_ch])
+
+        # cvt to BGR for display
+        labeled_img = cv2.cvtColor(labeled_img, cv2.COLOR_HSV2BGR)
+
+        # set bg label to black
+        labeled_img[label_hue == 0] = 0
+
+        cv2.imshow('labeled.png', labeled_img)
+        cv2.waitKey()
+
+    imshow_components(labels_im)
 
 

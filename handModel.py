@@ -37,19 +37,13 @@ def visualize(iter, **images):
 
     plt.figure(figsize=(16, 5))
     for i, (name, image) in enumerate(images.items()):
-        name = name
 
         if image.shape[0]<4:
             image = np.transpose(image,(1,2,0))
-        #print(image.shape)
-        #image = image.transpose(1, 2, 0)
-        plt.subplot(1, n, i + 1)
-        plt.xticks([])
-        plt.yticks([])
-        plt.title(' '.join(name.split('_')).title())
-        plt.imshow((image * 255).astype('uint8'))
-    plt.savefig('/home/2/2014/nagostin/Desktop/Tesi/predictions/' + iter +'.png')
-    plt.close()
+
+        image = Image.fromarray(image.astype('uint8'))
+        image.save('/home/2/2014/nagostin/Desktop/Tesi/predictions/' + iter +'.png')
+
 
 
 
