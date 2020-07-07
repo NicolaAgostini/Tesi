@@ -35,7 +35,6 @@ def visualize(iter, **images):
     """PLot images in one row."""
     n = len(images)
 
-    plt.figure(figsize=(16, 5))
     for i, (name, image) in enumerate(images.items()):
 
         if image.shape[0]<4:
