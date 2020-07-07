@@ -275,7 +275,7 @@ def train_val(model, loaders, optimizer, epochs, criterion, resume = False):
                 if accuracy_meter[str(mode)].value() > best_perf and mode == 1:
                     best_perf = accuracy_meter[str(mode)].value()
                     if best_perf > best:
-                        save_model(model, epoch + 1, accuracy_meter['validation'].value(), best_perf,
+                        save_model(model, epoch + 1, accuracy_meter['1'].value(), best_perf,
                                    experiment=experiment)
 
 
