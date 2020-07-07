@@ -41,6 +41,7 @@ def visualize(iter, **images):
             image = np.transpose(image,(1,2,0))
 
         image = Image.fromarray(image.astype('uint8'))
+
         image.save('/home/2/2014/nagostin/Desktop/Tesi/predictions/' + iter +'.png')
 
 

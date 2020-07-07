@@ -417,10 +417,10 @@ def correct_HM(path_of_folder):
     :return:
     """
     image_files = [f for f in glob.glob(path_of_folder+'*.png')]  # the outputs are in PGN format
-    print(image_files[15294])
-    img = cv2.imread(image_files[15294], 0)
-
-    img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)[1]  # ensure binary
+    print(image_files[40])
+    img = cv2.imread(image_files[40], 0)
+    #print(img)
+    #img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)[1]  # ensure binary
     num_labels, labels_im = cv2.connectedComponents(img)
 
 
