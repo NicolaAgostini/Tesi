@@ -8,6 +8,7 @@ import tqdm
 import json
 import glob
 import sys
+from scipy.spatial import distance
 
 
 class ValueMeter(object):
@@ -175,17 +176,17 @@ def upsample_to30fps(videos_path, destination_folder):
 
             os.system('ffmpeg -i /home/2/2014/nagostin/Desktop/video/{0}.mp4 -vf "scale=-1:256,fps=30" -qscale:v 2 /home/2/2014/nagostin/Desktop/frames/{0}/{0}_frame_%010d.jpg'.format(video))
 
-def loadNPY(file="/Volumes/Bella_li/featureobj/OP01-R05-Cheeseburger_detections.npy"):
+def loadNPY(file="/Volumes/Bella_li/objs/OP01-R01-PastaSalad_detections.npy"):
     """
     load npy object extracted and show in images from files computed as shown here https://github.com/fpv-iplab/rulstm/blob/master/FasterRCNN/tools/detect_video.py
     :return:
     """
     #load csv label objects into dict int_noun
 
-    df_csv = pandas.read_csv('/Users/nicolago/Desktop/EPIC_noun_classes.csv')
+    df_csv = pandas.read_csv('/Users/nicolanico/Desktop/EPIC_noun_classes.csv')
     #print(df_csv[1])
 
-    start_from = 8000
+    start_from = 12500
 
     objs = np.load(file, allow_pickle=True)
     #print(objs[1])
@@ -202,7 +203,7 @@ def loadNPY(file="/Volumes/Bella_li/featureobj/OP01-R05-Cheeseburger_detections.
                 if i > start_from:
                     image = cv2.imread("/Volumes/Bella_li/frames/" + vid + "/" + frames)
                     for n_obj in objs[count]:
-                        if n_obj[5]>0.30:  # if the confidence score is quite high
+                        if n_obj[5]>0.70:  # if the confidence score is quite high
                             #print(int(n_obj[1]))
                             image = cv2.rectangle(image, (int(n_obj[1]), int(n_obj[2])), (int(n_obj[3]), int(n_obj[4])), (255, 0, 0), 2)
                             cv2.putText(image, df_csv.iat[int(n_obj[0]), 1], (int(n_obj[1]), int(n_obj[2]) + 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (36, 255, 12), 1)
@@ -416,9 +417,22 @@ def correct_HM(path_of_folder):
     than a certain threshold and consider at most two biggest cc
     :return:
     """
+
+    #here insert loop on each folder
+    #for folder in path_of_folder:
+
     image_files = [f for f in glob.glob(path_of_folder+'*.png')]  # the outputs are in PGN format
-    print(image_files[12500])
-    img = cv2.imread(image_files[12500], 0)
+
+    name = image_files[25000]
+    vid_id = name.split("/")[-1].split("_")[0]
+
+    objs = np.load("/Volumes/Bella_li/objs/" + vid_id + "_detections.npy", allow_pickle=True)
+    #here insert lool on each image file
+    #for image in image_files:
+
+    n_frame = name.split("/")[-1].split("_")[-1].split(".")[0]  # number of the frame considered
+    print(name)
+    img = cv2.imread(image_files[25000], 0)
     #print(img)
     #img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)[1]  # ensure binary
     num_labels, labels_im = cv2.connectedComponents(img)
@@ -476,6 +490,27 @@ def correct_HM(path_of_folder):
 
         bar[con] = (x,y)
     print(bar)
+
+
+    new_features = np.zeros((2,352))
+    for n_obj in objs[int(n_frame)]:
+        if n_obj[5] > 0.60:  # if the confidence score is quite high
+            # print(int(n_obj[1]))
+            print(n_obj)
+
+            center_obj_x = np.floor((n_obj[1]+n_obj[3])/2)
+            center_obj_y = np.floor((n_obj[2]+n_obj[4])/2)
+            center_obj = (center_obj_x,center_obj_y)
+
+            for i,con in enumerate(bar):
+                if con != (0,0):
+                    new_features[i][int(n_obj[0])] = 1-(distance.euclidean(np.asarray(center_obj), np.asarray(bar[i]))/435)  # la diagonale dell'immagine
+    print(new_features)
+
+    new_features = np.mean(new_features, axis=0) # get a (1,352) mean vector
+
+
+
 
 
 
