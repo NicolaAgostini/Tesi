@@ -120,33 +120,34 @@ def main(args):
     model = infer_engine.initialize_model_from_cfg(args.weights)
     dummy_coco_dataset = dummy_datasets.get_coco_dataset()
 
-    for file in os.listdir("/aulahomes2/2/2014/nagostin/Desktop/frames06/"):
-        print(file)
-        all_boxes = []
-        for img in tqdm(sorted(os.listdir("/aulahomes2/2/2014/nagostin/Desktop/frames06/"+ file))):
-            if img.endswith(".jpg"):
-                
-                
-                #vid = cv2.VideoCapture("/aulahomes2/2/2014/nagostin/Desktop/frames/"+file)
-                
-                im = cv2.imread("/aulahomes2/2/2014/nagostin/Desktop/frames06/"+ file+ "/"+img)
+    #for file in os.listdir("/aulahomes2/2/2014/nagostin/Desktop/frames06/"):
+    file = "OP01-R01-PastaSalad/"
+    print(file)
+    all_boxes = []
+    for img in tqdm(sorted(os.listdir("/aulahomes2/2/2014/nagostin/Desktop/frames/"+ file))):
+        if img.endswith(".jpg"):
 
-                
-                
-                
-                    
-                timers = defaultdict(Timer)
-                t = time.time()
-                with c2_utils.NamedCudaScope(0):
-                    cls_boxes, cls_segms, cls_keyps = infer_engine.im_detect_all(
-                        model, im, None, timers=timers
-                    )
-                all_boxes.append(format_dets(cls_boxes))
-                    
-                    
-                    
 
-        np.save("/aulahomes2/2/2014/nagostin/Desktop/video/"+file+'_detections',all_boxes)
+            #vid = cv2.VideoCapture("/aulahomes2/2/2014/nagostin/Desktop/frames/"+file)
+
+            im = cv2.imread("/aulahomes2/2/2014/nagostin/Desktop/frames/"+ file+ "/"+img)
+
+
+
+
+
+            timers = defaultdict(Timer)
+            t = time.time()
+            with c2_utils.NamedCudaScope(0):
+                cls_boxes, cls_segms, cls_keyps = infer_engine.im_detect_all(
+                    model, im, None, timers=timers
+                )
+            all_boxes.append(format_dets(cls_boxes))
+
+
+
+
+    np.save("/aulahomes2/2/2014/nagostin/Desktop/video/"+file+'_detections',all_boxes)
 
 if __name__ == '__main__':
     workspace.GlobalInit(['caffe2', '--caffe2_log_level=0'])
