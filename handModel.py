@@ -330,7 +330,7 @@ def predict_folder(best_model, pathFrames = "/home/2/2014/nagostin/Desktop/frame
     """
     for folder in os.listdir("/home/2/2014/nagostin/Desktop/frames/"):
         pred_dir = "/home/2/2014/nagostin/Desktop/frames/"+folder
-        os.makedirs("/home/2/2014/nagostin/Desktop/predictions/" + folder+"/")
+        os.makedirs("/home/2/2014/nagostin/Desktop/Tesi/predictions/" + folder+"/")
 
         pred_dataset = Dataset(
             pred_dir,
