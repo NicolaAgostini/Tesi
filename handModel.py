@@ -31,7 +31,7 @@ y_valid_dir = os.path.join(DATA_DIR, 'Maschere/val')
 x_test_dir = os.path.join(DATA_DIR, 'Frames/test')
 y_test_dir = os.path.join(DATA_DIR, 'Maschere/test')
 
-def visualize(iter, **images):
+def visualize(iter, folder, **images):
     """PLot images in one row."""
     n = len(images)
 
@@ -42,7 +42,7 @@ def visualize(iter, **images):
 
         image = Image.fromarray(image.astype('uint8'))
 
-        image.save('/home/2/2014/nagostin/Desktop/Tesi/predictions/' + iter +'.png')
+        image.save('/home/2/2014/nagostin/Desktop/Tesi/predictions/'+folder+'/' + iter +'.png')
 
 
 
@@ -324,31 +324,33 @@ test_dataset_vis = Dataset(
     x_test_dir, y_test_dir,
 )
 
-def predict_folder(best_model, pathFrames = "/home/2/2014/nagostin/Desktop/frames/OP01-R01-PastaSalad"):
+def predict_folder(best_model, pathFrames = "/home/2/2014/nagostin/Desktop/frames/"):
     """
     :return:
     """
-    pred_dir = pathFrames
+    for folder in os.listdir("/home/2/2014/nagostin/Desktop/frames/"):
+        pred_dir = "/home/2/2014/nagostin/Desktop/frames/"+folder
+        os.makedirs("/home/2/2014/nagostin/Desktop/predictions" + folder+"/")
 
-    pred_dataset = Dataset(
-        pred_dir,
-        preprocessing=get_preprocessing(preprocessing_fn)
-    )
-
-    image_files = [f for f in glob.glob('/home/2/2014/nagostin/Desktop/frames/OP01-R01-PastaSalad/*.jpg')]
-    count = 0
-    for filepath in tqdm.tqdm(image_files):
-
-        image = pred_dataset[count]
-
-        count += 1
-        x_tensor = torch.from_numpy(image).to(DEVICE).unsqueeze(0)
-
-        pr_mask = best_model.predict(x_tensor)
-        pr_mask = (pr_mask.squeeze().cpu().numpy().round())
-        visualize(filepath.split("/")[-1].split(".")[0],
-            predicted_mask=pr_mask
+        pred_dataset = Dataset(
+            pred_dir,
+            preprocessing=get_preprocessing(preprocessing_fn)
         )
+
+        image_files = [f for f in glob.glob("/home/2/2014/nagostin/Desktop/frames/"+folder+"/*.jpg")]
+        count = 0
+        for filepath in tqdm.tqdm(image_files):
+
+            image = pred_dataset[count]
+
+            count += 1
+            x_tensor = torch.from_numpy(image).to(DEVICE).unsqueeze(0)
+
+            pr_mask = best_model.predict(x_tensor)
+            pr_mask = (pr_mask.squeeze().cpu().numpy().round())
+            visualize(filepath.split("/")[-1].split(".")[0], folder,
+                predicted_mask=pr_mask
+            )
 
 predict_folder(best_model)
 #  show a sample of predictions

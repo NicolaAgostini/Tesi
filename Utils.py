@@ -427,6 +427,7 @@ def correct_HM(path_of_folder):
     vid_id = name.split("/")[-1].split("_")[0]
 
     objs = np.load("/Volumes/Bella_li/objs/" + vid_id + "_detections.npy", allow_pickle=True)
+    # allboxes=[]
     #here insert lool on each image file
     #for image in image_files:
 
@@ -508,10 +509,11 @@ def correct_HM(path_of_folder):
     print(new_features)
 
     new_features = np.mean(new_features, axis=0) # get a (1,352) mean vector
+    #allboxes.append(new_features)
 
 
-
-
+    # out from all images loop but insiede all folder loop do
+    #np.save("/Volumes/Bella_li/newfeat/"+name+'_newfeat',all_boxes)
 
 
     def imshow_components(labels, bar):
