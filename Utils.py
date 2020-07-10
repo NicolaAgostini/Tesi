@@ -415,105 +415,117 @@ def correct_HM(path_of_folder):
     """
     this function will correct hand mask in order to get only two hands: it deletes connected components grater
     than a certain threshold and consider at most two biggest cc
+    :param path_of_folder : the path of the images mask predictions folder
     :return:
     """
 
     #here insert loop on each folder
-    #for folder in path_of_folder:
+    for folder in os.listdir(path_of_folder):
+        if not ".DS_Store" in folder:
+            image_files = [f for f in sorted(glob.glob(path_of_folder+folder+'/*.png'))]  # the outputs are in PGN format sorted by num frame
+            print(folder)
+            name = image_files[0]
+            vid_id = name.split("/")[-1].split("_")[0]
 
-    image_files = [f for f in glob.glob(path_of_folder+'*.png')]  # the outputs are in PGN format
+            objs = np.load("/Volumes/Bella_li/objs/" + vid_id + "_detections.npy", allow_pickle=True)
+            allboxes=[]
+            #here insert lool on each image file
+            for image in tqdm.tqdm(image_files):
 
-    name = image_files[25000]
-    vid_id = name.split("/")[-1].split("_")[0]
-
-    objs = np.load("/Volumes/Bella_li/objs/" + vid_id + "_detections.npy", allow_pickle=True)
-    # allboxes=[]
-    #here insert lool on each image file
-    #for image in image_files:
-
-    n_frame = name.split("/")[-1].split("_")[-1].split(".")[0]  # number of the frame considered
-    print(name)
-    img = cv2.imread(image_files[25000], 0)
-    #print(img)
-    #img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)[1]  # ensure binary
-    num_labels, labels_im = cv2.connectedComponents(img)
-
-
-
-    #print(im_bw)
-    #for image in tqdm.tqdm(image_files):
-    #print(labels_im)
-    unique, counts = np.unique(labels_im, return_counts=True)
-    print(unique)
-    print(counts)
-    to_delete = []
-    for i,el in enumerate(counts):
-        if el<100:  # threshold for hand
-            to_delete.append(i)
-
-    for i,row in enumerate(labels_im):
-        for j,item in enumerate(row):
-            if item > 2 or item in to_delete:
-                labels_im[i][j] = 0  # consider only 2 hands because the index of cc are given following decreasing cardinality
-
-    #now find the 4 vertex of every cc
-
-    h = [(0, 0),(0, 0)]
-    lsx = [(0, 0),(0, 0)]
-    ldx = [(0, 0),(0, 0)]
-
-    last_row = labels_im.shape[0]
-
-    for con in[1,2]:
-        for i, row in enumerate(labels_im):
-            for j, el in enumerate(row):
-                if el == con and h[con-1] == (0, 0):
-                    h[con-1] = (j,i)
-                if el ==con and i == last_row-1 and lsx[con - 1] == (0, 0):
-                    lsx[con - 1] = (j, i)
-                if el == con and i == last_row-1 and j > ldx[con-1][0]:
-                    ldx[con - 1] = (j, i)
-
-    print(h, lsx, ldx)
-
-    # compute weighted centroid
-
-    bar=[(0,0),(0,0)]
-
-    weight = 3
-
-    for con in [0, 1]:
-        sum_x=h[con][0]*weight + lsx[con][0] + ldx[con][0]
-        x = int(np.floor(sum_x/(2+weight)))
-
-        sum_y = h[con][1] * weight + lsx[con][1] + ldx[con][1]
-        y = int(np.floor(sum_y / (2 + weight)))
-
-        bar[con] = (x,y)
-    print(bar)
+                new_features = np.zeros((2, 352))
+                n_frame = image.split("/")[-1].split("_")[-1].split(".")[0]  # number of the frame considered
+                #print(n_frame)
+                img = cv2.imread(image, 0)
+                #print(img)
+                #img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)[1]  # ensure binary
+                num_labels, labels_im = cv2.connectedComponents(img)
 
 
-    new_features = np.zeros((2,352))
-    for n_obj in objs[int(n_frame)]:
-        if n_obj[5] > 0.60:  # if the confidence score is quite high
-            # print(int(n_obj[1]))
-            print(n_obj)
 
-            center_obj_x = np.floor((n_obj[1]+n_obj[3])/2)
-            center_obj_y = np.floor((n_obj[2]+n_obj[4])/2)
-            center_obj = (center_obj_x,center_obj_y)
+                #print(im_bw)
+                #for image in tqdm.tqdm(image_files):
+                #print(labels_im.shape)
+                unique, counts = np.unique(labels_im, return_counts=True)
+                #print(len(unique))
+                #print(counts)
+                to_delete = []
+                if len(unique) > 1:
+                    for i,el in enumerate(counts):
+                        if el<100:  # threshold for hand
+                            to_delete.append(i)
 
-            for i,con in enumerate(bar):
-                if con != (0,0):
-                    new_features[i][int(n_obj[0])] = 1-(distance.euclidean(np.asarray(center_obj), np.asarray(bar[i]))/435)  # la diagonale dell'immagine
-    print(new_features)
+                    for i,row in enumerate(labels_im):
+                        for j,item in enumerate(row):
+                            if item > 2 or item in to_delete:
+                                labels_im[i][j] = 0  # consider only 2 hands because the index of cc are given following decreasing cardinality
 
-    new_features = np.mean(new_features, axis=0) # get a (1,352) mean vector
-    #allboxes.append(new_features)
+                #now find the 3 vertex of every cc
+
+                    h = [(0, 0),(0, 0)]
+                    lsx = [(0, 0),(0, 0)]
+                    ldx = [(0, 0),(0, 0)]
+
+                    last_row = labels_im.shape[0]
+
+                    for con in[1,2]:
+                        for i, row in enumerate(labels_im):
+                            for j, el in enumerate(row):
+                                if el == con and h[con-1] == (0, 0):
+                                    h[con-1] = (j,i)
+                                if el ==con and i == last_row-1 and lsx[con - 1] == (0, 0):
+                                    lsx[con - 1] = (j, i)
+                                if el == con and i == last_row-1 and j > ldx[con-1][0]:
+                                    ldx[con - 1] = (j, i)
+
+                    #print(h, lsx, ldx)
+
+                    # compute weighted centroid
+
+                    bar=[(0,0),(0,0)]
+
+                    weight = 3
+
+                    for con in [0, 1]:
+                        sum_x=h[con][0]*weight + lsx[con][0] + ldx[con][0]
+                        x = int(np.floor(sum_x/(2+weight)))
+
+                        sum_y = h[con][1] * weight + lsx[con][1] + ldx[con][1]
+                        y = int(np.floor(sum_y / (2 + weight)))
+
+                        bar[con] = (x,y)
+                    #print(bar)
 
 
-    # out from all images loop but insiede all folder loop do
-    #np.save("/Volumes/Bella_li/newfeat/"+name+'_newfeat',all_boxes)
+
+                    for n_obj in objs[int(n_frame)]:  # compute center of object
+                        if n_obj[5] > 0.60:  # if the confidence score is quite high
+                            # print(int(n_obj[1]))
+                            #print(n_obj)
+
+                            center_obj_x = np.floor((n_obj[1]+n_obj[3])/2)
+                            center_obj_y = np.floor((n_obj[2]+n_obj[4])/2)
+                            center_obj = (center_obj_x,center_obj_y)
+
+                            for i,con in enumerate(bar):  # append its distance from center of hand to array of new features
+                                if con != (0,0):
+                                    distance_obj_hand = distance.euclidean(np.asarray(center_obj), np.asarray(bar[i]))/435  #la diagonale dell'immagine
+                                    if new_features[i][int(n_obj[0])] != 0:
+                                        if 1 - distance_obj_hand > new_features[i][int(n_obj[0])]:
+                                            new_features[i][int(n_obj[0])] = 1 - distance_obj_hand
+
+                                    else:
+                                        new_features[i][int(n_obj[0])] = 1-distance_obj_hand
+
+                #print(new_features)
+
+                new_features = np.mean(new_features, axis=0)  # get a (352,) mean vector
+                #print(new_features.shape)
+
+            allboxes.append(new_features)
+
+
+            # out from all images loop but insiede all folder loop do
+            np.save("/Volumes/Bella_li/newfeat/"+name+'_newfeat', allboxes)
 
 
     def imshow_components(labels, bar):
@@ -533,6 +545,6 @@ def correct_HM(path_of_folder):
         cv2.imshow('labeled.png', labeled_img)
         cv2.waitKey()
 
-    imshow_components(labels_im, bar)
+    #imshow_components(labels_im, bar)
 
 
