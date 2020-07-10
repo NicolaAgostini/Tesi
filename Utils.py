@@ -447,12 +447,14 @@ def correct_HM(path_of_folder):
                 #print(labels_im.shape)
                 unique, counts = np.unique(labels_im, return_counts=True)
                 #print(len(unique))
-                #print(counts)
+                print(counts)
                 to_delete = []
                 if len(unique) > 1:
                     for i,el in enumerate(counts):
-                        if el<100:  # threshold for hand
+
+                        if el<200:  # threshold for hand
                             to_delete.append(i)
+
 
                     for i,row in enumerate(labels_im):
                         for j,item in enumerate(row):
@@ -472,12 +474,14 @@ def correct_HM(path_of_folder):
                             for j, el in enumerate(row):
                                 if el == con and h[con-1] == (0, 0):
                                     h[con-1] = (j,i)
-                                if el ==con and i == last_row-1 and lsx[con - 1] == (0, 0):
+                                if (el == con and i == last_row-1) or (el == con and labels_im[i][j-1] !=con):
                                     lsx[con - 1] = (j, i)
-                                if el == con and i == last_row-1 and j > ldx[con-1][0]:
+                                    if i == last_row-1:
+                                        break
+                                if (el == con and labels_im[i][j+1] != con):
                                     ldx[con - 1] = (j, i)
 
-                    #print(h, lsx, ldx)
+                    print(h, lsx, ldx)
 
                     # compute weighted centroid
 
@@ -493,7 +497,7 @@ def correct_HM(path_of_folder):
                         y = int(np.floor(sum_y / (2 + weight)))
 
                         bar[con] = (x,y)
-                    #print(bar)
+                    print(bar)
 
 
 
@@ -517,7 +521,7 @@ def correct_HM(path_of_folder):
                                         new_features[i][int(n_obj[0])] = 1-distance_obj_hand
 
                 #print(new_features)
-
+                    #imshow_components(labels_im, bar)
                 new_features = np.mean(new_features, axis=0)  # get a (352,) mean vector
                 #print(new_features.shape)
 
@@ -528,23 +532,24 @@ def correct_HM(path_of_folder):
             np.save("/Volumes/Bella_li/newfeat/"+name+'_newfeat', allboxes)
 
 
-    def imshow_components(labels, bar):
-        # Map component labels to hue val
-        label_hue = np.uint8(179 * labels / np.max(labels))
-        for con in [0, 1]:
-            label_hue[bar[con][1]][bar[con][0]] = 0
-        blank_ch = 255 * np.ones_like(label_hue)
-        labeled_img = cv2.merge([label_hue, blank_ch, blank_ch])
-
-        # cvt to BGR for display
-        labeled_img = cv2.cvtColor(labeled_img, cv2.COLOR_HSV2BGR)
-
-        # set bg label to black
-        labeled_img[label_hue == 0] = 0
-
-        cv2.imshow('labeled.png', labeled_img)
-        cv2.waitKey()
-
-    #imshow_components(labels_im, bar)
 
 
+
+
+
+def imshow_components(labels, bar):
+    # Map component labels to hue val
+    label_hue = np.uint8(179 * labels / np.max(labels))
+    for con in [0, 1]:
+        label_hue[bar[con][1]][bar[con][0]] = 0
+    blank_ch = 255 * np.ones_like(label_hue)
+    labeled_img = cv2.merge([label_hue, blank_ch, blank_ch])
+
+    # cvt to BGR for display
+    labeled_img = cv2.cvtColor(labeled_img, cv2.COLOR_HSV2BGR)
+
+    # set bg label to black
+    labeled_img[label_hue == 0] = 0
+
+    cv2.imshow('labeled.png', labeled_img)
+    cv2.waitKey()
