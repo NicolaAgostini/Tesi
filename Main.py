@@ -91,7 +91,7 @@ def initialize_trainval_csv(which_split):
 
 
 def main():
-    #correct_HM("/Volumes/Bella_li/predictions/")  # postprocessing and extract new feature
+    correct_HM("/home/2/2014/nagostin/Desktop/predictions/")  # postprocessing and extract new feature
     #split_train_val_detectron()
     #csv_to_txt()
     #split_frames_objDect("/Volumes/Bella_li/frames")
@@ -118,7 +118,7 @@ def main():
     #path = initialize_trainval_csv(1)  # to generate training and validation csv depending on split defined by authors of egtea gaze +
 
     #smoothed_labels = label_smmothing("prior")  # for smoothed labels
-
+    """
 
     model = BaselineModel(batch_size, seq_len, input_dim)
 
@@ -140,7 +140,7 @@ def main():
 
     #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
 
-
+    """
 
 
 

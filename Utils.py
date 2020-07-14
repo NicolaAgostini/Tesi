@@ -428,7 +428,7 @@ def correct_HM(path_of_folder):
             name = image_files[0]
             vid_id = name.split("/")[-1].split("_")[0]
 
-            objs = np.load("/Volumes/Bella_li/objs/" + vid_id + "_detections.npy", allow_pickle=True)
+            objs = np.load("/home/2/2014/nagostin/Desktop/video/" + vid_id + "_detections.npy", allow_pickle=True)
             allboxes=[]
             #here insert lool on each image file
             for image in tqdm.tqdm(image_files):
@@ -531,7 +531,7 @@ def correct_HM(path_of_folder):
 
 
             # out from all images loop but insiede all folder loop do
-            np.save("/Volumes/Bella_li/newfeat/"+vid_id+'_newfeat', allboxes)
+            np.save("/home/2/2014/nagostin/Desktop/newfeat/"+vid_id+'_newfeat', allboxes)
 
 
 
