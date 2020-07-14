@@ -6,11 +6,11 @@ import os
 
 path_of_dir = "/home/2/2014/nagostin/Desktop/"
 
-for file in os.listdir(path_of_dir+"featureobj"):
+for file in os.listdir(path_of_dir+"video"):
     print("Processing "+ file)
-    env = lmdb.open(path_of_dir+'obj', map_size=1099511627776)
+    env = lmdb.open(path_of_dir+'obj_correct', map_size=1099511627776)
     video_name = file.split("_")[0] + '_frame_{:010d}.jpg'
-    detections = np.load(path_of_dir+"featureobj/"+file, allow_pickle=True, encoding='bytes')
+    detections = np.load(path_of_dir+"video/"+file, allow_pickle=True, encoding='bytes')
 
     for i, dets in enumerate(tqdm(detections,'Extracting features')):
         feat = np.zeros(352, dtype='float32')

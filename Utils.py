@@ -422,6 +422,7 @@ def correct_HM(path_of_folder):
     #here insert loop on each folder
     for folder in os.listdir(path_of_folder):
         if not ".DS_Store" in folder:
+
             image_files = [f for f in sorted(glob.glob(path_of_folder+folder+'/*.png'))]  # the outputs are in PGN format sorted by num frame
             print(folder)
             name = image_files[0]
@@ -445,91 +446,92 @@ def correct_HM(path_of_folder):
                 #print(im_bw)
                 #for image in tqdm.tqdm(image_files):
                 #print(labels_im.shape)
-                unique, counts = np.unique(labels_im, return_counts=True)
+
                 #print(len(unique))
-                print(counts)
+                #print(counts)
                 to_delete = []
-                if len(unique) > 1:
-                    for i,el in enumerate(counts):
+                if num_labels > 1:
 
-                        if el<200:  # threshold for hand
-                            to_delete.append(i)
+                    h, w = img.shape
+                    num_components, components = cv2.connectedComponents(img)
+                    comp_th = 200
+                    comp_list = []
+                    for i in range(1, 3):
+
+                        # Retrieve i-th component
+                        comp_i = np.where(components == i, np.ones_like(img), np.zeros_like(img))
+
+                        #print(comp_i.sum())
+                    # Filter the component, if needed
+                        if comp_i.sum() >= comp_th:
+                            comp_list += [comp_i]
+
+                    hand_center = []
+                    for comp in comp_list:
+
+                    # Compute hand region
+                        #print(comp)
+                        idxs = np.where(comp == 1)  # idxs shape [n_points, 2] the index where there is a hand rows and cols
+                        #print(idxs)
+                        #print(idxs)
+                        temp1 = comp[idxs[0].max(axis=0)]  # max row
+                        #print(temp1.shape)
+                        tempidx1 = np.where(temp1 == 1)  # the index col of the max col
+                        #print(tempidx1)
+                        p1 = np.array([tempidx1[0].min(axis=0), idxs[0].max(axis=0)])  # punto basso a sx
+                        p2 = np.array([tempidx1[0].max(axis=0), idxs[0].max(axis=0)])  # punto basso a dx
+                        #y_min = idxs.min(axis=0)
+                        p3 = np.array([idxs[1].min(axis=0), idxs[0].min(axis=0)])  # punto alto
 
 
-                    for i,row in enumerate(labels_im):
-                        for j,item in enumerate(row):
-                            if item > 2 or item in to_delete:
-                                labels_im[i][j] = 0  # consider only 2 hands because the index of cc are given following decreasing cardinality
+                        hand_center.append([p3,p1,p2])
 
-                #now find the 3 vertex of every cc
-
-                    h = [(0, 0),(0, 0)]
-                    lsx = [(0, 0),(0, 0)]
-                    ldx = [(0, 0),(0, 0)]
-
-                    last_row = labels_im.shape[0]
-
-                    for con in[1,2]:
-                        for i, row in enumerate(labels_im):
-                            for j, el in enumerate(row):
-                                if el == con and h[con-1] == (0, 0):
-                                    h[con-1] = (j,i)
-                                if (el == con and i == last_row-1) or (el == con and labels_im[i][j-1] !=con):
-                                    lsx[con - 1] = (j, i)
-                                    if i == last_row-1:
-                                        break
-                                if (el == con and labels_im[i][j+1] != con):
-                                    ldx[con - 1] = (j, i)
-
-                    print(h, lsx, ldx)
-
-                    # compute weighted centroid
-
-                    bar=[(0,0),(0,0)]
+                    bar = []
 
                     weight = 3
 
-                    for con in [0, 1]:
-                        sum_x=h[con][0]*weight + lsx[con][0] + ldx[con][0]
-                        x = int(np.floor(sum_x/(2+weight)))
+                    for hand in hand_center:
 
-                        sum_y = h[con][1] * weight + lsx[con][1] + ldx[con][1]
+                        sum_x = hand[0][0] * weight + hand[1][0] + hand[2][0]
+                        x = int(np.floor(sum_x / (2 + weight)))
+
+                        sum_y = hand[0][1] * weight + hand[1][1] + hand[2][1]
                         y = int(np.floor(sum_y / (2 + weight)))
 
-                        bar[con] = (x,y)
-                    print(bar)
+                        bar.append((x, y))
 
 
 
-                    for n_obj in objs[int(n_frame)]:  # compute center of object
+                    for n_obj in objs[int(n_frame)-1]:  # compute center of object
                         if n_obj[5] > 0.60:  # if the confidence score is quite high
                             # print(int(n_obj[1]))
-                            #print(n_obj)
 
+                            #print(n_obj)
                             center_obj_x = np.floor((n_obj[1]+n_obj[3])/2)
                             center_obj_y = np.floor((n_obj[2]+n_obj[4])/2)
                             center_obj = (center_obj_x,center_obj_y)
 
                             for i,con in enumerate(bar):  # append its distance from center of hand to array of new features
                                 if con != (0,0):
-                                    distance_obj_hand = distance.euclidean(np.asarray(center_obj), np.asarray(bar[i]))/435  #la diagonale dell'immagine
-                                    if new_features[i][int(n_obj[0])] != 0:
-                                        if 1 - distance_obj_hand > new_features[i][int(n_obj[0])]:
-                                            new_features[i][int(n_obj[0])] = 1 - distance_obj_hand
+                                    distance_obj_hand = distance.euclidean(np.asarray(center_obj), np.asarray(bar[i]))/435  #la diagonale dell'immagine = 435
+                                    if new_features[i][int(n_obj[0])] != 0:  # if more that 1 obj of the same type then compute the sum of their distances
+                                        new_features[i][int(n_obj[0])] += (1 - distance_obj_hand)
 
                                     else:
                                         new_features[i][int(n_obj[0])] = 1-distance_obj_hand
 
-                #print(new_features)
+
                     #imshow_components(labels_im, bar)
+                #print(new_features)
+
                 new_features = np.mean(new_features, axis=0)  # get a (352,) mean vector
                 #print(new_features.shape)
 
-            allboxes.append(new_features)
+                allboxes.append(new_features)
 
 
             # out from all images loop but insiede all folder loop do
-            np.save("/Volumes/Bella_li/newfeat/"+name+'_newfeat', allboxes)
+            np.save("/Volumes/Bella_li/newfeat/"+vid_id+'_newfeat', allboxes)
 
 
 
@@ -540,8 +542,8 @@ def correct_HM(path_of_folder):
 def imshow_components(labels, bar):
     # Map component labels to hue val
     label_hue = np.uint8(179 * labels / np.max(labels))
-    for con in [0, 1]:
-        label_hue[bar[con][1]][bar[con][0]] = 0
+    for con in bar:
+        label_hue[con[1]][con[0]] = 0
     blank_ch = 255 * np.ones_like(label_hue)
     labeled_img = cv2.merge([label_hue, blank_ch, blank_ch])
 
