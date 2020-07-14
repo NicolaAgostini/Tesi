@@ -24,11 +24,10 @@ print("DEVICE= "+device)
 
 # alpha = 0.2
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd"]
-#path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd",root_path + "obj"]  # the folders that contain the .mdb files
+path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd",root_path + "obj_correct"]  # the folders that contain the .mdb files
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd"]
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd"]
 #path_to_lmdb = [root_path + "obj"]
-path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_flow_model_best_fcfull_hd"]
 
 ### PATH OF TXT FOR TRAINING AND VALIDATION ###
 
@@ -92,7 +91,7 @@ def initialize_trainval_csv(which_split):
 
 
 def main():
-    correct_HM("/Volumes/Bella_li/predictions/")
+    #correct_HM("/Volumes/Bella_li/predictions/")  # postprocessing and extract new feature
     #split_train_val_detectron()
     #csv_to_txt()
     #split_frames_objDect("/Volumes/Bella_li/frames")
@@ -120,7 +119,7 @@ def main():
 
     #smoothed_labels = label_smmothing("prior")  # for smoothed labels
 
-    """
+
     model = BaselineModel(batch_size, seq_len, input_dim)
 
     model.to(device)
@@ -141,7 +140,7 @@ def main():
 
     #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
 
-    """
+
 
 
 
