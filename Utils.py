@@ -424,7 +424,7 @@ def correct_HM(path_of_folder):
         if not ".DS_Store" in folder:
 
             image_files = [f for f in sorted(glob.glob(path_of_folder+folder+'/*.png'))]  # the outputs are in PGN format sorted by num frame
-            print(folder)
+            print(path_of_folder+folder)
             name = image_files[0]
             vid_id = name.split("/")[-1].split("_")[0]
 
