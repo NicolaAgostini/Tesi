@@ -91,7 +91,7 @@ def initialize_trainval_csv(which_split):
 
 
 def main():
-    correct_HM("/home/2/2014/nagostin/Desktop/predictions/")  # postprocessing and extract new feature
+    correct_HM("/home/2/2014/nagostin/Desktop/predictions")  # postprocessing and extract new feature
     #split_train_val_detectron()
     #csv_to_txt()
     #split_frames_objDect("/Volumes/Bella_li/frames")
