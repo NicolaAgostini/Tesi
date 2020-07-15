@@ -24,10 +24,10 @@ print("DEVICE= "+device)
 
 # alpha = 0.2
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd"]
-path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd",root_path + "obj_correct"]  # the folders that contain the .mdb files
+#path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd",root_path + "obj_correct"]  # the folders that contain the .mdb files
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd"]
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd"]
-#path_to_lmdb = [root_path + "obj"]
+path_to_lmdb = [root_path + "obj_correct"]
 
 ### PATH OF TXT FOR TRAINING AND VALIDATION ###
 
@@ -91,7 +91,7 @@ def initialize_trainval_csv(which_split):
 
 
 def main():
-    correct_HM("/home/2/2014/nagostin/Desktop/Tesi/predictions/")  # postprocessing and extract new feature
+    #correct_HM("/home/2/2014/nagostin/Desktop/Tesi/predictions/")  # postprocessing and extract new feature
     #split_train_val_detectron()
     #csv_to_txt()
     #split_frames_objDect("/Volumes/Bella_li/frames")
@@ -118,7 +118,7 @@ def main():
     #path = initialize_trainval_csv(1)  # to generate training and validation csv depending on split defined by authors of egtea gaze +
 
     #smoothed_labels = label_smmothing("prior")  # for smoothed labels
-    """
+
 
     model = BaselineModel(batch_size, seq_len, input_dim)
 
@@ -134,13 +134,12 @@ def main():
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.4, smooth_prior="glove", action_embeddings_csv_path="action_embeddings_corretto.csv", reduce_time="mean")
+    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="verb-noun", action_embeddings_csv_path="vn_prior.csv", reduce_time="mean")
 
     train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)  # with smoothed labels
 
     #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
 
-    """
 
 
 
@@ -238,7 +237,7 @@ def train_val(model, loaders, optimizer, epochs, criterion, resume = False):
                     # top5 accuracy at 1s
                     idx = -4
 
-                    k = 1  # top k = 5 anticipation
+                    k = 5  # top k = 5 anticipation
 
                     acc = topk_accuracy(preds[:, idx, :].detach().cpu().numpy(), y.detach().cpu().numpy(), (k,))[0] * 100  # top 5 accuracy percentage
 
