@@ -14,7 +14,7 @@ for file in os.listdir(path_of_dir+"newfeat"):
 
     for i, dets in enumerate(tqdm(detections,'Extracting features')):
         feat = dets
-        print(dets.shape)
+        #print(dets.shape)
         key = video_name.format(i+1)
         with env.begin(write=True) as txn:
             txn.put(key.encode(),feat)
