@@ -186,7 +186,7 @@ def loadNPY(file="/Volumes/Bella_li/objs/OP01-R01-PastaSalad_detections.npy"):
     df_csv = pandas.read_csv('/Users/nicolanico/Desktop/EPIC_noun_classes.csv')
     #print(df_csv[1])
 
-    start_from = 12500
+    start_from = 7610
 
     objs = np.load(file, allow_pickle=True)
     #print(objs[1])
