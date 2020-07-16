@@ -247,7 +247,7 @@ def test_model():
 
 
 def print_data(path_1):
-    """
+
     env = lmdb.open(path_1, readonly=True, lock=False)
     with env.begin() as e:
         with e.cursor() as curs:
@@ -263,7 +263,7 @@ def print_data(path_1):
     detections = np.load("/aulahomes2/2/2014/nagostin/Desktop/video/" + "P05-R01-PastaSalad_detections.npy",
                          allow_pickle=True, encoding='bytes')
     print(detections[20635])
-
+    """
 
 
 
