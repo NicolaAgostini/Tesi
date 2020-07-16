@@ -252,7 +252,7 @@ def print_data(path_1):
     with env.begin() as e:
         with e.cursor() as curs:
             print(curs.item())
-            dd = e.get("OP01-R01-PastaSalad_frame_0000020636.jpg".encode('utf-8'))
+            dd = e.get("P01-R01-PastaSalad_frame_0000020636.jpg".encode('utf-8'))
         data = np.frombuffer(dd, 'float32')
         print(data.shape)
     #read_representations()
