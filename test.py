@@ -257,6 +257,9 @@ def print_data(path_1):
         print(data.shape)
     #read_representations()
 
+    detections = np.load("/aulahomes2/2/2014/nagostin/Desktop/" + "newfeat/" + "OP01-R01-PastaSalad_newfeat.npy", allow_pickle=True, encoding='bytes')
+    print(detections[20636])
+
 
 
 
