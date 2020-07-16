@@ -20,7 +20,7 @@ class BaselineModel(torch.nn.Module):
         self.seq_len = seq_len
         self.batch_size = batch_size
         self.dropout = torch.nn.Dropout(dropout)
-        self.fc = torch.nn.Linear(1024*1, num_classes)  # without seq_len because i want my output on every timestamp from 0 to 2s of observations
+        self.fc = torch.nn.Linear(1024*3, num_classes)  # without seq_len because i want my output on every timestamp from 0 to 2s of observations
 
         #self.fc = torch.nn.Linear(1024*3, num_classes)
         self.num_classes = num_classes
@@ -37,7 +37,7 @@ class BaselineModel(torch.nn.Module):
 
         for i, j in enumerate(feat):
             #print("INPUT " + str(i))
-            print(j.size())
+            #print(j.size())
             x_mod, hid = self.branches[i](j)  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
             x.append(x_mod)
             #print(x_mod.size())
