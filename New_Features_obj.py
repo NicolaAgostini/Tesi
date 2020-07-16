@@ -17,5 +17,7 @@ for file in os.listdir(path_of_dir+"newfeat"):
         feat = dets
         #print(feat.shape)
         key = video_name.format(i+1)
+        print(key)
+        print(feat)
         with env.begin(write=True) as txn:
             txn.put(key.encode(),feat)
