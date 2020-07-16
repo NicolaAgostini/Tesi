@@ -37,7 +37,7 @@ class BaselineModel(torch.nn.Module):
 
         for i, j in enumerate(feat):
             #print("INPUT " + str(i))
-            #print(j)
+            print(j)
             x_mod, hid = self.branches[i](j)  # x_mod has shapes [batch_size, 14, lstm_hidden_size=1024]
             x.append(x_mod)
             #print(x_mod.size())
