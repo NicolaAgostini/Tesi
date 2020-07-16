@@ -14,7 +14,9 @@ for file in os.listdir(path_of_dir+"newfeat"):
 
     for i, dets in enumerate(tqdm(detections,'Extracting features')):
         feat = np.zeros(352, dtype='float32')
-        feat = dets
+        for index,value in enumerate(dets):
+            feat[index] = value
+        #feat = dets
         #print(feat.shape)
         key = video_name.format(i+1)
         print(key)
