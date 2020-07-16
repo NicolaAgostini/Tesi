@@ -254,11 +254,11 @@ def print_data(path_1):
             print(curs.item())
             dd = e.get("P05-R01-PastaSalad_frame_0000020636.jpg".encode('utf-8'))
         data = np.frombuffer(dd, 'float32')
-        print(data.shape)
+        print(data)
     #read_representations()
 
     detections = np.load("/aulahomes2/2/2014/nagostin/Desktop/" + "newfeat/" + "P05-R01-PastaSalad_newfeat.npy", allow_pickle=True, encoding='bytes')
-    print(detections[20636].shape)
+    print(detections[20636])
 
 
 
