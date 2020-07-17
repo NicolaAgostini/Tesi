@@ -257,13 +257,13 @@ def print_data(path_1):
         print(data)
     #read_representations()
 
-    detections = np.load("/aulahomes2/2/2014/nagostin/Desktop/" + "newfeat/" + "P05-R01-PastaSalad_newfeat.npy", allow_pickle=True, encoding='bytes')
-    print(detections[20635])
-    """
+
     detections = np.load("/aulahomes2/2/2014/nagostin/Desktop/video/" + "P05-R01-PastaSalad_detections.npy",
                          allow_pickle=True, encoding='bytes')
     print(detections[20635])
-    """
+
+
+
 
 
 

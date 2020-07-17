@@ -112,7 +112,7 @@ def main():
 
     #inspect_lmdb("/volumes/Bella_li/egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd/")
 
-    #print_data(root_path + "hand_obj_newfeat")
+    print_data(root_path + "obj")
 
 
     
@@ -120,7 +120,7 @@ def main():
 
     #smoothed_labels = label_smmothing("prior")  # for smoothed labels
 
-
+    """
     model = BaselineModel(batch_size, seq_len, input_dim)
 
     model.to(device)
@@ -140,7 +140,7 @@ def main():
     #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)  # with smoothed labels
 
     train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
-
+    """
 
 
 
