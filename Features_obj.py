@@ -19,7 +19,7 @@ for file in os.listdir(path_of_dir+"video"):
         for d in dets:
             if(d[5]>0.5):
                 if int(d[0]) in dict:
-                    dict[d[0]] = count
+                    dict[int(d[0])] = count
                     count += 1
                 feat[dict[int(d[0])]]+=d[5]
         key = video_name.format(i+1)
