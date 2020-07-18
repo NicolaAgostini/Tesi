@@ -27,8 +27,10 @@ print("DEVICE= "+device)
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd",root_path + "obj_correct"]  # the folders that contain the .mdb files
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd"]
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd"]
-path_to_lmdb = [root_path + "obj_correct"]
+#path_to_lmdb = [root_path + "obj_correct"]
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd",root_path + "hand_obj_newfeat"]
+path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd",root_path + "obj_min"]
+
 
 ### PATH OF TXT FOR TRAINING AND VALIDATION ###
 
@@ -54,7 +56,7 @@ best = 69
 
 ### SOME MODEL'S VARIABLES ###
 
-input_dim = [1024, 1024, 352]
+input_dim = [1024, 1024, 56]
 batch_size = 8
 seq_len = 14
 
@@ -135,16 +137,16 @@ def main():
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="uniform", action_embeddings_csv_path="action_embeddings_corretto.csv", reduce_time="mean")
+    #criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="uniform", action_embeddings_csv_path="action_embeddings_corretto.csv", reduce_time="mean")
 
-    train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)  # with smoothed labels
+    #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)  # with smoothed labels
 
-    #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
-
-
+    train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
 
 
-def train_val(model, loaders, optimizer, epochs, criterion, resume = False):
+
+
+def train_val(model, loaders, optimizer, epochs, resume = False):
     """
 
     :param model:
@@ -220,16 +222,16 @@ def train_val(model, loaders, optimizer, epochs, criterion, resume = False):
                     preds = preds.contiguous()
 
                     # linearize predictions
-                    #linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106)
+                    linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106)
 
-                    linear_labels = y.unsqueeze(1).expand(-1, preds.shape[1]).contiguous()  # for smoothed label
+                    #linear_labels = y.unsqueeze(1).expand(-1, preds.shape[1]).contiguous()  # for smoothed label
 
                     #print(linear_labels.size())
-                    #linear_labels = y.view(-1, 1).expand(-1, preds.shape[1]).contiguous().view(-1)
+                    linear_labels = y.view(-1, 1).expand(-1, preds.shape[1]).contiguous().view(-1)
 
-                    #loss = F.cross_entropy(linear_preds, linear_labels)
+                    loss = F.cross_entropy(linear_preds, linear_labels)
 
-                    loss = criterion(preds, linear_labels)  # for smoothed labels
+                    #loss = criterion(preds, linear_labels)  # for smoothed labels
 
                     #print(loss)
 
