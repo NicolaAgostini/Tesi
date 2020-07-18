@@ -18,9 +18,10 @@ for file in os.listdir(path_of_dir+"video"):
         feat = np.zeros(56, dtype='float32')
         for d in dets:
             if(d[5]>0.5):
-                if int(d[0]) in dict:
+                if not int(d[0]) in dict:
                     dict[int(d[0])] = count
                     count += 1
+
                 feat[dict[int(d[0])]]+=d[5]
         key = video_name.format(i+1)
         with env.begin(write=True) as txn:
