@@ -24,7 +24,6 @@ for file in os.listdir(path_of_dir+"video"):
 
                 feat[dict[int(d[0])]]+=d[5]
         key = video_name.format(i+1)
-        print(feat)
         with env.begin(write=True) as txn:
             txn.put(key.encode(),feat)
 """
