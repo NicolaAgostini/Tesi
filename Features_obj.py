@@ -18,7 +18,7 @@ for file in os.listdir(path_of_dir+"video"):
         feat = np.zeros(56, dtype='float32')
         for d in dets:
             if(d[5]>0.5):
-                if dict[d[0]] == None:
+                if d[0] in dict:
                     dict[d[0]] = count
                     count += 1
                 feat[dict[d[0]]]+=d[5]
