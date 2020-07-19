@@ -30,7 +30,7 @@ print("DEVICE= "+device)
 #path_to_lmdb = [root_path + "obj_correct"]
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd",root_path + "hand_obj_newfeat"]
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd",root_path + "obj_min"]
-path_to_lmdb = [root_path + "obj_min"]
+path_to_lmdb = [root_path + "hand_obj_newfeat"]
 
 ### PATH OF TXT FOR TRAINING AND VALIDATION ###
 
@@ -56,7 +56,7 @@ best = 69
 
 ### SOME MODEL'S VARIABLES ###
 
-input_dim = [1024, 1024, 56]
+input_dim = [1024, 1024, 352]
 batch_size = 8
 seq_len = 14
 
