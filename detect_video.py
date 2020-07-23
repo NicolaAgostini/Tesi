@@ -34,6 +34,7 @@ import time
 import numpy as np
 
 from caffe2.python import workspace
+from caffe2.python import core
 
 from detectron.core.config import assert_and_infer_cfg
 from detectron.core.config import cfg
@@ -143,6 +144,7 @@ def main(args):
                     cls_boxes, cls_segms, cls_keyps = infer_engine.im_detect_all(
                         model, im, None, timers=timers
                     )
+                    print(workspace.FetchBlob(core.ScopedName('fc7_b')))
                 all_boxes.append(format_dets(cls_boxes))
 
 
