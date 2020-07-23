@@ -144,7 +144,7 @@ def main(args):
                     cls_boxes, cls_segms, cls_keyps = infer_engine.im_detect_all(
                         model, im, None, timers=timers
                     )
-                    print(workspace.FetchBlob(model.ScopedName('fc7_b')))
+                    #print(workspace.FetchBlob("gpu_0/fc7_b"))
                 all_boxes.append(format_dets(cls_boxes))
 
 
