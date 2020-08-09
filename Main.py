@@ -50,11 +50,13 @@ groundtruth_path_test = [root_path+"egtea/action_annotation/test_split1.txt",
 
 path_to_csv_trainval = [root_path+"egtea/training1.csv", root_path+"egtea/validation1.csv"]  # path of train val csv
 
+path_to_csv_test = root_path+"egtea/validation1.csv"  # for test dataloader
 
 
-experiment = "lr5_3br_ls"
+#experiment = "lr5_3br_ls"
 saveModel = False
-best = 69
+best = 0
+mode = "test"
 
 ### SOME MODEL'S VARIABLES ###
 
@@ -119,7 +121,7 @@ def main():
     #print_data(root_path + "hand_obj_newfeat")
 
 
-    
+    #split_frames_objDect("/Volumes/Bella_li/frames")
     #path = initialize_trainval_csv(1)  # to generate training and validation csv depending on split defined by authors of egtea gaze +
 
     #smoothed_labels = label_smmothing("prior")  # for smoothed labels
@@ -140,8 +142,13 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
     criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="glove", action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean")
-
-    train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)  # with smoothed labels
+    if mode == "train":
+        train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)  # with smoothed labels
+    if mode == "test":
+        data_loader_test = get_dataset(path_to_csv_test, batch_size, 4)
+        epoch, perf, best_perf = load_model(model)  # load the best model saved
+        print("Testing model" + str(best_perf))
+        test_model(model, data_loader_test)
 
     #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
 
@@ -158,7 +165,7 @@ def train_val(model, loaders, optimizer, epochs, criterion, resume = False):
     :return:
     """
     if resume == True:
-        start_epoch, _, best_perf, experiment = load_model(model)
+        start_epoch, _, best_perf = load_model(model)
     else:
         best_perf = 0
     for epoch in range(epochs):
@@ -190,30 +197,6 @@ def train_val(model, loaders, optimizer, epochs, criterion, resume = False):
                     y = batch['label'].to(device)  # get the label of the batch (batch, 1)
                     #y = batch['label']
 
-                    """
-                    ###  FOR SMOOTHED LABELS ###
-
-                    y_temp = y  # label (batch_size, 1) to use for top-k accuracy
-                    bs = y.shape[0]  # batch size
-                    preds = model(x)
-                    preds = preds.contiguous()
-
-                    temp = []
-                    for j in range(bs):
-                        temp += 8*[smoothed_labels[y[j]]]
-                    y = temp  # y size (batch*8, 106) and contains the smoothed labels for every y where 8 is 8 anticipation steps
-                    y = torch.FloatTensor(y).cuda()
-
-                    # USE WITH :
-
-                    linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106) ogni riga ha una label corrispondente al timestamp
-                    
-                    linear_labels = y
-                     
-                    loss = nn.BCEWithLogitsLoss()(linear_preds, linear_labels)  # loss function for smoothed labels
-
-                    #print(y[1])
-                    """
 
                     bs = y.shape[0]  # batch size
 
@@ -275,18 +258,18 @@ def train_val(model, loaders, optimizer, epochs, criterion, resume = False):
                     if mode == 1 else None, green=True)
 
 
-                if accuracy_meter[str(mode)].value() > best_perf and mode == 1:
+                if accuracy_meter[str(mode)].value() > best_perf and mode == 1:  # if we are in validation and get an accuracy greater than before
                     best_perf = accuracy_meter[str(mode)].value()
                     if best_perf > best:
-                        save_model(model, epoch + 1, accuracy_meter['1'].value(), best_perf,
-                                   experiment=experiment)
+                        best = best_perf
+                        save_model(model, epoch + 1, accuracy_meter['1'].value(), best_perf)
 
 
         # save checkpoint at the end of each train/val epoch
         #save_model(model, epoch + 1, accuracy_meter['validation'].value())
 
         if saveModel == True:
-            save_model(model, epoch + 1, accuracy_meter[1].value(), best_perf, experiment=experiment)
+            save_model(model, epoch + 1, accuracy_meter[1].value(), best_perf)
 
 
 def load_model(model, path_to_model = "/home/2/2014/nagostin/Desktop/egtea/model.pth.tar"):
@@ -301,18 +284,18 @@ def load_model(model, path_to_model = "/home/2/2014/nagostin/Desktop/egtea/model
     """
     chk = torch.load(path_to_model)
 
-    experiment = chk["experiment"]
+    #experiment = chk["experiment"]
     epoch = chk['epoch']
     best_perf = chk['best_perf']
     perf = chk['perf']
 
     model.load_state_dict(chk['state_dict'])
 
-    return epoch, perf, best_perf, experiment
+    return epoch, perf, best_perf
 
-def save_model(model, epoch, perf, best_perf, experiment, path_to_model = "/home/2/2014/nagostin/Desktop/egtea/model.pth.tar"):
+def save_model(model, epoch, perf, best_perf, path_to_model = "/home/2/2014/nagostin/Desktop/egtea/model.pth.tar"):
 
-    torch.save({'state_dict': model.state_dict(), 'epoch': epoch, 'perf': perf, 'best_perf': best_perf, "experiment": experiment}, path_to_model)
+    torch.save({'state_dict': model.state_dict(), 'epoch': epoch, 'perf': perf, 'best_perf': best_perf}, path_to_model)
 
 
 
@@ -369,9 +352,54 @@ def generate_action_vnprior_csv():
 
 
 
+def test_model(model, data_loader_test):
+    """
+    test the model in the current test set
+    :return:
+    """
 
+    accuracy_meter = ValueMeter()
 
+    with torch.set_grad_enabled(False):
 
+        model.eval()
+
+        for i, batch in enumerate(data_loader_test):
+            # print(i)
+
+            x = batch[
+                'past_features']  # load in batch the next "past_features" datas of size (batch_size * 14 * 1024(352)
+
+            x = [xx.to(device) for xx in x]  # if input is a list (for multiple branch) then load in the device gpu
+
+            # print(x[0].size())
+
+            y = batch['label'].to(device)  # get the label of the batch (batch, 1)
+            # y = batch['label']
+
+            bs = y.shape[0]  # batch size
+
+            preds = model(x)
+
+            preds = preds.contiguous()
+
+            # get the predictions for anticipation time = 1s (index -4) (anticipation)
+            # or for the last time-step (100%) (early recognition)
+            # top5 accuracy at 1s
+            idx = -4
+
+            k = 5  # top k = 5 anticipation
+
+            acc = topk_accuracy(preds[:, idx, :].detach().cpu().numpy(), y.detach().cpu().numpy(), (k,))[
+                      0] * 100  # top 5 accuracy percentage
+
+            # acc = topk_accuracy(preds[:, idx, :].detach().cpu().numpy(), y_temp.detach().cpu().numpy(), (k,))[0] * 100  # for smoothed labels
+
+            # store the values in the meters to keep incremental averages
+            accuracy_meter.add(acc, bs)
+
+        # log at the end of testing
+        print("top-k accuracy at 1 sec = " + accuracy_meter.value())
 
 
 if __name__ == '__main__':

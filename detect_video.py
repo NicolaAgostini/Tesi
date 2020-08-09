@@ -144,13 +144,18 @@ def main(args):
                     cls_boxes, cls_segms, cls_keyps = infer_engine.im_detect_all(
                         model, im, None, timers=timers
                     )
-                    print(workspace.FetchBlob(core.ScopedName('cls_prob')).shape)
-                all_boxes.append(format_dets(cls_boxes))
+                    # sarebbe la media di tutti i RoIs dell'ultimo FC layer
+                    #print(np.mean(workspace.FetchBlob(core.ScopedName('fc7')), axis=0))
+                    result = np.mean(workspace.FetchBlob(core.ScopedName('fc7')), axis=0)
+                    #print(cls_boxes)
+                #all_boxes.append(format_dets(cls_boxes))  # for standard 352 feature
+                all_boxes.append(result)
 
 
 
 
-        np.save("/aulahomes2/2/2014/nagostin/Desktop/video/"+file+'_detections',all_boxes)
+        #np.save("/aulahomes2/2/2014/nagostin/Desktop/video/"+file+'_detections',all_boxes)
+        np.save("/aulahomes2/2/2014/nagostin/Desktop/video/" + file + '_detections', all_boxes)
 
 if __name__ == '__main__':
     workspace.GlobalInit(['caffe2', '--caffe2_log_level=0'])

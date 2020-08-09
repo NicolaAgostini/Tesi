@@ -310,11 +310,12 @@ def split_train_val_test_handMask(path_to_folder):
 
 def split_frames_objDect(path_of_buckets):
     """
+    split train and test set for detectron training
     :param path_of_buckets:
     :return:
     """
-    n, p = 1, .2  # number of trials, probability of each trial
-    random = np.random.binomial(n, p, 86)
+    n, p = 1, .1  # number of trials, probability of each trial
+    random = np.random.binomial(n, p, 1298)
     validation=[]
     train=[]
     with open("train.txt", "w+") as train_file:
@@ -329,7 +330,9 @@ def split_frames_objDect(path_of_buckets):
                 else:
                     train.append(folder)
                     #train_file.write(folder+"\n")
-            for files in os.listdir("/Volumes/Bella_li/Frames_da_labellare"):
+
+            for files in os.listdir("/Users/nicolago/Desktop/voc2coco-master/sample/Annotations"):
+
                 if files.split("_")[0] in validation:
                     val_file.write(files.split(".")[0] + "\n")
                 if files.split("_")[0] in train:
@@ -338,7 +341,7 @@ def split_frames_objDect(path_of_buckets):
     #print(len(validation))
 
 
-def csv_to_txt(file = "labelz.txt"):
+def csv_to_txt(file = "/Volumes/Bella_li/labelz.txt"):
     """ parse the files in label352 noun .csv into a labels.txt file for voc2coco
     :param file:
     :return:
@@ -347,26 +350,26 @@ def csv_to_txt(file = "labelz.txt"):
         with open(file) as fp:
             line = fp.readline()
             while line:
-                label = line.split(",")[1]
+                label = line.split(" ")[0]
                 val_file.write(label + "\n")
                 line = fp.readline()
 
 def split_train_val_detectron(train = "/Volumes/Bella_li/train.txt", val = "/Volumes/Bella_li/val.txt"):
-    """ split the dataset into train and val defined in txt files
+    """ split the dataset into train and val defined in txt files for detectron
     :return:
     """
-    #os.makedirs("/Volumes/Bella_li/train")
-    #os.makedirs("/Volumes/Bella_li/val")
+    os.makedirs("/Volumes/Bella_li/train")
+    os.makedirs("/Volumes/Bella_li/val")
     with open(train) as fp:
         line = fp.readline().rstrip()
         while line:
-            shutil.copy("/Volumes/Bella_li/Frames_da_labellare/"+line+ ".jpg",
+            shutil.copy("/Users/nicolago/Desktop/FRAMES/"+line + ".jpg",
                         "/Volumes/Bella_li/train/"+line+".jpg")
             line = fp.readline().rstrip()
     with open(val) as fp:
         line = fp.readline().rstrip()
         while line:
-            shutil.copy("/Volumes/Bella_li/Frames_da_labellare/"+line+ ".jpg",
+            shutil.copy("/Users/nicolago/Desktop/FRAMES/"+line + ".jpg",
                         "/Volumes/Bella_li/val/"+line+".jpg")
             line = fp.readline().rstrip()
 
