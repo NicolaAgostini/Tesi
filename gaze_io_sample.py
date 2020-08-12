@@ -2,6 +2,7 @@ import glob
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from PIL import Image
 
 
 def _str2frame(frame_str, fps=None):
@@ -126,24 +127,41 @@ def plot_gaze():
     gaze_type = ['untracked', 'fixation', 'saccade', 'unknown', 'truncated']
 
     # old version
-    test_file_01 = '/Users/nicolago/Desktop/gaze_data/gaze_data/P21-R04-ContinentalBreakfast.txt'
+    test_file_01 = '/Users/nicolago/Desktop/gaze_data/gaze_data/OP01-R01-PastaSalad.txt'
     test_data_01 = parse_gtea_gaze(test_file_01)
 
-    start1 = int(6979-(3.5*24))
-    end1 = 6979
+
+
+    start1 = int((432970/1000)-(3.5))
+    end1 = int(432970 /1000)
     x = []
     y = []
+    Frames = np.arange(start1*24, end1*24, 1)
+    image_name = "/Volumes/Bella_li/frames/OP01-R01-PastaSalad/OP01-R01-PastaSalad_frame_{:010d}.jpg"
+    """
+    for i in Frames:
+        x.append(test_data_01[i,0])
+        y.append(test_data_01[i,1])
+        plt.scatter(x=[test_data_01[i,0]], y=[test_data_01[i,1]],  c='r', s=40)
+    """
 
-    for i in range(start1, end1, 1):
-
-        if i % (0.25*24) == 0:
-            x.append(test_data_01[i,0])
-            y.append(test_data_01[i,1])
+    which_frame = 50
+    print('Frame {:d}, Gaze Point ({:02f}, {:0.2f}), Gaze Type: {:s}'.format(
+        Frames[which_frame],
+        test_data_01[Frames[which_frame], 0],
+        test_data_01[Frames[which_frame], 1],
+        gaze_type[int(test_data_01[Frames[which_frame], 2])]
+    ))
+    im = Image.open(image_name.format(int((Frames[which_frame] / 24) * 30)))
+    width, height = im.size
+    im = plt.imread(image_name.format(int((Frames[which_frame] / 24) * 30)))
+    implot = plt.imshow(im)
+    plt.scatter(x=[test_data_01[Frames[which_frame], 0]*width], y=[test_data_01[Frames[which_frame], 1]*height], c='r', s=100)
 
     #print(x)
 
-    plt.plot(np.asarray(x), np.asarray(y), color='black')
-    plt.show()
+    #plt.plot(np.asarray(x), np.asarray(y), color='black')
+    plt.savefig("Gaze.jpg")
     # print the loaded gaze
     """
     print('Loaded gaze data from {:s}'.format(test_file_01))

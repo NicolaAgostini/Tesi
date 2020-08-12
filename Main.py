@@ -109,6 +109,7 @@ def main():
     #split_train_val_test_handMask(root_path+"hand14k/")
     #plot_gaze()
     #loadNPY()
+    show_8_Images()
 
     #generate_action_vnprior_csv()
     #generate_action_embeddings_csv()
@@ -126,7 +127,7 @@ def main():
 
     #smoothed_labels = label_smmothing("prior")  # for smoothed labels
 
-
+    """
     model = BaselineModel(batch_size, seq_len, input_dim)
 
     model.to(device)
@@ -151,7 +152,7 @@ def main():
         test_model(model, data_loader_test)
 
     #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
-
+    """
 
 
 

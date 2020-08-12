@@ -9,6 +9,7 @@ import json
 import glob
 import sys
 from scipy.spatial import distance
+import matplotlib.pyplot as plt
 
 
 class ValueMeter(object):
@@ -558,3 +559,23 @@ def imshow_components(labels, bar):
 
     cv2.imshow('labeled.png', labeled_img)
     cv2.waitKey()
+
+
+def show_8_Images(Frames = "/Volumes/Bella_li/frames/OP01-R01-PastaSalad/OP01-R01-PastaSalad_frame_{:010d}.jpg"):
+    w = 100
+    h = 100
+    fig = plt.figure(figsize=(8, 8))
+    columns = 3
+    rows = 3
+
+    for i in range(1, columns * rows + 1):
+        img = plt.imread(Frames.format((int((432970/1000)-(3.5))*30)+i*30))
+        fig.add_subplot(rows, columns, i)
+        plt.axis('off')
+
+        plt.imshow(img)
+
+    plt.savefig("8images.png")
+
+
+
