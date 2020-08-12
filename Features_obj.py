@@ -36,6 +36,7 @@ for file in os.listdir(path_of_dir+"video"):
 
     for i, dets in enumerate(tqdm(detections,'Extracting features')):
         feat = np.zeros(54, dtype='float32')
+        print(dets)
         for d in dets:
             feat[int(d[0])]+=d[5]
         key = video_name.format(i+1)
