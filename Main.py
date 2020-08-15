@@ -29,9 +29,9 @@ print("DEVICE= "+device)
 
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd"]
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd"]
-path_to_lmdb = [root_path + "obj_FT"]
+#path_to_lmdb = [root_path + "obj_FT"]
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd",root_path + "hand_obj_newfeat"]
-#path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd",root_path + "obj_min"]
+path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd",root_path + "obj_54_FT"]
 #path_to_lmdb = [root_path + "hand_obj_newfeat"]
 
 ### PATH OF TXT FOR TRAINING AND VALIDATION ###
@@ -56,11 +56,11 @@ path_to_csv_test = root_path+"egtea/validation1.csv"  # for test dataloader
 #experiment = "lr5_3br_ls"
 saveModel = False
 best = 0
-mode = "test"
+mode = "train"
 
 ### SOME MODEL'S VARIABLES ###
 
-input_dim = [1024, 1024, 352]
+input_dim = [1024, 1024, 54]
 batch_size = 8
 seq_len = 14
 
@@ -109,8 +109,10 @@ def main():
     #split_train_val_test_handMask(root_path+"hand14k/")
     #plot_gaze()
     #loadNPY()
+
     #show_8_Images()  # to print a example figure for thesis
     #plot_frequency_actions()  # to print a plot of frequency for thesis
+
 
     #generate_action_vnprior_csv()
     #generate_action_embeddings_csv()
@@ -128,7 +130,7 @@ def main():
 
     #smoothed_labels = label_smmothing("prior")  # for smoothed labels
 
-    """
+
     model = BaselineModel(batch_size, seq_len, input_dim)
 
     model.to(device)
@@ -143,9 +145,9 @@ def main():
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="glove", action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean")
+    #criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="glove", action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean")
     if mode == "train":
-        train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)  # with smoothed labels
+        train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)  # with smoothed labels
     if mode == "test":
         data_loader_test = get_dataset(path_to_csv_test, batch_size, 4)
         epoch, perf, best_perf = load_model(model)  # load the best model saved
@@ -153,11 +155,11 @@ def main():
         test_model(model, data_loader_test)
 
     #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
-    """
 
 
 
-def train_val(model, loaders, optimizer, epochs, criterion, resume = False):
+
+def train_val(model, loaders, optimizer, epochs, resume = False):
     """
 
     :param model:
@@ -209,16 +211,16 @@ def train_val(model, loaders, optimizer, epochs, criterion, resume = False):
                     preds = preds.contiguous()
 
                     # linearize predictions
-                    #linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106)
+                    linear_preds = preds.view(-1, preds.shape[-1])  # (batch * 8 , 106)
 
-                    linear_labels = y.unsqueeze(1).expand(-1, preds.shape[1]).contiguous()  # for smoothed label
+                    #linear_labels = y.unsqueeze(1).expand(-1, preds.shape[1]).contiguous()  # for smoothed label
 
                     #print(linear_labels.size())
-                    #linear_labels = y.view(-1, 1).expand(-1, preds.shape[1]).contiguous().view(-1)
+                    linear_labels = y.view(-1, 1).expand(-1, preds.shape[1]).contiguous().view(-1)
 
-                    #loss = F.cross_entropy(linear_preds, linear_labels)
+                    loss = F.cross_entropy(linear_preds, linear_labels)
 
-                    loss = criterion(preds, linear_labels)  # for smoothed labels
+                    #loss = criterion(preds, linear_labels)  # for smoothed labels
 
                     #print(loss)
 
