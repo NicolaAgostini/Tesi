@@ -168,6 +168,7 @@ def train_val(model, loaders, optimizer, epochs, resume = False):
     :param epochs:
     :return:
     """
+    best = 0
     if resume == True:
         start_epoch, _, best_perf = load_model(model)
     else:
