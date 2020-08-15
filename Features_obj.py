@@ -38,6 +38,7 @@ for file in os.listdir(path_of_dir+"video"):
         feat = np.zeros(54, dtype='float32')
         print(dets)
         for d in dets:
+            print(d)
             feat[int(d[0])]+=d[5]
         key = video_name.format(i+1)
         with env.begin(write=True) as txn:

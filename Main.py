@@ -109,7 +109,8 @@ def main():
     #split_train_val_test_handMask(root_path+"hand14k/")
     #plot_gaze()
     #loadNPY()
-    show_8_Images()
+    #show_8_Images()  # to print a example figure for thesis
+    #plot_frequency_actions()  # to print a plot of frequency for thesis
 
     #generate_action_vnprior_csv()
     #generate_action_embeddings_csv()

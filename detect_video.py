@@ -146,10 +146,10 @@ def main(args):
                     )
                     # sarebbe la media di tutti i RoIs dell'ultimo FC layer
                     #print(np.mean(workspace.FetchBlob(core.ScopedName('fc7')), axis=0))
-                    result = np.mean(workspace.FetchBlob(core.ScopedName('fc7')), axis=0)
+                    #result = np.mean(workspace.FetchBlob(core.ScopedName('fc7')), axis=0)
                     #print(cls_boxes)
-                #all_boxes.append(format_dets(cls_boxes))  # for standard 352 feature
-                all_boxes.append(result)
+                all_boxes.append(format_dets(cls_boxes))  # for standard 352 feature
+                #all_boxes.append(result)
 
 
 

@@ -562,6 +562,11 @@ def imshow_components(labels, bar):
 
 
 def show_8_Images(Frames = "/Volumes/Bella_li/frames/OP01-R01-PastaSalad/OP01-R01-PastaSalad_frame_{:010d}.jpg"):
+    """
+    only shows 8 frames in a single image for thesis
+    :param Frames:
+    :return:
+    """
     w = 100
     h = 100
     fig = plt.figure(figsize=(8, 8))
@@ -576,6 +581,39 @@ def show_8_Images(Frames = "/Volumes/Bella_li/frames/OP01-R01-PastaSalad/OP01-R0
         plt.imshow(img)
 
     plt.savefig("8images.png")
+
+def plot_frequency_actions():
+    """
+    plot frequency of action verb noun depending on "lines.split(" ")[x:]:"
+    :return:
+    """
+    path_of_txt = ["/Users/nicolago/Desktop/action_annotation/train_split1.txt",
+                   "/Users/nicolago/Desktop/action_annotation/train_split2.txt",
+                   "/Users/nicolago/Desktop/action_annotation/train_split3.txt",
+                   "/Users/nicolago/Desktop/action_annotation/test_split1.txt",
+                   "/Users/nicolago/Desktop/action_annotation/test_split2.txt",
+                   "/Users/nicolago/Desktop/action_annotation/test_split3.txt"]
+    n_labels = np.zeros(53)
+    for el in path_of_txt:
+        with open(el, "r") as sample_file:
+
+            for lines in sample_file:
+                lines = lines.strip()
+                for i in np.arange(1,54):
+
+                    if str(i) in lines.split(" ")[3:]:
+                        n_labels[i-1] += 1
+    print(n_labels)
+    plt.bar(np.arange(1, 54), n_labels, width=0.5)
+    """
+    for i in np.arange(1,54):
+        plt.text(i, 2, i, color='black',
+                ha='center', va='top', rotation=0, fontsize=10)
+    plt.xticks([])
+    """
+    plt.ylabel('frequency')
+    plt.savefig("noun_freq.jpg")
+
 
 
 
