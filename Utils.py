@@ -184,10 +184,10 @@ def loadNPY(file="/Volumes/Bella_li/objs/OP01-R01-PastaSalad_detections.npy"):
     """
     #load csv label objects into dict int_noun
 
-    df_csv = pandas.read_csv('/Users/nicolanico/Desktop/EPIC_noun_classes.csv')
+    df_csv = pandas.read_csv('/Users/nicolago/Desktop/EPIC_noun_classes.csv')
     #print(df_csv[1])
 
-    start_from = 7310
+    start_from = 25890
 
     objs = np.load(file, allow_pickle=True)
     #print(objs[1])
@@ -217,6 +217,10 @@ def loadNPY(file="/Volumes/Bella_li/objs/OP01-R01-PastaSalad_detections.npy"):
                 k = cv2.waitKey(0)
                 if k == 27:  # Esc key to stop
                     break
+
+                if k == 115:
+                    cv2.imwrite("bounding_boxes_example.jpg", image)
+
                 elif k == 32:  # a key to go on
                     continue
 
