@@ -132,19 +132,20 @@ def plot_gaze():
 
 
 
-    start1 = int((432970/1000)-(3.5))
-    end1 = int(432970 /1000)
+    start1 = int((754360/1000)-(3.5))
+    end1 = int(754360 /1000)
     x = []
     y = []
     Frames = np.arange(start1*24, end1*24, 1)
     image_name = "/Volumes/Bella_li/frames/OP01-R01-PastaSalad/OP01-R01-PastaSalad_frame_{:010d}.jpg"
-    """
+
     for i in Frames:
         x.append(test_data_01[i,0])
         y.append(test_data_01[i,1])
         plt.scatter(x=[test_data_01[i,0]], y=[test_data_01[i,1]],  c='r', s=40)
-    """
+    plt.show()
 
+    """
     which_frame = 50
     print('Frame {:d}, Gaze Point ({:02f}, {:0.2f}), Gaze Type: {:s}'.format(
         Frames[which_frame],
@@ -157,11 +158,11 @@ def plot_gaze():
     im = plt.imread(image_name.format(int((Frames[which_frame] / 24) * 30)))
     implot = plt.imshow(im)
     plt.scatter(x=[test_data_01[Frames[which_frame], 0]*width], y=[test_data_01[Frames[which_frame], 1]*height], c='r', s=100)
-
+    """
     #print(x)
 
     #plt.plot(np.asarray(x), np.asarray(y), color='black')
-    plt.savefig("Gaze.jpg")
+    #plt.savefig("Gaze.jpg")
     # print the loaded gaze
     """
     print('Loaded gaze data from {:s}'.format(test_file_01))
