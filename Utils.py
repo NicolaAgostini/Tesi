@@ -511,7 +511,7 @@ def correct_HM(path_of_folder):
 
 
                     for n_obj in objs[int(n_frame)-1]:  # compute center of object
-                        if n_obj[5] > 0.60:  # if the confidence score is quite high
+                        if n_obj[5] > 0.50:  # if the confidence score is quite high
                             # print(int(n_obj[1]))
 
                             #print(n_obj)
@@ -532,13 +532,13 @@ def correct_HM(path_of_folder):
                     #imshow_components(labels_im, bar)
                 #print(new_features)
 
-                new_features = np.mean(new_features, axis=0)  # get a (352,) mean vector
+                new_features = np.mean(new_features, axis=0)  # get a (352,) mean vector FIXME se una sola mano non fare media!!!  fai somma piuttosto
                 #print(new_features.shape)
 
                 allboxes.append(new_features)
 
 
-            # out from all images loop but insiede all folder loop do
+            # out from all images loop but inside all folder loop do
             np.save("/home/2/2014/nagostin/Desktop/newfeat/"+vid_id+'_newfeat', allboxes)
 
 

@@ -185,3 +185,26 @@ def plot_gaze():
             gaze_type[int(test_data_02[1000, 2])]
         )) 
     """
+
+def return_gaze_point(index_fr, file):
+    """
+
+    :param index_fr: the index of the frame to get gaze info (index is in 30 fps format)
+    :param file: name of file gaze
+    :return: two cordinates of gaze x,y
+    """
+    """Sample for gaze IO"""
+    # gaze type
+    gaze_type = ['untracked', 'fixation', 'saccade', 'unknown', 'truncated']
+
+    # old version
+    test_file_01 = '/home/2/2014/nagostin/Desktop/gaze_data/gaze_data/'+file+'.txt'
+    test_data_01 = parse_gtea_gaze(test_file_01)
+
+
+
+
+    index_at_24fps = round(index_fr/30)*24
+
+    return (test_data_01[index_at_24fps, 0]),(test_data_01[index_at_24fps, 1])
+
