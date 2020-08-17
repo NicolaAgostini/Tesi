@@ -532,7 +532,7 @@ def correct_HM(path_of_folder):
                     #imshow_components(labels_im, bar)
                 #print(new_features)
 
-                new_features = np.mean(new_features, axis=0)  # get a (352,) mean vector FIXME se una sola mano non fare media!!!  fai somma piuttosto
+                new_features = np.sum(new_features, axis=0)  # get a (352,) sum vector
                 #print(new_features.shape)
 
                 allboxes.append(new_features)
