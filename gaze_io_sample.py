@@ -3,6 +3,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
+from scipy import signal
 
 
 def _str2frame(frame_str, fps=None):
@@ -201,10 +202,31 @@ def return_gaze_point(index_fr, file):
     test_file_01 = '/home/2/2014/nagostin/Desktop/gaze_data/gaze_data/'+file+'.txt'
     test_data_01 = parse_gtea_gaze(test_file_01)
 
+    list = os.listdir("/home/2/2014/nagostin/Desktop/frames/" + file)  # dir is your directory path
+    number_files = len(list)
 
 
+    f = signal.resample(test_data_01, number_files)
 
-    index_at_24fps = round(index_fr/30)*24
+    return (f[index_fr][0]),(f[index_fr][1])
 
-    return (test_data_01[index_at_24fps, 0]),(test_data_01[index_at_24fps, 1])
+
+def test_gaze(file = "OP01-R02-TurkeySandwich"):
+
+    test_file_01 = '/Users/nicolago/Desktop/gaze_data/gaze_data/' + file + '.txt'
+    test_data_01 = parse_gtea_gaze(test_file_01)
+    test_data_01 = np.asarray(test_data_01)
+
+    print(test_data_01.shape)
+
+    list = os.listdir("/Volumes/Bella_li/frames/"+file)  # dir is your directory path
+    number_files = len(list)
+    print(number_files)
+
+    f = signal.resample(test_data_01, number_files)
+
+    print(f.shape)
+
+
+    return 0
 
