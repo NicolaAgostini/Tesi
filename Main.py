@@ -100,7 +100,7 @@ def initialize_trainval_csv(which_split):
 
 
 def main():
-    correct_HM("/home/2/2014/nagostin/Desktop/Tesi/predictions/")  # postprocessing and extract new feature
+    #correct_HM("/home/2/2014/nagostin/Desktop/Tesi/predictions/")  # postprocessing and extract new feature
     #split_train_val_detectron()
     #csv_to_txt()
     #split_frames_objDect("/Volumes/Bella_li/frames")
@@ -130,8 +130,10 @@ def main():
     #split_frames_objDect("/Volumes/Bella_li/frames")
     #path = initialize_trainval_csv(1)  # to generate training and validation csv depending on split defined by authors of egtea gaze +
 
-    #smoothed_labels = label_smmothing("prior")  # for smoothed labels
-    """
+    #smoothed_labels = label_smoothing("glove")  # for smoothed labels
+
+
+
 
     model = BaselineModel(batch_size, seq_len, input_dim)
 
@@ -147,7 +149,7 @@ def main():
 
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="uniform", action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean")
+    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="verb-noun", action_embeddings_csv_path="vn_prior.csv", reduce_time="mean")
     if mode == "train":
         train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)  # with smoothed labels
     if mode == "test":
@@ -158,7 +160,7 @@ def main():
 
     #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
 
-    """
+
 
 
 def train_val(model, loaders, optimizer, epochs, criterion, resume = False):
@@ -326,7 +328,7 @@ def log(mode, epoch, loss_meter, accuracy_meter, best_perf=None, green=False):
 
 
 
-def label_smmothing(set_modality="standard", alpha=0.1, temperature = 0):
+def label_smoothing(set_modality="glove", alpha=0.1, temperature = 0):
     """
     :param set_modality: standard or softmax or prior
     :param alpha:
@@ -337,6 +339,7 @@ def label_smmothing(set_modality="standard", alpha=0.1, temperature = 0):
 
     # print(a.find_similar("move")[1:6])
     b = a.get_ysoft()
+    a.print_heatmap()
     return b
 
 def generate_action_embeddings_csv():

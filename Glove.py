@@ -158,7 +158,7 @@ class Glove():
         """
         n_dim = self.Pi.shape[0]
         y = np.zeros((n_dim, n_dim))
-        with open(root_path + "egtea/action_annotation/action_idx.txt", 'r') as f:
+        with open(root_path + "action_annotation/action_idx.txt", 'r') as f:
             for line in f:
                 line = line.strip()
                 values = re.split("/| |_|,", line)
