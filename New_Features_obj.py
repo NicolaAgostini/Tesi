@@ -13,7 +13,7 @@ for file in os.listdir(path_of_dir+"newfeat"):
     detections = np.load(path_of_dir+"newfeat/"+file, allow_pickle=True, encoding='bytes')
 
     for i, dets in enumerate(tqdm(detections,'Extracting features')):
-        feat = np.zeros(352, dtype='float32')
+        feat = np.zeros(54, dtype='float32')
         for index,value in enumerate(dets):
             feat[index] = value
         #feat = dets

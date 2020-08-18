@@ -441,7 +441,7 @@ def correct_HM(path_of_folder):
             #here insert lool on each image file
             for image in tqdm.tqdm(image_files):
 
-                new_features = np.zeros((2, 352))
+                new_features = np.zeros((2, 54))  # size 2 X number of objects
                 n_frame = image.split("/")[-1].split("_")[-1].split(".")[0]  # number of the frame considered
                 #print(n_frame)
                 img = cv2.imread(image, 0)
@@ -494,7 +494,7 @@ def correct_HM(path_of_folder):
 
                         hand_center.append([p3,p1,p2])
 
-                    bar = []
+                    bar = []  # the weighted center of the hands
 
                     weight = 3
 
