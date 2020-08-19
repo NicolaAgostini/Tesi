@@ -189,7 +189,7 @@ def loadNPY(file="/Volumes/Bella_li/objs/OP01-R01-PastaSalad_detections.npy"):
     df_csv = pandas.read_csv('/Users/nicolago/Desktop/EPIC_noun_classes.csv')
     #print(df_csv[1])
 
-    start_from = 25890
+    start_from = 3245
 
     objs = np.load(file, allow_pickle=True)
     #print(objs[1])
@@ -206,10 +206,10 @@ def loadNPY(file="/Volumes/Bella_li/objs/OP01-R01-PastaSalad_detections.npy"):
                 if i > start_from:
                     image = cv2.imread("/Volumes/Bella_li/frames/" + vid + "/" + frames)
                     for n_obj in objs[count]:
-                        if n_obj[5]>0.70:  # if the confidence score is quite high
+                        if n_obj[5]>0.50:  # if the confidence score is quite high
                             #print(int(n_obj[1]))
                             image = cv2.rectangle(image, (int(n_obj[1]), int(n_obj[2])), (int(n_obj[3]), int(n_obj[4])), (255, 0, 0), 2)
-                            cv2.putText(image, df_csv.iat[int(n_obj[0]), 1], (int(n_obj[1]), int(n_obj[2]) + 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (36, 255, 12), 1)
+                            cv2.putText(image, df_csv.iat[int(n_obj[0]), 1], (int(n_obj[1]), int(n_obj[2]) + 10), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (36, 255, 12), 1)
                     cv2.imshow("framez", image)
 
                 else:
@@ -661,6 +661,7 @@ def split_val_test(path_of_test = "/Users/nicolago/Desktop/action_annotation/tes
                         writer_test.writerow([idx_test, v_name, start_sec, end_sec, action_id])
                         idx_test += 1
                     count += 1
+
 
 
 
