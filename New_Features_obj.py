@@ -20,6 +20,9 @@ for file in os.listdir(path_of_dir+"newfeat"):
         #print(feat.shape)
         key = video_name.format(i+1)
         #print(key)
-        #print(feat)
+        print(np.count_nonzero(feat))
+
+        """
         with env.begin(write=True) as txn:
             txn.put(key.encode(),feat)
+        """
