@@ -27,4 +27,4 @@ for file in os.listdir(path_of_dir+"newfeat"):
         with env.begin(write=True) as txn:
             txn.put(key.encode(),feat)
 
-    print("non vero feat = "+ str(n_feat))
+    print("not zero feat = " + str(n_feat))
