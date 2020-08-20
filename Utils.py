@@ -189,7 +189,7 @@ def loadNPY(file="/Volumes/Bella_li/objs/OP01-R01-PastaSalad_detections.npy"):
     df_csv = pandas.read_csv('/Users/nicolago/Desktop/EPIC_noun_classes.csv')
     #print(df_csv[1])
 
-    start_from = 3245
+    start_from = 17445
 
     objs = np.load(file, allow_pickle=True)
     #print(objs[1])
@@ -209,7 +209,7 @@ def loadNPY(file="/Volumes/Bella_li/objs/OP01-R01-PastaSalad_detections.npy"):
                         if n_obj[5]>0.50:  # if the confidence score is quite high
                             #print(int(n_obj[1]))
                             image = cv2.rectangle(image, (int(n_obj[1]), int(n_obj[2])), (int(n_obj[3]), int(n_obj[4])), (255, 0, 0), 2)
-                            cv2.putText(image, df_csv.iat[int(n_obj[0]), 1], (int(n_obj[1]), int(n_obj[2]) + 10), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (36, 255, 12), 1)
+                            cv2.putText(image, df_csv.iat[int(n_obj[0]), 1], (int(n_obj[1])-20, int(n_obj[2]) + 10), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (36, 255, 12), 2)
                     cv2.imshow("framez", image)
 
                 else:
@@ -664,6 +664,30 @@ def split_val_test(path_of_test = "/Users/nicolago/Desktop/action_annotation/tes
 
 
 
+
+
+def show_hand_mask(path = "/Volumes/Bella_li/OP06-R07-Pizza"):
+
+    image_files = [f for f in sorted(glob.glob(path + '/*.png'))]
+
+    for image in tqdm.tqdm(image_files):
+
+        img = cv2.imread(image, cv2.COLOR_BGR2GRAY)
+        num_labels, labels_im = cv2.connectedComponents(img)
+        print(img.shape)
+        if num_labels > 1:
+            labeled_img = img * 255
+
+            cv2.imshow('labeled.png', labeled_img)
+            k = cv2.waitKey(0)
+            if k == 27:  # Esc key to stop
+                break
+
+            if k == 115: # s to save
+                cv2.imwrite("bounding_boxes_example.jpg", labeled_img)
+
+            elif k == 32:  # a key to go on
+                continue
 
 
 
