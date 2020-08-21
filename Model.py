@@ -8,9 +8,8 @@ from torch.nn import functional as F
 class BaselineModel(torch.nn.Module):
     def __init__(self, batch_size, seq_len, input_size, dropout=0.8, num_classes=106):
         super(BaselineModel, self).__init__()
-        #self.lstm = torch.nn.LSTM(input_size[2], 1024, 1, batch_first=True)
-        self.branches = torch.nn.ModuleList([torch.nn.LSTM(input_size[0], 1024, 1, batch_first=True),
-                                             torch.nn.LSTM(input_size[1], 1024, 1, batch_first=True)])
+        self.lstm = torch.nn.LSTM(input_size[2], 1024, 1, batch_first=True)
+        #self.branches = torch.nn.ModuleList([torch.nn.LSTM(input_size[0], 1024, 1, batch_first=True),torch.nn.LSTM(input_size[1], 1024, 1, batch_first=True)])
         """
         self.branches = nn.ModuleDict({
             "rgb": torch.nn.LSTM(input_size[0], 1024, seq_len),  # input of lstm is 1024 (vector of input), hidden units are 1024, num layers is 14 (6 enc + 8 dec)

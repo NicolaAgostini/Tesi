@@ -24,7 +24,7 @@ print("DEVICE= "+device)
 
 # alpha = 0.2
 
-path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd"]
+#path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd"]
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd", root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd", root_path + "obj_FT"]  # the folders that contain the .mdb files
 
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd"]
@@ -33,7 +33,7 @@ path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcf
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd",root_path + "hand_obj_newfeat"]
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd",root_path + "obj_54_FT"]
 #path_to_lmdb = [root_path + "hand_obj_newfeat"]
-#path_to_lmdb = [root_path + "obj_54_FT"]
+path_to_lmdb = [root_path + "obj_54_FT"]
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "obj_54_FT"]
 """
 path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",
@@ -59,7 +59,7 @@ groundtruth_path_test = [root_path+"egtea/action_annotation/test_split1.txt",
 
 path_to_csv_trainval = [root_path+"egtea/training1.csv", root_path+"egtea/validation1.csv"]  # path of train val csv
 
-path_to_csv_test = root_path+"egtea/validation1.csv"  # for test dataloader
+path_to_csv_test = root_path+"egtea/test1.csv"  # for test dataloader
 
 
 #experiment = "lr5_3br_ls"
@@ -159,7 +159,7 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
     #criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="verb-noun", action_embeddings_csv_path="vn_prior.csv", reduce_time="mean")
-    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.6, smooth_prior="glove", action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean")
+    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.2, smooth_prior="glove", action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean")
     if mode == "train":
         train_val(model, [data_loader_train, data_loader_val], optimizer,epochs, criterion)  # with smoothed labels
     if mode == "test":
