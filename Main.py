@@ -65,7 +65,7 @@ path_to_csv_test = root_path+"egtea/test1.csv"  # for test dataloader
 #experiment = "lr5_3br_ls"
 saveModel = False
 best = 0
-mode = "train"
+mode = "test"
 
 ### SOME MODEL'S VARIABLES ###
 
