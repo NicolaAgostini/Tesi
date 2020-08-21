@@ -168,7 +168,6 @@ def main():
         print("Testing model" + str(best_perf))
         test_model(model, data_loader_test)
 
-    #train_val(model, [data_loader_train, data_loader_val], optimizer, epochs)
 
 
 
@@ -220,8 +219,6 @@ def train_val(model, loaders, optimizer, epochs, criterion, resume = False):
                     bs = y.shape[0]  # batch size
 
                     preds = model(x)
-
-
 
                     preds = preds.contiguous()
 
