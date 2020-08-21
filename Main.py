@@ -419,7 +419,7 @@ def test_model(model, data_loader_test):
             accuracy_meter.add(acc, bs)
 
         # log at the end of testing
-        print("top-k accuracy at 1 sec = " + accuracy_meter.value())
+        print("top-k accuracy at 1 sec = " + str(accuracy_meter.value()))
 
 
 if __name__ == '__main__':
