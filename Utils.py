@@ -622,17 +622,17 @@ def plot_frequency_actions():
 
 
 
-def split_val_test(path_of_test = "/Users/nicolago/Desktop/action_annotation/test_split1.txt"):
+def split_val_train(path_of_test = "/Users/nicolago/Desktop/action_annotation/train_split1.txt"):
     with open(path_of_test, 'r') as f:
-        with open("val1.csv", 'w+', newline='') as val:
-            with open("test1.csv", 'w+', newline='') as test:
+        with open("train1.csv", 'w+', newline='') as val:
+            with open("val1.csv", 'w+', newline='') as test:
                 writer_val = csv.writer(val)
                 writer_test = csv.writer(test)
                 count = 0
                 idx_val = 0
                 idx_test = 0
                 for line in f:
-                    if count%2 == 0:
+                    if count%10 == 0:
                         values = re.split("-| ", line)
                         v_name = values[0] + "-" + values[1] + "-" + values[2]
                         # start_time = values[3]  # Not used
