@@ -76,7 +76,7 @@ seq_len = 14
 learning_rate = 0.00001
 
 
-epochs = 30
+epochs = 60
 
 display_every = 10
 
