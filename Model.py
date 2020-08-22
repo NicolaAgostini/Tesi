@@ -23,7 +23,7 @@ class BaselineModel(torch.nn.Module):
         self.seq_len = seq_len
         self.batch_size = batch_size
         self.dropout = torch.nn.Dropout(dropout)
-        self.fc = torch.nn.Linear(1024*2, num_classes)  # without seq_len because i want my output on every timestamp from 0 to 2s of observations
+        self.fc = torch.nn.Linear(1024*4, num_classes)  # without seq_len because i want my output on every timestamp from 0 to 2s of observations
 
         #self.fc = torch.nn.Linear(1024*3, num_classes)
         self.num_classes = num_classes
