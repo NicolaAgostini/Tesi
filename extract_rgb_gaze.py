@@ -11,18 +11,18 @@ from os.path import basename
 from argparse import ArgumentParser
 
 
-print(torch.__version__)
+#print(torch.__version__)
 
-env = lmdb.open("/aulahomes2/2/2014/nagostin/Desktop/RGB_Gaze", map_size=1099511627776, lock=False)
+env = lmdb.open("/aulahomes2/2/2014/nagostin/Desktop/RGB_Gaze", map_size=1099511627776)
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 model = bninception(pretrained=None)
-state_dict = torch.load("/aulahomes2/2/2014/nagostin/Desktop/tsn-pytorch/egteabninception__rgb_model_best.pth.tar", map_location="cpu")['state_dict']
+state_dict = torch.load("/aulahomes2/2/2014/nagostin/Desktop/tsn-pytorch/egteabninception__rgb_model_best.pth.tar")['state_dict']
 state_dict = {k.replace('module.base_model.','') : v for k,v in state_dict.items()}
 model.load_state_dict(state_dict, strict=False)
 
-print(model)
+#print(model)
 
 model.last_linear = nn.Identity()
 model.global_pool = nn.AdaptiveAvgPool2d(1)
