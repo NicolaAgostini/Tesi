@@ -30,14 +30,13 @@ model.global_pool = nn.AdaptiveAvgPool2d(1)
 model.to(device)
 
 transform = transforms.Compose([
-    transforms.Resize([256, 454]),
+    transforms.Resize([256, 341]),
     transforms.ToTensor(),
     transforms.Lambda(lambda x: x[[2,1,0],...]*255), #to BGR
     transforms.Normalize(mean=[104, 117, 128],
                          std=[1, 1, 1]),
 ])
 
-imgs = sorted(glob('data/sample_rgb/*.jpg'))
 
 model.eval()
 for file in os.listdir("/aulahomes2/2/2014/nagostin/Desktop/frames/"):
