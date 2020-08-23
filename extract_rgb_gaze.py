@@ -11,7 +11,7 @@ from os.path import basename
 from argparse import ArgumentParser
 
 
-env = lmdb.open("/home/2/2014/nagostin/Desktop/RGB_Gaze", map_size=1099511627776)
+env = lmdb.open("/home/2/2014/nagostin/Desktop/RGB_Gaze", map_size=1099511627776, lock=False)
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
