@@ -20,6 +20,7 @@ state_dict = torch.load("/aulahomes2/2/2014/nagostin/Desktop/tsn-pytorch/egteabn
 state_dict = {k.replace('module.base_model.','') : v for k,v in state_dict.items()}
 model.load_state_dict(state_dict, strict=False)
 
+print(model)
 
 model.last_linear = nn.Identity()
 model.global_pool = nn.AdaptiveAvgPool2d(1)
