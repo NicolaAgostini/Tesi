@@ -11,12 +11,12 @@ from os.path import basename
 from argparse import ArgumentParser
 
 
-env = lmdb.open("/home/2/2014/nagostin/Desktop/RGB_Gaze", map_size=1099511627776, lock=False)
+env = lmdb.open("/aulahomes2/2/2014/nagostin/Desktop/RGB_Gaze", map_size=1099511627776, lock=False)
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 model = bninception(pretrained=None)
-state_dict = torch.load("/home/2/2014/nagostin/Desktop/tsn-pythorch/egteabninception__rgb_model_best.pth.tar")['state_dict']
+state_dict = torch.load("/aulahomes2/2/2014/nagostin/Desktop/tsn-pythorch/egteabninception__rgb_model_best.pth.tar")['state_dict']
 state_dict = {k.replace('module.base_model.','') : v for k,v in state_dict.items()}
 model.load_state_dict(state_dict, strict=False)
 
