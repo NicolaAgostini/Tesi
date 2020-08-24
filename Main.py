@@ -69,7 +69,7 @@ mode = "train"
 
 ### SOME MODEL'S VARIABLES ###
 
-input_dim = [1024, 1024, 54, 54]
+input_dim = [1024, 1024, 54, 54, 352]
 batch_size = 8
 seq_len = 14
 
