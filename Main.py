@@ -142,34 +142,33 @@ def main():
     #show_hand_mask()
 
 
+    criterion_list = [SmoothedCrossEntropy(device=device, smooth_factor=0.6, smooth_prior="uniform", action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean"),
+                      SmoothedCrossEntropy(device=device, smooth_factor=0.6, smooth_prior="verb-noun", action_embeddings_csv_path="vn_prior.csv", reduce_time="mean")]
+    for criterion in criterion_list:
+        model = BaselineModel(batch_size, seq_len, input_dim)
 
+        model.to(device)
+        print(model)
 
-    model = BaselineModel(batch_size, seq_len, input_dim)
+        #if mode == "train":
+        data_loader_train = get_dataset(path_to_csv_trainval[0], batch_size, 4)  # loader for training
+        data_loader_val = get_dataset(path_to_csv_trainval[1], batch_size, 4)  # loader for validation
 
-    model.to(device)
-    print(model)
+        #data_loader_train = get_mock_dataloader()
+        #data_loader_val = get_mock_dataloader()
 
-    #if mode == "train":
-    data_loader_train = get_dataset(path_to_csv_trainval[0], batch_size, 4)  # loader for training
-    data_loader_val = get_dataset(path_to_csv_trainval[1], batch_size, 4)  # loader for validation
+        optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-    #data_loader_train = get_mock_dataloader()
-    #data_loader_val = get_mock_dataloader()
+        #criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.6, smooth_prior="verb-noun", action_embeddings_csv_path="vn_prior.csv", reduce_time="mean")
+        #criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.6, smooth_prior="uniform", action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean")
+        if mode == "train":
+            train_val(model, [data_loader_train, data_loader_val], optimizer,epochs, criterion)  # with smoothed labels
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-
-    #criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.6, smooth_prior="verb-noun", action_embeddings_csv_path="vn_prior.csv", reduce_time="mean")
-    criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.6, smooth_prior="uniform", action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean")
-    if mode == "train":
-        train_val(model, [data_loader_train, data_loader_val], optimizer,epochs, criterion)  # with smoothed labels
-        criterion = SmoothedCrossEntropy(device=device, smooth_factor=0.6, smooth_prior="verb-noun",
-                                         action_embeddings_csv_path="vn_prior.csv", reduce_time="mean")
-        train_val(model, [data_loader_train, data_loader_val], optimizer, epochs, criterion)
-    if mode == "test":
-        data_loader_test = get_dataset(path_to_csv_test, batch_size, 4)
-        epoch, perf, best_perf = load_model(model)  # load the best model saved
-        print("Testing model" + str(best_perf))
-        test_model(model, data_loader_test)
+        #if mode == "test":
+            data_loader_test = get_dataset(path_to_csv_test, batch_size, 4)
+            epoch, perf, best_perf = load_model(model)  # load the best model saved
+            print("Testing model" + str(best_perf))
+            test_model(model, data_loader_test)
 
 
 
