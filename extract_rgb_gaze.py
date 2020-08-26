@@ -44,7 +44,7 @@ for file in os.listdir("/aulahomes2/2/2014/nagostin/Desktop/frames/"):
     video_name = file.split("_")[0] + '_frame_{:010d}.jpg'
     for i,im in enumerate(tqdm(sorted(os.listdir("/aulahomes2/2/2014/nagostin/Desktop/frames/"+ file+"/")))):
         key = video_name.format(i+1)
-        img = Image.open(im)
+        img = Image.open("/aulahomes2/2/2014/nagostin/Desktop/frames/"+ file+"/"+im)
         data = transform(img).unsqueeze(0).to(device)
         feat = model(data).squeeze().detach().cpu().numpy()
         with env.begin(write=True) as txn:
