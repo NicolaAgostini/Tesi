@@ -30,7 +30,7 @@ model.global_pool = nn.AdaptiveAvgPool2d(1)
 model.to(device)
 
 transform = transforms.Compose([
-    transforms.Resize([256, 341]),
+    transforms.Resize([256, 454]),
     transforms.ToTensor(),
     transforms.Lambda(lambda x: x[[2,1,0],...]*255), #to BGR
     transforms.Normalize(mean=[104, 117, 128],
