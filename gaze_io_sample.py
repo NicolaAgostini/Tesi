@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 from scipy import signal
+from PIL import Image, ImageDraw
+from collections import namedtuple
 
 
 def _str2frame(frame_str, fps=None):
@@ -209,6 +211,102 @@ def return_gaze_point(index_fr, file):
     f = signal.resample(test_data_01, number_files)
 
     return (f[index_fr][0]),(f[index_fr][1])
+
+
+def get_gaze_mask(gaze_point, image_size, mask_kind='soft', radius=60):
+    '''
+    Args:
+        input gaze_point: named tuple point thas stores x and y
+        input image_size: tuple that contains the image size (h, w)
+        input mask_kind: string in ['soft', 'hard']
+        input radius: radius of the circle in the mask
+
+    '''
+
+    # Retrieve image shape
+    h, w = image_size
+
+    # Soft mask
+    if mask_kind == 'soft':
+        def super_gaussian(x, center=None, radius=60):
+            def super_gaussian_i(x_i, center, radius):
+                if len(x_i.shape) == 1:
+                    x_i = x_i.reshape(-1, 1)
+                x_i = x_i - center
+                x_i = np.exp(- (np.dot(x_i.T, x_i) / (70 * radius)) ** 8)
+                return x_i
+
+            # Retrieve input shape
+            N, x_dim = x.shape
+
+            # Mean and sigma
+            if center is None:
+                center = np.zeros([x_dim, 1])
+            if isinstance(center, list) or isinstance(center, tuple):
+                center = np.array(center).reshape(x_dim, 1)
+
+            # Compute the bell function
+            x = np.array([super_gaussian_i(x_i, center=center, radius=radius) for x_i in x]).reshape(N, 1)
+            return x
+
+        num_points = 50
+        x_points = np.linspace(0, w, num_points)
+        y_points = np.linspace(0, h, num_points)
+        xv, yv = np.meshgrid(x_points, y_points)
+        mask = np.stack([yv, xv], axis=-1).reshape(-1, 2)
+        mask = super_gaussian(mask, center=[gaze_point.y, gaze_point.x], radius=radius).reshape(num_points, num_points)
+        mask = mask / mask.max()
+        mask = cv2.resize(mask, (w, h))
+        mask = np.stack([mask, mask, mask], axis=-1)
+
+    # Hard mask
+    elif mask_kind == 'hard':
+        mask = Image.new('RGB', (w, h))
+        draw = ImageDraw.Draw(mask)
+        draw.ellipse((gaze_point.x - radius, gaze_point.y - radius, gaze_point.x + radius, gaze_point.y + radius),
+                     fill=(255, 255, 255))
+        mask = np.array(mask)
+        mask = mask / mask.max()
+
+    else:
+        raise Exception(f'Error. Mask kind {mask_kind} not supported.')
+
+    return mask
+
+
+##################################################
+# Main
+##################################################
+
+def return_cropped_img(image, gaze_x, gaze_y, h, w, raggio, type = "hard"):
+    """
+    return the images cropped following the mask specification and the gaze point
+    :return:
+    """
+    # Set the seed
+    #np.random.seed(1234)
+
+    # Create a random image
+    #image = np.random.uniform(0, 1, size=(h, w, 3))
+
+
+    # Set the gaze point
+    Point = namedtuple('Point', ['x', 'y'])
+    gaze_point = Point(x=gaze_x, y=gaze_y)
+
+    # Create mask
+    if type == "hard":
+        mask_hard = get_gaze_mask(gaze_point, image_size=(h, w), mask_kind='hard', radius=raggio)
+        # Create image with gaze
+        image_gaze = image * mask_hard
+    elif type == "soft":
+        mask_soft = get_gaze_mask(gaze_point, image_size=(h, w), mask_kind='soft', radius=raggio)
+        image_gaze = image * mask_soft
+
+    return image_gaze
+
+
+
 
 
 def test_gaze(file = "OP01-R02-TurkeySandwich"):

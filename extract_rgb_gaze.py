@@ -9,6 +9,7 @@ import lmdb
 from tqdm import tqdm
 from os.path import basename
 from argparse import ArgumentParser
+from gaze_io_sample import *
 
 
 #print(torch.__version__)
@@ -45,7 +46,16 @@ for file in os.listdir("/aulahomes2/2/2014/nagostin/Desktop/frames/"):
     for i,im in enumerate(tqdm(sorted(os.listdir("/aulahomes2/2/2014/nagostin/Desktop/frames/"+ file+"/")))):
         key = video_name.format(i+1)
         img = Image.open("/aulahomes2/2/2014/nagostin/Desktop/frames/"+ file+"/"+im)
-        data = transform(img).unsqueeze(0).to(device)
-        feat = model(data).squeeze().detach().cpu().numpy()
+        gaze_center_x, gaze_center_y = return_gaze_point(i,file)  # sono normalizzati sulla grandezza dell'immagine
+        width, height = img.size
+        raggio = 80
+        pix = np.array(img)
+        gaze_center_x, gaze_center_y = gaze_center_x * width, gaze_center_y * height
+        x = return_cropped_img(pix, gaze_center_x, gaze_center_y, height, width, raggio, "soft")
+
+        im = Image.fromarray(np.uint8(x))  # to convert back to img pil
+
+        data = transform(im).unsqueeze(0).to(device)
+        feat = model(im).squeeze().detach().cpu().numpy()
         with env.begin(write=True) as txn:
             txn.put(key.encode(),feat.tobytes())
