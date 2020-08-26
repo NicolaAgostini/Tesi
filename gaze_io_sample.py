@@ -6,6 +6,7 @@ from PIL import Image
 from scipy import signal
 from PIL import Image, ImageDraw
 from collections import namedtuple
+import cv2
 
 
 def _str2frame(frame_str, fps=None):
