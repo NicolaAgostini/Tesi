@@ -54,7 +54,7 @@ for file in os.listdir("/aulahomes2/2/2014/nagostin/Desktop/frames/"):
         x = return_cropped_img(pix, gaze_center_x, gaze_center_y, height, width, raggio, "soft")
 
         im = Image.fromarray(np.uint8(x))  # to convert back to img pil
-
+        im.save("niang", "JPEG")
         data = transform(im).unsqueeze(0).to(device)
         feat = model(data).squeeze().detach().cpu().numpy()
         with env.begin(write=True) as txn:
