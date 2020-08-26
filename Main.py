@@ -24,11 +24,12 @@ print("DEVICE= "+device)
 
 # alpha = 0.2
 
-path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd"]
+#path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd"]
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd", root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd", root_path + "obj"]  # the folders that contain the .mdb files
 
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd"]
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd"]
+path_to_lmdb = [root_path + "obj"]
 #path_to_lmdb = [root_path + "obj_FT"]
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd",root_path + "hand_obj_newfeat"]
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd",root_path + "obj_54_FT"]
@@ -76,7 +77,7 @@ seq_len = 14
 learning_rate = 0.00001
 
 
-epochs = 15
+epochs = 60
 
 display_every = 10
 
@@ -142,7 +143,9 @@ def main():
     #show_hand_mask()
 
 
-    criterion_list = [SmoothedCrossEntropy(device=device, smooth_factor=0.6, smooth_prior="uniform",
+    criterion_list = [SmoothedCrossEntropy(device=device, smooth_factor=0.6, smooth_prior="glove",
+                                           action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean"),
+                      SmoothedCrossEntropy(device=device, smooth_factor=0.6, smooth_prior="uniform",
                                            action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean"),
                       SmoothedCrossEntropy(device=device, smooth_factor=0.6, smooth_prior="verb-noun", action_embeddings_csv_path="vn_prior.csv", reduce_time="mean")]
     for criterion in criterion_list:
