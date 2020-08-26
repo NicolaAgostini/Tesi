@@ -56,6 +56,6 @@ for file in os.listdir("/aulahomes2/2/2014/nagostin/Desktop/frames/"):
         im = Image.fromarray(np.uint8(x))  # to convert back to img pil
 
         data = transform(im).unsqueeze(0).to(device)
-        feat = model(im).squeeze().detach().cpu().numpy()
+        feat = model(data).squeeze().detach().cpu().numpy()
         with env.begin(write=True) as txn:
             txn.put(key.encode(),feat.tobytes())
