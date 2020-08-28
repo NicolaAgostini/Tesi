@@ -195,7 +195,7 @@ def return_gaze_point(index_fr, file):
 
     :param index_fr: the index of the frame to get gaze info (index is in 30 fps format)
     :param file: name of file gaze
-    :return: two cordinates of gaze x,y
+    :return: two cordinates of gaze x,y normalized on the image size
     """
     """Sample for gaze IO"""
     # gaze type
@@ -282,14 +282,15 @@ def get_gaze_mask(gaze_point, image_size, mask_kind='soft', radius=60):
 def return_cropped_img(image, gaze_x, gaze_y, h, w, raggio, type = "hard"):
     """
     return the images cropped following the mask specification and the gaze point
-    :return:
+    :param image: the image to be cropped as a numpy array
+    :param gaze_x: the x point of the gaze
+    :param gaze_y:
+    :param h: the height of the image
+    :param w:
+    :param raggio: the radius of the gaze cropping
+    :type type: type of label smoothing
+    :return: the image cropped following the gaze
     """
-    # Set the seed
-    #np.random.seed(1234)
-
-    # Create a random image
-    #image = np.random.uniform(0, 1, size=(h, w, 3))
-
 
     # Set the gaze point
     Point = namedtuple('Point', ['x', 'y'])
@@ -311,6 +312,11 @@ def return_cropped_img(image, gaze_x, gaze_y, h, w, raggio, type = "hard"):
 
 
 def test_gaze(file = "OP01-R02-TurkeySandwich"):
+    """
+    A simple function to test the gaze data
+    :param file:
+    :return:
+    """
 
     test_file_01 = '/Users/nicolago/Desktop/gaze_data/gaze_data/' + file + '.txt'
     test_data_01 = parse_gtea_gaze(test_file_01)

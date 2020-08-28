@@ -37,7 +37,7 @@ class BaselineModel(torch.nn.Module):
 
         # LSTM forward
         x = []
-
+        ### For multiple branches ###
         """
         for i, j in enumerate(feat):
             #print("INPUT " + str(i))

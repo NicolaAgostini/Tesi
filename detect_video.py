@@ -122,39 +122,23 @@ def main(args):
     dummy_coco_dataset = dummy_datasets.get_coco_dataset()
 
     for file in os.listdir("/aulahomes2/2/2014/nagostin/Desktop/frames/"):
-    #file = "OP01-R01-PastaSalad"
         print(file)
         all_boxes = []
 
         for img in tqdm(sorted(os.listdir("/aulahomes2/2/2014/nagostin/Desktop/frames/"+ file+"/"))):
             if img.endswith(".jpg"):
 
-
-                #vid = cv2.VideoCapture("/aulahomes2/2/2014/nagostin/Desktop/frames/"+file)
-
                 im = cv2.imread("/aulahomes2/2/2014/nagostin/Desktop/frames/"+ file+ "/"+img)
 
-
-
-
-
                 timers = defaultdict(Timer)
-                t = time.time()
+                t = time.time()  # if you want to print the time of inference
                 with c2_utils.NamedCudaScope(0):
                     cls_boxes, cls_segms, cls_keyps = infer_engine.im_detect_all(
                         model, im, None, timers=timers
                     )
-                    # sarebbe la media di tutti i RoIs dell'ultimo FC layer
-                    #print(np.mean(workspace.FetchBlob(core.ScopedName('fc7')), axis=0))
-                    #result = np.mean(workspace.FetchBlob(core.ScopedName('fc7')), axis=0)
-                    #print(cls_boxes)
-                all_boxes.append(format_dets(cls_boxes))  # for standard 352 feature
-                #all_boxes.append(result)
 
+                all_boxes.append(format_dets(cls_boxes))  # for standard object features
 
-
-
-        #np.save("/aulahomes2/2/2014/nagostin/Desktop/video/"+file+'_detections',all_boxes)
         np.save("/aulahomes2/2/2014/nagostin/Desktop/video/" + file + '_detections', all_boxes)
 
 if __name__ == '__main__':

@@ -12,6 +12,7 @@ from argparse import ArgumentParser
 from gaze_io_sample import *
 
 
+### TO EXTRACT THE GAZED RGB FEATURE ###
 #print(torch.__version__)
 
 env = lmdb.open("/aulahomes2/2/2014/nagostin/Desktop/RGB_Gaze", map_size=1099511627776)

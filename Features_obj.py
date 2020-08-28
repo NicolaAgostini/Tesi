@@ -5,6 +5,9 @@ import os
 
 
 path_of_dir = "/home/2/2014/nagostin/Desktop/"
+
+### OBJECT FEATURE EXTRACTION ###
+
 """
 dict = {}
 count=0

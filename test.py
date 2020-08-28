@@ -14,6 +14,9 @@ import subprocess
 import shlex
 import json
 
+
+# SOME TESTS ON THE PROJECTS #
+
 def get_rotation(file_path_with_file_name):
     """
     Function to get the rotation of the input video file.

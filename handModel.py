@@ -75,8 +75,6 @@ class Dataset(BaseDataset):
             self.masks_fps = [os.path.join(masks_dir, image_id) for image_id in self.ids]
         else:
             self.masks_fps = masks_dir
-            # convert str names to class values on masks
-        #self.class_values = [self.CLASSES.index(cls.lower()) for cls in classes]
 
         self.augmentation = augmentation
         self.preprocessing = preprocessing
@@ -114,14 +112,9 @@ class Dataset(BaseDataset):
         return len(self.ids)
 
 dataset = Dataset(x_train_dir, y_train_dir)
-#print(type(dataset[4][0]))
-"""
-image, mask = dataset[4] # get some sample
-visualize(
-    image=image,
-    cars_mask=mask.squeeze(),
-)
-"""
+
+
+### we didin't used augmentation for training but it can be useful to improve the performance ###
 def get_training_augmentation():
     train_transform = [
 
@@ -178,13 +171,9 @@ def pad_with(vector, pad_width, iaxis, kwargs):
 
 def to_tensor(x, **kwargs):  # MAKE SURE IMAGES SHAPE ARE DIVISIBLE BY 32 since they will be subsampled 5 times
     if x.shape[-1] > 3:
-        #print(x.shape)
-        #x = np.expand_dims(x, axis=2)
+
         x = np.stack((x,) * 1, axis=-1)
         x = x/255
-        #print(x.shape)
-        #print(x)
-
 
     npad = ((0, 0), (5, 6), (0, 0))
     x = np.pad(x, pad_width=npad, mode='constant', constant_values=0)
@@ -209,26 +198,19 @@ def get_preprocessing(preprocessing_fn):
     ]
     return albu.Compose(_transform)
 
-
+"""
 augmented_dataset = Dataset(
     x_train_dir,
     y_train_dir,
     augmentation=get_training_augmentation()
 )
-
-# same image with different random transforms
-"""
-for i in range(3):
-    image, mask = augmented_dataset[9]
-    visualize(image=image, mask=mask.squeeze())
 """
 
 ENCODER = 'se_resnext50_32x4d'
 ENCODER_WEIGHTS = 'imagenet'
 CLASSES = ['car']
-ACTIVATION = 'sigmoid' # could be None for logits or 'softmax2d' for multicalss segmentation
+ACTIVATION = 'sigmoid'  # could be None for logits or 'softmax2d' for multicalss segmentation
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-#DEVICE = 'cpu'
 
 # create segmentation model with pretrained encoder
 model = smp.FPN(
@@ -253,11 +235,6 @@ valid_dataset = Dataset(
 
     preprocessing=get_preprocessing(preprocessing_fn)
 )
-
-"""
-image, mask = train_dataset[81]
-visualize(image=image, mask=mask.squeeze())
-"""
 
 train_loader = DataLoader(train_dataset, batch_size=2, shuffle=True, num_workers=4)
 valid_loader = DataLoader(valid_dataset, batch_size=2, shuffle=False, num_workers=4)
@@ -312,7 +289,7 @@ for i in range(0, 5):
 
 
 #best_model = torch.load('./best_model.pth', map_location=torch.device('cpu'))  # load best model into cpu
-best_model = torch.load('./best_model.pth')
+best_model = torch.load('./best_model.pth')  # load best model into gpu
 ### TEST ###  # best model giving IoU 0.80
 test_dataset = Dataset(
     x_test_dir,
@@ -353,7 +330,8 @@ def predict_folder(best_model, pathFrames = "/home/2/2014/nagostin/Desktop/frame
             )
 
 predict_folder(best_model)
-#  show a sample of predictions
+
+###  show a sample of predictions  ###
 """
 for i in range(10):
     n = np.random.choice(len(test_dataset))

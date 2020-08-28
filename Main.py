@@ -19,11 +19,6 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print("DEVICE= "+device)
 
 
-
-# mode = "train"  # if train or test
-
-# alpha = 0.2
-
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd"]
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd", root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd", root_path + "obj"]  # the folders that contain the .mdb files
 
@@ -63,10 +58,10 @@ path_to_csv_trainval = [root_path+"egtea/training1.csv", root_path+"egtea/valida
 path_to_csv_test = root_path+"egtea/test1.csv"  # for test dataloader
 
 
-#experiment = "lr5_3br_ls"
+
 saveModel = False
 best = 0
-mode = "train"
+mode = "train" # if train or test
 
 ### SOME MODEL'S VARIABLES ###
 
@@ -322,6 +317,16 @@ def save_model(model, epoch, perf, best_perf, path_to_model = "/home/2/2014/nago
 
 
 def log(mode, epoch, loss_meter, accuracy_meter, best_perf=None, green=False):
+    """
+    To log each (fraction of) epochs
+    :param mode:
+    :param epoch:
+    :param loss_meter:
+    :param accuracy_meter:
+    :param best_perf:
+    :param green:
+    :return:
+    """
     if mode == 0:
         mode = "Training"
     elif mode == 1:

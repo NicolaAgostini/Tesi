@@ -6,6 +6,8 @@ import os
 
 path_of_dir = "/home/2/2014/nagostin/Desktop/"
 
+### CODE TO EXTRACT THE NEW FEATURE HAND OBJECT INTERACTION HOI ###
+
 for file in os.listdir(path_of_dir+"newfeat"):
     print("Processing "+ file)
     env = lmdb.open(path_of_dir+'hand_obj_newfeat', map_size=1099511627776)
@@ -27,4 +29,4 @@ for file in os.listdir(path_of_dir+"newfeat"):
         with env.begin(write=True) as txn:
             txn.put(key.encode(),feat)
 
-    print("not zero feat = " + str(n_feat))
+    #print("not zero feat = " + str(n_feat))

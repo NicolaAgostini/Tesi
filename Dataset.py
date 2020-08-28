@@ -10,7 +10,7 @@ from Main import root_path
 
 def txt_to_csv(path_oftxt, which_part):
     """
-    from the txt files return the training csv in which there are annotations well formed for lmdb features
+    from the txt files return the (training/val/test) file csv in which there are annotations well formed for action
     :param path_oftxt:
     :return:
     """
@@ -56,8 +56,6 @@ def read_representations(frames, env):
         features.append(data)
     # convert list to numpy array
     features = np.array(features)
-
-    #print("features dim " + str(features.shape))
 
     return features  # dim 14 X 1024 for rgb and flow and 352 for obj
 
@@ -118,10 +116,8 @@ class Dataset(data.Dataset):
                 self.past_frames.append(self.get_frames(frames, value.video))
                 # now past frames are the list in correct format of the frames in lmdb
 
-                self.ids.append(value.id)  # append the id of the video  # FIXME : ID OR CLIP NAME ???
+                self.ids.append(value.id)  # append the id of the video
 
-                # handle whether a list of labels is required (e.g., [verb, noun]), rather than a single action
-                #print(value.action)
                 self.labels.append(value.action)
 
             else:  # if the sequence is invalid then insert in the list of invalid sequence
@@ -141,8 +137,7 @@ class Dataset(data.Dataset):
         # in this case "2" means, sample 2s before the beginning of the action
         time_stamps = np.arange(self.alphaa, self.alphaa * (self.sequence_length + 1), self.alphaa)[::-1]  # reverse order
 
-        # compute the time stamp corresponding to the beginning of the action
-        #end_time_stamp = point / self.fps
+        # compute the time stamp corresponding to the beginning of the action, it is in seconds
         end_time_stamp = point
         # subtract time stamps to the timestamp of the last frame
         time_stamps = end_time_stamp - time_stamps

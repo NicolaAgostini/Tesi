@@ -632,7 +632,7 @@ def split_val_train(path_of_test = "/Users/nicolago/Desktop/action_annotation/tr
                 idx_val = 0
                 idx_test = 0
                 for line in f:
-                    if count%10 == 0:
+                    if count%7 == 0:
                         values = re.split("-| ", line)
                         v_name = values[0] + "-" + values[1] + "-" + values[2]
                         # start_time = values[3]  # Not used
