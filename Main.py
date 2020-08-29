@@ -131,7 +131,7 @@ def main():
 
 
     #split_frames_objDect("/Volumes/Bella_li/frames")
-    path = initialize_trainval_csv(2)  # to generate training and validation csv depending on split defined by authors of egtea gaze +
+    path = initialize_trainval_csv(3)  # to generate training and validation csv depending on split defined by authors of egtea gaze +
 
     #smoothed_labels = label_smoothing("glove")  # for smoothed labels
     #split_val_train()
