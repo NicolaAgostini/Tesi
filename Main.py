@@ -131,13 +131,13 @@ def main():
 
 
     #split_frames_objDect("/Volumes/Bella_li/frames")
-    #path = initialize_trainval_csv(1)  # to generate training and validation csv depending on split defined by authors of egtea gaze +
+    path = initialize_trainval_csv(2)  # to generate training and validation csv depending on split defined by authors of egtea gaze +
 
     #smoothed_labels = label_smoothing("glove")  # for smoothed labels
     #split_val_train()
     #show_hand_mask()
 
-
+    """
     criterion_list = [SmoothedCrossEntropy(device=device, smooth_factor=0.6, smooth_prior="glove",
                                            action_embeddings_csv_path="action_embeddings.csv", reduce_time="mean"),
                       SmoothedCrossEntropy(device=device, smooth_factor=0.6, smooth_prior="uniform",
@@ -170,7 +170,7 @@ def main():
             test_model(model, data_loader_test)
 
 
-
+    """
 
 
 def train_val(model, loaders, optimizer, epochs, criterion, resume = False):
