@@ -19,7 +19,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print("DEVICE= "+device)
 
 
-#path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd"]
+path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s2_rgb_model_best_fcfull_hd",root_path + "egtea/TSN-C_3_egtea_action_CE_s2_flow_model_best_fcfull_hd"]
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd", root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd", root_path + "obj"]  # the folders that contain the .mdb files
 
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd"]
@@ -31,13 +31,13 @@ print("DEVICE= "+device)
 #path_to_lmdb = [root_path + "hand_obj_newfeat"]
 #path_to_lmdb = [root_path + "obj_54_FT"]
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "obj_54_FT"]
-
+"""
 path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s3_rgb_model_best_fcfull_hd",
                 root_path + "egtea/TSN-C_3_egtea_action_CE_s3_flow_model_best_fcfull_hd",
                 root_path + "obj_54_FT",
                 root_path + "hand_obj_newfeat"]
                 
-
+"""
 
 ### PATH OF TXT FOR TRAINING AND VALIDATION ###
 
@@ -53,7 +53,7 @@ groundtruth_path_test = [root_path+"egtea/action_annotation/test_split1.txt",
 ###
 
 
-path_to_csv_trainval = [root_path+"egtea/training3.csv", root_path+"egtea/validation3.csv"]  # path of train val csv
+path_to_csv_trainval = [root_path+"egtea/training2.csv", root_path+"egtea/validation2.csv"]  # path of train val csv
 
 path_to_csv_test = root_path+"egtea/test1.csv"  # for test dataloader
 
@@ -72,7 +72,7 @@ seq_len = 14
 learning_rate = 0.00001
 
 
-epochs = 30
+epochs = 20
 
 display_every = 10
 
