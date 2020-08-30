@@ -213,6 +213,22 @@ def return_gaze_point(index_fr, file):
 
     return (f[index_fr][0]),(f[index_fr][1])
 
+def gaze_arrays(file):
+    """
+    operazioni costose
+    :param file:
+    :return:
+    """
+    test_file_01 = '/home/2/2014/nagostin/Desktop/gaze_data/gaze_data/' + file + '.txt'
+    test_data_01 = parse_gtea_gaze(test_file_01)
+
+    list = os.listdir("/home/2/2014/nagostin/Desktop/frames/" + file)  # dir is your directory path
+    number_files = len(list)
+
+    f = signal.resample(test_data_01, number_files)
+
+    return f
+
 
 def get_gaze_mask(gaze_point, image_size, mask_kind='soft', radius=60):
     '''

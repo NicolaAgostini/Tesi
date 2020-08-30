@@ -44,10 +44,12 @@ model.eval()
 for file in os.listdir("/aulahomes2/2/2014/nagostin/Desktop/frames/"):
     print(file)
     video_name = file.split("_")[0] + '_frame_{:010d}.jpg'
+    f = gaze_arrays(file)
     for i,im in enumerate(tqdm(sorted(os.listdir("/aulahomes2/2/2014/nagostin/Desktop/frames/"+ file+"/")))):
         key = video_name.format(i+1)
         img = Image.open("/aulahomes2/2/2014/nagostin/Desktop/frames/"+ file+"/"+im)
-        gaze_center_x, gaze_center_y = return_gaze_point(i,file)  # sono normalizzati sulla grandezza dell'immagine
+        #gaze_center_x, gaze_center_y = return_gaze_point(i,file)  # sono normalizzati sulla grandezza dell'immagine
+        gaze_center_x, gaze_center_y = f[i][0], f[i][1]
         width, height = img.size
         raggio = 80
         pix = np.array(img)
