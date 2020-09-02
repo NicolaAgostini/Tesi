@@ -31,12 +31,14 @@ print("DEVICE= "+device)
 #path_to_lmdb = [root_path + "hand_obj_newfeat"]
 #path_to_lmdb = [root_path + "obj_54_FT"]
 #path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",root_path + "obj_54_FT"]
-
+path_to_lmdb = [root_path + "RGB_Gaze_s1"]
+"""
 path_to_lmdb = [root_path + "egtea/TSN-C_3_egtea_action_CE_s1_rgb_model_best_fcfull_hd",
                 root_path + "egtea/TSN-C_3_egtea_action_CE_s1_flow_model_best_fcfull_hd",
                 root_path + "obj_54_FT",
                 root_path + "hand_obj_newfeat",
                 root_path + "RGB_Gaze_s1"]
+"""
                 
 
 
